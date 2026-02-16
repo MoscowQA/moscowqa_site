@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set active_page = 'events' %}
+{% set now_year = 2026 %}
+
+{% block title %}Мероприятия — {{ site.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Мероприятия</h1>
+    <p class="text-muted">Все митапы и воркшопы Moscow QA — {{ events | length }} мероприятий</p>
+
+    {% for event in events %}
+    <div class="item">
+        <div class="item__image item__image--s">
+            <div class="event-badge">#{{ event.number }}</div>
+        </div>
+        <div class="item__content">
+            <div class="item__meta">
+                <time datetime="{{ event.date }}">{{ event.date }}</time>
+                {% if event.company %} &mdash; {{ event.company }}{% endif %}
+                {% if event.type %}
+                <span class="tag tag--online">{{ event.type }}</span>
+                {% endif %}
+                {% if event.completed %}
+                <span class="tag tag--completed">Завершено</span>
+                {% else %}
+                <span class="tag tag--upcoming">Скоро</span>
+                {% endif %}
+            </div>
+            <div class="item__title">
+                <a href="/events/{{ event.slug }}/">{{ event.title }}</a>
+            </div>
+            <p>{{ event.short_description }}</p>
+            {% if event.talks %}
+            <div class="text-muted" style="font-size: 0.85rem;">
+                {% for talk in event.talks %}
+                {{ talk.title }}{% if talk.speakers %} ({{ talk.speakers | join(', ') }}){% endif %}{% if not loop.last %}; {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% set active_page = 'index' %}
+{% set now_year = 2026 %}
+
+{% block title %}{{ site.title }} — {{ site.description }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero__content">
+        <h1 class="hero__title">Moscow <span>QA</span></h1>
+        <p class="hero__subtitle">
+            Сообщество тестировщиков Москвы. Регулярные митапы, доклады и нетворкинг
+            для всех, кто связан с обеспечением качества ПО.
+        </p>
+        <div class="hero__actions">
+            <a href="{{ site.telegram }}" class="btn btn--primary">Telegram</a>
+            <a href="/events/" class="btn btn--outline">Мероприятия</a>
+            <a href="/cfp/" class="btn btn--outline">Стать спикером</a>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="panel">
+        <h3>Для докладчиков</h3>
+        <p>
+            Мы всегда рады новым докладам. Чтобы стать докладчиком на нашем
+            митапе, нужно заполнить специальную форму. Подать заявку и
+            ознакомиться с информацией для спикеров можно <a href="/cfp/">тут</a>.
+        </p>
+    </div>
+
+    {% if latest_events %}
+    <section class="section">
+        <h2 class="section__title">Мероприятия</h2>
+        {% for event in latest_events %}
+        <div class="item">
+            <div class="item__image item__image--s">
+                <div class="event-badge">#{{ event.number }}</div>
+            </div>
+            <div class="item__content">
+                <div class="item__meta">
+                    <time datetime="{{ event.date }}">{{ event.date }}</time>
+                    {% if event.company %} &mdash; {{ event.company }}{% endif %}
+                    {% if event.completed %}
+                    <span class="tag tag--completed">Завершено</span>
+                    {% else %}
+                    <span class="tag tag--upcoming">Скоро</span>
+                    {% endif %}
+                </div>
+                <div class="item__title">
+                    <a href="/events/{{ event.slug }}/">{{ event.title }}</a>
+                </div>
+                <p>{{ event.short_description }}</p>
+                {% if event.talks %}
+                <div class="text-muted" style="font-size: 0.85rem;">
+                    Доклады: {{ event.talks | map(attribute='title') | join(', ') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        <p><a href="/events/">Все мероприятия ({{ events | length }})</a></p>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

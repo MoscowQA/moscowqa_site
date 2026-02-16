@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% set active_page = 'events' %}
+{% set now_year = 2026 %}
+
+{% block title %}{{ event.title }} — {{ site.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <article>
+        <h1>{{ event.title }}</h1>
+
+        <div class="event-meta">
+            <div class="event-meta__item">
+                <span class="event-meta__label">Когда</span>
+                <span><time datetime="{{ event.date }}">{{ event.date }}</time></span>
+            </div>
+            {% if event.address %}
+            <div class="event-meta__item">
+                <span class="event-meta__label">Где</span>
+                <span>{{ event.address }}{% if event.company %} ({{ event.company }}){% endif %}</span>
+            </div>
+            {% endif %}
+            {% if event.registration_link %}
+            <div class="event-meta__item">
+                <span class="event-meta__label">Регистрация</span>
+                <span><a href="{{ event.registration_link }}">Зарегистрироваться</a></span>
+            </div>
+            {% endif %}
+            {% if event.video_link %}
+            <div class="event-meta__item">
+                <span class="event-meta__label">{{ 'Запись' if event.completed else 'Трансляция' }}</span>
+                <span><a href="{{ event.video_link }}">Смотреть</a></span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if event.body %}
+        <section class="section md-content">
+            {{ event.body | safe }}
+        </section>
+        {% endif %}
+
+        {% if event.talks %}
+        <section class="section">
+            <h2>{{ 'О чём говорили' if event.completed else 'О чём будем говорить' }}</h2>
+            {% for talk in event.talks %}
+            <div class="item">
+                <div class="item__content">
+                    <div class="item__title">{{ talk.title }}</div>
+                    {% if talk.speakers %}
+                    <div class="item__meta">
+                        {% for speaker_name in talk.speakers %}
+                        <a href="/speakers/{{ speaker_name | lower | replace(' ', '-') }}/">{{ speaker_name }}</a>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        {% if talk.company %} &mdash; {{ talk.company }}{% endif %}
+                    </div>
+                    {% endif %}
+                    {% if talk.description %}
+                    <p>{{ talk.description }}</p>
+                    {% endif %}
+                    <div class="talk-links">
+                        {% if talk.slides_url %}
+                        <a href="{{ talk.slides_url }}">&#128196; Слайды</a>
+                        {% endif %}
+                        {% if talk.record %}
+                        <a href="{{ talk.record }}">&#9654; Запись</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        <p><a href="/events/">&larr; Все мероприятия</a></p>
+    </article>
+</div>
+{% endblock %}
