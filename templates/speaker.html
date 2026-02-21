@@ -1,74 +1,68 @@
 {% extends "base.html" %}
 {% set active_page = 'speakers' %}
-{% set now_year = 2026 %}
 
 {% block title %}{{ speaker.name }} — {{ site.title }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <article>
-        <div class="item">
-            <div class="item__image item__image--m">
-                <div class="speaker-card__photo" style="width: 150px; height: 150px;">
-                    <div class="speaker-card__placeholder">&#128100;</div>
+<main class="main">
+    <div class="container">
+        <div class="speaker-detail">
+            <div class="speaker-detail__photo">
+                <div class="speaker-detail__photo-img">
+                    <div class="speaker-card__placeholder" style="font-size: 5rem;">&#128100;</div>
                 </div>
             </div>
-            <div class="item__content">
-                <h1>{{ speaker.name }}</h1>
+            <div class="speaker-detail__info">
+                <h1 class="speaker-detail__name">{{ speaker.name }}</h1>
                 {% if speaker.company %}
-                <p class="text-muted">{{ speaker.company }}</p>
+                <p class="speaker-detail__company">{{ speaker.company }}</p>
                 {% endif %}
 
                 {% if speaker.body %}
-                <div class="md-content">{{ speaker.body | safe }}</div>
+                <div class="speaker-detail__bio md-content">{{ speaker.body | safe }}</div>
                 {% endif %}
 
-                <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                <div class="speaker-detail__social">
                     {% if speaker.telegram %}
-                    <div>Telegram: <a href="https://t.me/{{ speaker.telegram }}">@{{ speaker.telegram }}</a></div>
+                    <a href="https://t.me/{{ speaker.telegram }}">Telegram</a>
                     {% endif %}
                     {% if speaker.github %}
-                    <div>GitHub: <a href="https://github.com/{{ speaker.github }}">@{{ speaker.github }}</a></div>
+                    <a href="https://github.com/{{ speaker.github }}">GitHub</a>
                     {% endif %}
                     {% if speaker.twitter %}
-                    <div>Twitter: <a href="https://twitter.com/{{ speaker.twitter }}">@{{ speaker.twitter }}</a></div>
+                    <a href="https://twitter.com/{{ speaker.twitter }}">Twitter</a>
                     {% endif %}
                 </div>
             </div>
         </div>
 
         {% if speaker_talks %}
-        <section class="section">
-            <h2>Доклады</h2>
+        <section class="section speaker-talks">
+            <h2 class="section__title" style="color: var(--gray-900);">Доклады</h2>
             {% for talk in speaker_talks %}
-            <div class="item">
-                <div class="item__image item__image--s">
-                    <div class="event-badge event-badge--small">#{{ talk.event.number }}</div>
+            <div class="talk-item">
+                <div class="talk-item__meta">
+                    <a href="{{ base }}/events/{{ talk.event.slug }}/">{{ talk.event.title }}</a>,
+                    <time datetime="{{ talk.event.date }}">{{ talk.event.date }}</time>
                 </div>
-                <div class="item__content">
-                    <div class="item__meta">
-                        <a href="{{ base }}/events/{{ talk.event.slug }}/">{{ talk.event.title }}</a>,
-                        <time datetime="{{ talk.event.date }}">{{ talk.event.date }}</time>
-                    </div>
-                    <div class="item__title">{{ talk.title }}</div>
-                    {% if talk.description %}
-                    <p>{{ talk.description }}</p>
+                <div class="talk-item__title">{{ talk.title }}</div>
+                {% if talk.description %}
+                <p class="talk-item__desc">{{ talk.description }}</p>
+                {% endif %}
+                <div class="talk-links">
+                    {% if talk.slides_url %}
+                    <a href="{{ talk.slides_url }}">&#128196; Слайды</a>
                     {% endif %}
-                    <div class="talk-links">
-                        {% if talk.slides_url %}
-                        <a href="{{ talk.slides_url }}">&#128196; Слайды</a>
-                        {% endif %}
-                        {% if talk.record %}
-                        <a href="{{ talk.record }}">&#9654; Запись</a>
-                        {% endif %}
-                    </div>
+                    {% if talk.record %}
+                    <a href="{{ talk.record }}">&#9654; Запись</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
         </section>
         {% endif %}
 
-        <p><a href="{{ base }}/speakers/">&larr; Все спикеры</a></p>
-    </article>
-</div>
+        <p class="back-link"><a href="{{ base }}/speakers/">&larr; Все докладчики</a></p>
+    </div>
+</main>
 {% endblock %}

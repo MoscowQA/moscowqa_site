@@ -5,7 +5,6 @@ Reads markdown content from content/ directory, applies Jinja2 templates,
 and outputs static HTML to dist/ directory.
 """
 import os
-import sys
 import shutil
 import yaml
 import markdown

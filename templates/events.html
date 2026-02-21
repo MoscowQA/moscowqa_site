@@ -1,45 +1,56 @@
 {% extends "base.html" %}
-{% set active_page = 'events' %}
-{% set now_year = 2026 %}
+{% set active_page = 'index' %}
 
 {% block title %}Мероприятия — {{ site.title }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Мероприятия</h1>
-    <p class="text-muted">Все митапы и воркшопы Moscow QA — {{ events | length }} мероприятий</p>
+<main class="main">
+    <div class="container">
+        <h2 class="section__title">Все мероприятия</h2>
+        <p class="text-muted" style="margin-bottom: 2rem;">{{ events | length }} мероприятий Moscow QA</p>
 
-    {% for event in events %}
-    <div class="item">
-        <div class="item__image item__image--s">
-            <div class="event-badge">#{{ event.number }}</div>
-        </div>
-        <div class="item__content">
-            <div class="item__meta">
-                <time datetime="{{ event.date }}">{{ event.date }}</time>
-                {% if event.company %} &mdash; {{ event.company }}{% endif %}
-                {% if event.type %}
-                <span class="tag tag--online">{{ event.type }}</span>
-                {% endif %}
-                {% if event.completed %}
-                <span class="tag tag--completed">Завершено</span>
-                {% else %}
-                <span class="tag tag--upcoming">Скоро</span>
-                {% endif %}
+        {% for event in events %}
+        <article class="event-card">
+            <div class="event-card__inner">
+                <div class="event-card__badge" style="position: relative;">
+                    <span class="event-card__number">{{ event.number }}</span>
+                    <span class="event-card__label">MoscowQA</span>
+                    {% if not event.completed %}
+                    <span class="event-card__tag--upcoming">Предстоящее</span>
+                    {% endif %}
+                </div>
+                <div class="event-card__body">
+                    <div class="event-card__meta">
+                        <div class="event-card__meta-item">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/></svg>
+                            <time datetime="{{ event.date }}">{{ event.date }}</time>
+                        </div>
+                        {% if event.company %}
+                        <div class="event-card__meta-item">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke-width="2"/></svg>
+                            <span>{{ event.company }}</span>
+                        </div>
+                        {% endif %}
+                        {% if event.type %}
+                        <span class="tag tag--online">{{ event.type }}</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="event-card__title">
+                        <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
+                    </h3>
+                    <p class="event-card__desc">{{ event.short_description }}</p>
+                    <div class="event-card__actions">
+                        {% if event.talks %}
+                        <span class="event-card__tag event-card__tag--talks">
+                            {{ event.talks | length }} {{ 'доклад' if event.talks | length == 1 else 'докладов' }}
+                        </span>
+                        {% endif %}
+                        <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
+                    </div>
+                </div>
             </div>
-            <div class="item__title">
-                <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
-            </div>
-            <p>{{ event.short_description }}</p>
-            {% if event.talks %}
-            <div class="text-muted" style="font-size: 0.85rem;">
-                {% for talk in event.talks %}
-                {{ talk.title }}{% if talk.speakers %} ({{ talk.speakers | join(', ') }}){% endif %}{% if not loop.last %}; {% endif %}
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
+        </article>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
+</main>
 {% endblock %}

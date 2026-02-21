@@ -1,67 +1,115 @@
 {% extends "base.html" %}
 {% set active_page = 'index' %}
-{% set now_year = 2026 %}
 
 {% block title %}{{ site.title }} — {{ site.description }}{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="hero__content">
-        <h1 class="hero__title">Moscow <span>QA</span></h1>
-        <p class="hero__subtitle">
-            Сообщество тестировщиков Москвы. Регулярные митапы, доклады и нетворкинг
-            для всех, кто связан с обеспечением качества ПО.
-        </p>
-        <div class="hero__actions">
-            <a href="{{ site.telegram }}" class="btn btn--primary">Telegram</a>
-            <a href="{{ base }}/events/" class="btn btn--outline">Мероприятия</a>
-            <a href="{{ base }}/cfp/" class="btn btn--outline">Стать спикером</a>
-        </div>
-    </div>
-</section>
-
-<div class="container">
-    <div class="panel">
-        <h3>Для докладчиков</h3>
-        <p>
-            Мы всегда рады новым докладам. Чтобы стать докладчиком на нашем
-            митапе, нужно заполнить специальную форму. Подать заявку и
-            ознакомиться с информацией для спикеров можно <a href="{{ base }}/cfp/">тут</a>.
-        </p>
-    </div>
-
-    {% if latest_events %}
-    <section class="section">
-        <h2 class="section__title">Мероприятия</h2>
-        {% for event in latest_events %}
-        <div class="item">
-            <div class="item__image item__image--s">
-                <div class="event-badge">#{{ event.number }}</div>
-            </div>
-            <div class="item__content">
-                <div class="item__meta">
-                    <time datetime="{{ event.date }}">{{ event.date }}</time>
-                    {% if event.company %} &mdash; {{ event.company }}{% endif %}
-                    {% if event.completed %}
-                    <span class="tag tag--completed">Завершено</span>
-                    {% else %}
-                    <span class="tag tag--upcoming">Скоро</span>
-                    {% endif %}
-                </div>
-                <div class="item__title">
-                    <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
-                </div>
-                <p>{{ event.short_description }}</p>
-                {% if event.talks %}
-                <div class="text-muted" style="font-size: 0.85rem;">
-                    Доклады: {{ event.talks | map(attribute='title') | join(', ') }}
-                </div>
-                {% endif %}
-            </div>
-        </div>
+<main class="main">
+    <h1 class="sr-only">MoscowQA — Сообщество тестировщиков Москвы</h1>
+    <div class="container">
+        {% set upcoming = [] %}
+        {% set past = [] %}
+        {% for event in events %}
+            {% if not event.completed %}
+                {% set _ = upcoming.append(event) %}
+            {% else %}
+                {% set _ = past.append(event) %}
+            {% endif %}
         {% endfor %}
-        <p><a href="{{ base }}/events/">Все мероприятия ({{ events | length }})</a></p>
-    </section>
-    {% endif %}
-</div>
+
+        {% if upcoming %}
+        <section class="section">
+            <h2 class="section__title">Предстоящие события</h2>
+            {% for event in upcoming %}
+            <article class="event-card">
+                <div class="event-card__inner">
+                    <div class="event-card__badge" style="position: relative;">
+                        <span class="event-card__number">{{ event.number }}</span>
+                        <span class="event-card__label">MoscowQA</span>
+                        <span class="event-card__tag--upcoming">Предстоящее</span>
+                    </div>
+                    <div class="event-card__body">
+                        <div class="event-card__meta">
+                            <div class="event-card__meta-item">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/></svg>
+                                <time datetime="{{ event.date }}">{{ event.date }}</time>
+                            </div>
+                            {% if event.address %}
+                            <div class="event-card__meta-item">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke-width="2"/><circle cx="12" cy="9" r="2.5" stroke-width="2"/></svg>
+                                <span>{{ event.address }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h3 class="event-card__title">
+                            <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
+                        </h3>
+                        <p class="event-card__desc">{{ event.short_description }}</p>
+                        <div class="event-card__actions">
+                            {% if event.talks %}
+                            <span class="event-card__tag event-card__tag--talks">
+                                {{ event.talks | length }} {{ 'доклад' if event.talks | length == 1 else 'докладов' }}
+                            </span>
+                            {% endif %}
+                            {% if event.registration_link %}
+                            <a href="{{ event.registration_link }}" class="btn btn--green" target="_blank" rel="noopener">Зарегистрироваться &rarr;</a>
+                            {% endif %}
+                            <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if past %}
+        <section class="section">
+            <h2 class="section__title" style="color: var(--gray-600);">Прошедшие события</h2>
+            {% for event in past %}
+            <article class="event-card">
+                <div class="event-card__inner">
+                    <div class="event-card__badge">
+                        <span class="event-card__number">{{ event.number }}</span>
+                        <span class="event-card__label">MoscowQA</span>
+                    </div>
+                    <div class="event-card__body">
+                        <div class="event-card__meta">
+                            <div class="event-card__meta-item">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/></svg>
+                                <time datetime="{{ event.date }}">{{ event.date }}</time>
+                            </div>
+                            {% if event.company %}
+                            <div class="event-card__meta-item">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-width="2"/></svg>
+                                <span>{{ event.company }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h3 class="event-card__title">
+                            <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
+                        </h3>
+                        <p class="event-card__desc">{{ event.short_description }}</p>
+                        <div class="event-card__actions">
+                            {% if event.talks %}
+                            <span class="event-card__tag event-card__tag--talks">
+                                {{ event.talks | length }} {{ 'доклад' if event.talks | length == 1 else 'докладов' }}
+                            </span>
+                            {% endif %}
+                            <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if not events %}
+        <div style="text-align: center; padding: 3rem;">
+            <p style="font-size: 1.25rem; color: var(--gray-600);">Нет событий. Следите за обновлениями!</p>
+        </div>
+        {% endif %}
+    </div>
+</main>
 {% endblock %}

@@ -1,26 +1,32 @@
 {% extends "base.html" %}
 {% set active_page = 'speakers' %}
-{% set now_year = 2026 %}
 
-{% block title %}Спикеры — {{ site.title }}{% endblock %}
+{% block title %}Докладчики — {{ site.title }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Спикеры</h1>
-    <p class="text-muted">Все спикеры Moscow QA — {{ speakers | length }} человек</p>
+<main class="main">
+    <div class="container">
+        <h2 class="section__title">Докладчики</h2>
+        <p class="text-muted" style="margin-bottom: 2rem;">{{ speakers | length }} спикеров Moscow QA</p>
 
-    <div class="speakers-grid">
-        {% for speaker in speakers %}
-        <div class="speaker-card">
-            <div class="speaker-card__photo">
-                <div class="speaker-card__placeholder">&#128100;</div>
+        <div class="speakers-grid">
+            {% for speaker in speakers %}
+            <div class="speaker-card">
+                <div class="speaker-card__photo">
+                    <div class="speaker-card__placeholder">&#128100;</div>
+                </div>
+                <div class="speaker-card__info">
+                    <div class="speaker-card__name">
+                        <a href="{{ base }}/speakers/{{ speaker.slug }}/">{{ speaker.name }}</a>
+                    </div>
+                    {% if speaker.company %}
+                    <div class="speaker-card__company">{{ speaker.company }}</div>
+                    {% endif %}
+                    <a href="{{ base }}/speakers/{{ speaker.slug }}/" class="btn btn--pink" style="font-size:0.85rem; padding:0.5rem 1.25rem;">Подробнее</a>
+                </div>
             </div>
-            <div class="speaker-card__name">
-                <a href="{{ base }}/speakers/{{ speaker.slug }}/">{{ speaker.name }}</a>
-            </div>
-            <div class="speaker-card__company">{{ speaker.company }}</div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
+</main>
 {% endblock %}

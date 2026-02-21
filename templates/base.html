@@ -7,23 +7,22 @@
     <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@600&family=Ubuntu:wght@300;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ base }}/static/css/styles.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23F7DF1F'/><text y='72' x='12' font-size='60' font-family='sans-serif' font-weight='bold'>QA</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23facc15'/><text y='72' x='12' font-size='60' font-family='sans-serif' font-weight='bold'>QA</text></svg>">
 </head>
 <body>
     <header class="header">
         <div class="header__inner">
             <a href="{{ base }}/" class="header__logo">
                 <div class="header__logo-icon">QA</div>
-                Moscow QA
+                <span class="header__logo-text">MoscowQA</span>
             </a>
             <button class="header__burger" onclick="document.querySelector('.header__nav').classList.toggle('open')" aria-label="Меню">&#9776;</button>
             <nav class="header__nav">
-                <a href="{{ base }}/" {% if active_page == 'index' %}class="active"{% endif %}>Главная</a>
-                <a href="{{ base }}/events/" {% if active_page == 'events' %}class="active"{% endif %}>Мероприятия</a>
-                <a href="{{ base }}/speakers/" {% if active_page == 'speakers' %}class="active"{% endif %}>Спикеры</a>
-                <a href="{{ base }}/cfp/" {% if active_page == 'cfp' %}class="active"{% endif %}>CFP</a>
+                <a href="{{ base }}/" {% if active_page == 'index' %}class="active"{% endif %}>События</a>
+                <a href="{{ base }}/speakers/" {% if active_page == 'speakers' %}class="active"{% endif %}>Докладчики</a>
+                <a href="{{ base }}/cfp/" {% if active_page == 'cfp' %}class="active"{% endif %}>Подать доклад</a>
             </nav>
         </div>
     </header>
@@ -35,9 +34,9 @@
             <div class="footer__col">
                 <div class="footer__copyright">&copy; 2024 &mdash; 2026, Moscow QA Team</div>
                 <div class="footer__links">
-                    <a href="{{ base }}/events/">Мероприятия</a>
-                    <a href="{{ base }}/speakers/">Спикеры</a>
-                    <a href="{{ base }}/cfp/">Стать спикером</a>
+                    <a href="{{ base }}/">События</a>
+                    <a href="{{ base }}/speakers/">Докладчики</a>
+                    <a href="{{ base }}/cfp/">Подать доклад</a>
                 </div>
             </div>
             <div class="footer__col">
