@@ -1,6 +1,7 @@
 ---
 name: "Андрей Мясников"
 company: "more.tv"
+photo: "https://storage.yandexcloud.net/barbez/speaker/miyasnikov.jpg"
 telegram: ""
 github: ""
 ---

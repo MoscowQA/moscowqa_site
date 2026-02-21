@@ -1,6 +1,7 @@
 ---
 name: "Константин Волков"
 company: "Flipper Devices"
+photo: "https://storage.yandexcloud.net/barbez/speaker/volkov.jpg"
 telegram: ""
 github: ""
 ---

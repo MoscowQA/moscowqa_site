@@ -13,7 +13,11 @@
             {% for speaker in speakers %}
             <div class="speaker-card">
                 <div class="speaker-card__photo">
+                    {% if speaker.photo %}
+                    <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                    {% else %}
                     <div class="speaker-card__placeholder">&#128100;</div>
+                    {% endif %}
                 </div>
                 <div class="speaker-card__info">
                     <div class="speaker-card__name">

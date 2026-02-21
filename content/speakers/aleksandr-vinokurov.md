@@ -1,6 +1,7 @@
 ---
 name: "Александр Винокуров"
 company: "Самолет"
+photo: "https://storage.yandexcloud.net/barbez/speaker/vinokurov1.jpg"
 telegram: ""
 github: ""
 ---

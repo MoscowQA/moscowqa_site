@@ -110,7 +110,13 @@
                     <div class="talk-card__speakers">
                         {% for speaker_name in talk.speakers %}
                         <div class="talk-card__speaker">
-                            <div class="talk-card__speaker-avatar">&#128100;</div>
+                            <div class="talk-card__speaker-avatar">
+                                {% if speaker_by_name.get(speaker_name, {}).get('photo') %}
+                                <img src="{{ speaker_by_name[speaker_name].photo }}" alt="{{ speaker_name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                                {% else %}
+                                &#128100;
+                                {% endif %}
+                            </div>
                             <div>
                                 <a href="{{ base }}/speakers/{{ speaker_slugs.get(speaker_name, speaker_name | lower | replace(' ', '-')) }}/" class="talk-card__speaker-name">{{ speaker_name }}</a>
                                 {% if talk.company %}

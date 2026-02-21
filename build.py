@@ -103,11 +103,12 @@ def build():
         "base_url": BASE_URL,
     }
 
-    # Map speaker display names to their file slugs for URL generation
+    # Map speaker display names to their file slugs and data for URL/photo generation
     speaker_slugs = {s["name"]: s["slug"] for s in speakers}
+    speaker_by_name = {s["name"]: s for s in speakers}
 
     common = {"site": site, "events": events, "speakers": speakers, "base": BASE_URL,
-              "speaker_slugs": speaker_slugs}
+              "speaker_slugs": speaker_slugs, "speaker_by_name": speaker_by_name}
 
     # Build index page
     tpl = env.get_template("index.html")
