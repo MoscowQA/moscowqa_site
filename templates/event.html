@@ -112,7 +112,7 @@
                         <div class="talk-card__speaker">
                             <div class="talk-card__speaker-avatar">&#128100;</div>
                             <div>
-                                <a href="{{ base }}/speakers/{{ speaker_name | lower | replace(' ', '-') }}/" class="talk-card__speaker-name">{{ speaker_name }}</a>
+                                <a href="{{ base }}/speakers/{{ speaker_slugs.get(speaker_name, speaker_name | lower | replace(' ', '-')) }}/" class="talk-card__speaker-name">{{ speaker_name }}</a>
                                 {% if talk.company %}
                                 <div class="talk-card__speaker-company">{{ talk.company }}</div>
                                 {% endif %}
