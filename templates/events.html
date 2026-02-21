@@ -28,7 +28,7 @@
                 {% endif %}
             </div>
             <div class="item__title">
-                <a href="/events/{{ event.slug }}/">{{ event.title }}</a>
+                <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
             </div>
             <p>{{ event.short_description }}</p>
             {% if event.talks %}

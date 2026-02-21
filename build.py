@@ -5,6 +5,7 @@ Reads markdown content from content/ directory, applies Jinja2 templates,
 and outputs static HTML to dist/ directory.
 """
 import os
+import sys
 import shutil
 import yaml
 import markdown
@@ -16,6 +17,9 @@ CONTENT_DIR = ROOT / "content"
 TEMPLATES_DIR = ROOT / "templates"
 STATIC_DIR = ROOT / "static"
 OUTPUT_DIR = ROOT / "dist"
+
+# Base URL for GitHub Pages project sites (e.g. /moscowqa_scripts)
+BASE_URL = os.environ.get("BASE_URL", "/moscowqa_scripts")
 
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
 
@@ -97,9 +101,10 @@ def build():
         "telegram": "https://t.me/moscowqa",
         "youtube": "https://www.youtube.com/@moscowqa",
         "timepad": "https://moscowqa.timepad.ru",
+        "base_url": BASE_URL,
     }
 
-    common = {"site": site, "events": events, "speakers": speakers}
+    common = {"site": site, "events": events, "speakers": speakers, "base": BASE_URL}
 
     # Build index page
     tpl = env.get_template("index.html")

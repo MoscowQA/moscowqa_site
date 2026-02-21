@@ -50,7 +50,7 @@
                     {% if talk.speakers %}
                     <div class="item__meta">
                         {% for speaker_name in talk.speakers %}
-                        <a href="/speakers/{{ speaker_name | lower | replace(' ', '-') }}/">{{ speaker_name }}</a>{% if not loop.last %}, {% endif %}
+                        <a href="{{ base }}/speakers/{{ speaker_name | lower | replace(' ', '-') }}/">{{ speaker_name }}</a>{% if not loop.last %}, {% endif %}
                         {% endfor %}
                         {% if talk.company %} &mdash; {{ talk.company }}{% endif %}
                     </div>
@@ -72,7 +72,7 @@
         </section>
         {% endif %}
 
-        <p><a href="/events/">&larr; Все мероприятия</a></p>
+        <p><a href="{{ base }}/events/">&larr; Все мероприятия</a></p>
     </article>
 </div>
 {% endblock %}

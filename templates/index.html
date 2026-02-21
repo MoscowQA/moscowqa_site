@@ -14,8 +14,8 @@
         </p>
         <div class="hero__actions">
             <a href="{{ site.telegram }}" class="btn btn--primary">Telegram</a>
-            <a href="/events/" class="btn btn--outline">Мероприятия</a>
-            <a href="/cfp/" class="btn btn--outline">Стать спикером</a>
+            <a href="{{ base }}/events/" class="btn btn--outline">Мероприятия</a>
+            <a href="{{ base }}/cfp/" class="btn btn--outline">Стать спикером</a>
         </div>
     </div>
 </section>
@@ -26,7 +26,7 @@
         <p>
             Мы всегда рады новым докладам. Чтобы стать докладчиком на нашем
             митапе, нужно заполнить специальную форму. Подать заявку и
-            ознакомиться с информацией для спикеров можно <a href="/cfp/">тут</a>.
+            ознакомиться с информацией для спикеров можно <a href="{{ base }}/cfp/">тут</a>.
         </p>
     </div>
 
@@ -49,7 +49,7 @@
                     {% endif %}
                 </div>
                 <div class="item__title">
-                    <a href="/events/{{ event.slug }}/">{{ event.title }}</a>
+                    <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
                 </div>
                 <p>{{ event.short_description }}</p>
                 {% if event.talks %}
@@ -60,7 +60,7 @@
             </div>
         </div>
         {% endfor %}
-        <p><a href="/events/">Все мероприятия ({{ events | length }})</a></p>
+        <p><a href="{{ base }}/events/">Все мероприятия ({{ events | length }})</a></p>
     </section>
     {% endif %}
 </div>

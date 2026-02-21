@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/static-site-generator-HWt2j]
   workflow_dispatch:
 
 permissions:
@@ -31,6 +31,8 @@ jobs:
 
       - name: Build site
         run: python build.py
+        env:
+          BASE_URL: /moscowqa_scripts
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

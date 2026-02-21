@@ -47,7 +47,7 @@
                 </div>
                 <div class="item__content">
                     <div class="item__meta">
-                        <a href="/events/{{ talk.event.slug }}/">{{ talk.event.title }}</a>,
+                        <a href="{{ base }}/events/{{ talk.event.slug }}/">{{ talk.event.title }}</a>,
                         <time datetime="{{ talk.event.date }}">{{ talk.event.date }}</time>
                     </div>
                     <div class="item__title">{{ talk.title }}</div>
@@ -68,7 +68,7 @@
         </section>
         {% endif %}
 
-        <p><a href="/speakers/">&larr; Все спикеры</a></p>
+        <p><a href="{{ base }}/speakers/">&larr; Все спикеры</a></p>
     </article>
 </div>
 {% endblock %}
