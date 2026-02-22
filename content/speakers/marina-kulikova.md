@@ -1,9 +1,9 @@
 ---
 name: "Марина Куликова"
 company: "Garage Eight"
-photo: "https://storage.yandexcloud.net/barbez/speaker/kulikova.jpg"
+photo: "https://storage.yandexcloud.net/barbez/speaker/kulicova2.png"
 telegram: ""
 github: ""
 ---
 
-QA Lead в Garage Eight. Занимается аудитом процессов качества в командах разработки.
+Head of QA в Garage Eight.
