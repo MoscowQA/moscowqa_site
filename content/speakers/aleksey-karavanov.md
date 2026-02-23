@@ -1,7 +1,7 @@
 ---
 name: "Алексей Караванов"
 company: "YADRO"
-photo: ""
+photo: "https://storage.yandexcloud.net/barbez/speaker/karavanov.png"
 telegram: ""
 github: ""
 ---

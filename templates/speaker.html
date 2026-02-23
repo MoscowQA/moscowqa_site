@@ -57,22 +57,43 @@
                 <div class="speaker-detail__bio md-content">{{ speaker.body | safe }}</div>
                 {% endif %}
 
+                {% if speaker.telegram or speaker.github or speaker.twitter or speaker.website %}
                 <div class="speaker-detail__social">
                     {% if speaker.telegram %}
-                    <a href="https://t.me/{{ speaker.telegram }}">Telegram</a>
+                    <a href="https://t.me/{{ speaker.telegram }}" target="_blank" rel="noopener" class="social-btn social-btn--telegram">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+                        </svg>
+                        <span>Telegram</span>
+                    </a>
                     {% endif %}
                     {% if speaker.github %}
-                    <a href="https://github.com/{{ speaker.github }}">GitHub</a>
+                    <a href="https://github.com/{{ speaker.github }}" target="_blank" rel="noopener" class="social-btn social-btn--github">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        <span>GitHub</span>
+                    </a>
                     {% endif %}
                     {% if speaker.twitter %}
-                    <a href="https://twitter.com/{{ speaker.twitter }}">Twitter</a>
+                    <a href="https://twitter.com/{{ speaker.twitter }}" target="_blank" rel="noopener" class="social-btn social-btn--twitter">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        <span>Twitter</span>
+                    </a>
+                    {% endif %}
+                    {% if speaker.website %}
+                    <a href="{{ speaker.website }}" target="_blank" rel="noopener" class="social-btn social-btn--other">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        <span>Другое</span>
+                    </a>
                     {% endif %}
                 </div>
-
-                <div class="speaker-detail__share">
-                    <button class="btn btn--pink btn--sm" onclick="navigator.clipboard.writeText(window.location.href).then(function(){var b=document.querySelector('.speaker-detail__share-ok');b.style.display='inline';setTimeout(function(){b.style.display='none'},2000)})">&#128279; Поделиться профилем</button>
-                    <span class="speaker-detail__share-ok" style="display:none;color:var(--green);font-weight:500;margin-left:0.5rem;">Ссылка скопирована!</span>
-                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -81,7 +102,7 @@
         <div class="speaker-stats">
             <div class="speaker-stats__item">
                 <span class="speaker-stats__number">{{ total_talks }}</span>
-                <span class="speaker-stats__label">{{ total_talks }} {% if total_talks % 10 == 1 and total_talks % 100 != 11 %}доклад{% elif total_talks % 10 in [2,3,4] and total_talks % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}</span>
+                <span class="speaker-stats__label">{% if total_talks % 10 == 1 and total_talks % 100 != 11 %}доклад{% elif total_talks % 10 in [2,3,4] and total_talks % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}</span>
             </div>
             {% if speaker_talks %}
             <div class="speaker-stats__item">
@@ -107,18 +128,14 @@
                     <a href="{{ base }}/events/{{ talk.event.slug }}/">{{ talk.event.title }}</a>,
                     <time datetime="{{ talk.event.date }}">{{ talk.event.date }}</time>
                 </div>
-                <div class="talk-item__title">{{ talk.title }}</div>
+                <div class="talk-item__title">
+                    <a href="{{ base }}/events/{{ talk.event.slug }}/talks/{{ talk.slug }}/" style="color:inherit;text-decoration:none;">
+                        {{ talk.title }}
+                    </a>
+                </div>
                 {% if talk.description %}
                 <p class="talk-item__desc">{{ talk.description }}</p>
                 {% endif %}
-                <div class="talk-links">
-                    {% if talk.slides_url %}
-                    <a href="{{ talk.slides_url }}">&#128196; Слайды</a>
-                    {% endif %}
-                    {% if talk.record %}
-                    <a href="{{ talk.record }}">&#9654; Запись</a>
-                    {% endif %}
-                </div>
             </div>
             {% endfor %}
         </section>

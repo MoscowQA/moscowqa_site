@@ -7,6 +7,7 @@ address: "Москва, пр-т Андропова 18к1, МТС банк, 1 э�
 completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с МТС Финтех. Доклады о юнит-тестах с Jest и Testing Library, мультипротокольном подходе к управлению качеством и самоорганизации QA без лидов."
+video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35uGkEp2cuNIx7ky33dGsAO"
 registration_link: ""
 talks:
   - title: "QA и юнит-тесты? Используем Jest и Testing Library"
@@ -14,11 +15,13 @@ talks:
       - "Софья Ковалева"
     company: "Т-Банк"
     description: "Инструменты для юнит-тестов, которые можно внедрить в любой frontend-проект. Почему не стоит бояться QA писать юнит-тесты, как помочь разработке и дёшево автоматизировать приложение."
+    record: "https://www.youtube.com/watch?v=9FhQBg4n878"
   - title: "Управление качеством и развитие платформенных сервисов: мультипротокольный подход на всех этапах жизненного цикла"
     speakers:
       - "Наталья Кузина"
     company: "МТС Финтех"
     description: "О многопротокольной архитектуре сервисов, использующих gRPC, REST и GraphQL. Подходы к автоматизации деплоя через CI/CD, методы обеспечения качества, включая тестирование, мониторинг и работу с нагрузкой."
+    record: "https://www.youtube.com/watch?v=-rrKVufHr10"
   - title: "Лиды не нужны"
     speakers:
       - "Борис Мошнин"

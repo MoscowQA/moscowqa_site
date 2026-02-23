@@ -31,8 +31,6 @@ jobs:
 
       - name: Build site
         run: python build.py
-        env:
-          BASE_URL: "http://moscowqa.ru/"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

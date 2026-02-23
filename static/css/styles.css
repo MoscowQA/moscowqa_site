@@ -1,4 +1,4 @@
-/* MoscowQA Static Site — based on moscowqa-site (Next.js) design */
+/* MoscowQA Static Site â€” based on moscowqa-site (Next.js) design */
 
 /* === Reset & Base === */
 *, *::before, *::after {
@@ -712,11 +712,8 @@ img { max-width: 100%; height: auto; }
 }
 
 .speaker-card {
-    background: #fff;
     border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--gray-200);
+    border: 1px solid #e5e7eb52;
     transition: box-shadow 0.2s;
 }
 
@@ -726,11 +723,11 @@ img { max-width: 100%; height: auto; }
 
 .speaker-card__photo {
     aspect-ratio: 1;
-    background: var(--gray-100);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: 50%
 }
 
 .speaker-card__photo img {
@@ -1100,4 +1097,145 @@ img { max-width: 100%; height: auto; }
     height: 1.25rem;
     vertical-align: middle;
     flex-shrink: 0;
+}
+
+/* === Talk Page Styles === */
+.breadcrumb {
+    background: var(--gray-50);
+    padding: 1rem 0;
+    font-size: 0.875rem;
+}
+
+.breadcrumb a {
+    color: var(--pink);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb__separator {
+    margin: 0 0.5rem;
+    color: var(--gray-500);
+}
+
+.talk-hero {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+    padding: 3rem 0;
+    color: white;
+}
+
+.talk-hero__inner {
+    max-width: var(--max-w);
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.talk-hero__tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 0.375rem 0.875rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.talk-hero__title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .talk-hero__title {
+        font-size: 1.75rem;
+    }
+}
+
+.talk-card:hover a,
+.talk-item__title:hover a {
+    color: var(--pink);
+}
+
+/* === Social Buttons === */
+.speaker-detail__social {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
+    color: white !important;
+}
+
+.social-btn__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+
+.social-btn--telegram {
+    background: #0088cc;
+}
+
+.social-btn--telegram:hover {
+    background: #006699;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,136,204,.3);
+}
+
+.social-btn--github {
+    background: #24292e;
+}
+
+.social-btn--github:hover {
+    background: #1a1e22;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(36,41,46,.3);
+}
+
+.social-btn--twitter {
+    background: #1da1f2;
+}
+
+.social-btn--twitter:hover {
+    background: #0d8bd9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(29,161,242,.3);
+}
+
+.social-btn--other {
+    background: var(--gray-700);
+}
+
+.social-btn--other:hover {
+    background: var(--gray-800);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(55,65,81,.3);
+}
+
+@media (max-width: 640px) {
+    .speaker-detail__social {
+        flex-direction: column;
+    }
+
+    .social-btn {
+        justify-content: center;
+    }
 }

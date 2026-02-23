@@ -1,7 +1,7 @@
 ---
 name: "Алексей Делендик"
 company: "YADRO"
-photo: ""
+photo: "https://storage.yandexcloud.net/barbez/speaker/delendik.png"
 telegram: ""
 github: ""
 ---
