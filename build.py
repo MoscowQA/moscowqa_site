@@ -18,10 +18,8 @@ TEMPLATES_DIR = ROOT / "templates"
 STATIC_DIR = ROOT / "static"
 OUTPUT_DIR = ROOT / "dist"
 
-# Base URL for GitHub Pages project sites (e.g. /moscowqa_scripts)
-BASE_URL = os.environ.get("BASE_URL", "/moscowqa_scripts")
-# Full site URL for canonical links, OG tags and sitemap
-SITE_URL = os.environ.get("SITE_URL", "https://dragin96.github.io/moscowqa_scripts")
+BASE_URL = os.environ.get("BASE_URL")
+SITE_URL = os.environ.get("SITE_URL", "https://moscowqa.ru/")
 
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
 
