@@ -45,7 +45,12 @@
                         </div>
                         {% endif %}
                         {% if event.type %}
-                        <span class="tag tag--online">{{ event.type }}</span>
+                            {% if 'Offline' in event.type %}
+                            <span class="tag tag--offline">Offline</span>
+                            {% endif %}
+                            {% if 'Online' in event.type %}
+                            <span class="tag tag--online">Online</span>
+                            {% endif %}
                         {% endif %}
                     </div>
                     <h3 class="event-card__title">

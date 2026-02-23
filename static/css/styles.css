@@ -1057,6 +1057,11 @@ img { max-width: 100%; height: auto; }
     color: #3b82f6;
 }
 
+.tag--offline {
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--purple);
+}
+
 /* === Page content (from markdown) === */
 .md-content h2 {
     margin-top: 2rem;
