@@ -1,9 +1,9 @@
 ---
 name: "Павел Голяков"
-company: "Garage Eight"
+company: ""
 photo: "https://storage.yandexcloud.net/barbez/speaker/golyakov2.png"
 telegram: ""
 github: ""
 ---
 
-Head of QA в Garage Eight.
+Head of QA
