@@ -848,6 +848,72 @@ img { max-width: 100%; height: auto; }
     text-decoration: underline;
 }
 
+/* Share button */
+.speaker-detail__share {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.btn--sm {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+}
+
+/* Speaker stats */
+.speaker-stats {
+    display: flex;
+    gap: 2rem;
+    margin: 2.5rem 0;
+    padding: 1.5rem 2rem;
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+}
+
+.speaker-stats__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.speaker-stats__number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--pink);
+    line-height: 1;
+}
+
+.speaker-stats__label {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .speaker-stats {
+        gap: 1rem;
+        padding: 1rem;
+    }
+    .speaker-stats__number {
+        font-size: 1.5rem;
+    }
+}
+
+/* External talks badge */
+.talk-item__event-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.75rem;
+    background: var(--purple);
+    color: #fff;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
 /* Speaker talks list */
 .speaker-talks .talk-item {
     background: var(--gray-50);

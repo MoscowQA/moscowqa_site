@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% set active_page = 'speakers' %}
 
-{% block title %}{{ speaker.name }} — {{ site.title }}{% endblock %}
+{% block title %}{{ speaker.name }} — Профиль спикера — {{ site.title }}{% endblock %}
+{% block description %}{{ speaker.name }}{% if speaker.company %}, {{ speaker.company }}{% endif %} — профиль спикера сообщества Moscow QA{% endblock %}
 
 {% block content %}
 <main class="main">
@@ -37,12 +38,39 @@
                     <a href="https://twitter.com/{{ speaker.twitter }}">Twitter</a>
                     {% endif %}
                 </div>
+
+                <div class="speaker-detail__share">
+                    <button class="btn btn--pink btn--sm" onclick="navigator.clipboard.writeText(window.location.href).then(function(){var b=document.querySelector('.speaker-detail__share-ok');b.style.display='inline';setTimeout(function(){b.style.display='none'},2000)})">&#128279; Поделиться профилем</button>
+                    <span class="speaker-detail__share-ok" style="display:none;color:var(--green);font-weight:500;margin-left:0.5rem;">Ссылка скопирована!</span>
+                </div>
             </div>
         </div>
 
+        {% set total_talks = (speaker_talks | length) + (speaker.external_talks | default([], true) | length) %}
+        {% if total_talks > 0 %}
+        <div class="speaker-stats">
+            <div class="speaker-stats__item">
+                <span class="speaker-stats__number">{{ total_talks }}</span>
+                <span class="speaker-stats__label">{{ total_talks }} {% if total_talks % 10 == 1 and total_talks % 100 != 11 %}доклад{% elif total_talks % 10 in [2,3,4] and total_talks % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}</span>
+            </div>
+            {% if speaker_talks %}
+            <div class="speaker-stats__item">
+                <span class="speaker-stats__number">{{ speaker_talks | length }}</span>
+                <span class="speaker-stats__label">на Moscow QA</span>
+            </div>
+            {% endif %}
+            {% if speaker.external_talks | default([], true) | length > 0 %}
+            <div class="speaker-stats__item">
+                <span class="speaker-stats__number">{{ speaker.external_talks | length }}</span>
+                <span class="speaker-stats__label">на других площадках</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         {% if speaker_talks %}
         <section class="section speaker-talks">
-            <h2 class="section__title" style="color: var(--gray-900);">Доклады</h2>
+            <h2 class="section__title" style="color: var(--gray-900);">Доклады на Moscow QA</h2>
             {% for talk in speaker_talks %}
             <div class="talk-item">
                 <div class="talk-item__meta">
@@ -59,6 +87,34 @@
                     {% endif %}
                     {% if talk.record %}
                     <a href="{{ talk.record }}">&#9654; Запись</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if speaker.external_talks | default([], true) | length > 0 %}
+        <section class="section speaker-talks speaker-external-talks">
+            <h2 class="section__title" style="color: var(--gray-900);">Внешние выступления</h2>
+            {% for talk in speaker.external_talks %}
+            <div class="talk-item">
+                <div class="talk-item__meta">
+                    <span class="talk-item__event-badge">{{ talk.event }}</span>
+                    {% if talk.date %}
+                    <time datetime="{{ talk.date }}">{{ talk.date }}</time>
+                    {% endif %}
+                </div>
+                <div class="talk-item__title">{{ talk.title }}</div>
+                {% if talk.description %}
+                <p class="talk-item__desc">{{ talk.description }}</p>
+                {% endif %}
+                <div class="talk-links">
+                    {% if talk.slides_url %}
+                    <a href="{{ talk.slides_url }}">&#128196; Слайды</a>
+                    {% endif %}
+                    {% if talk.url %}
+                    <a href="{{ talk.url }}">&#9654; Запись</a>
                     {% endif %}
                 </div>
             </div>
