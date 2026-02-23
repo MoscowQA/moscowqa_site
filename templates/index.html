@@ -65,7 +65,7 @@
                         <div class="event-card__actions">
                             {% if event.talks %}
                             <span class="event-card__tag event-card__tag--talks">
-                                {{ event.talks | length }} {{ 'доклад' if event.talks | length == 1 else 'докладов' }}
+                                {% set n = event.talks | length %}{{ n }} {% if n % 10 == 1 and n % 100 != 11 %}доклад{% elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}
                             </span>
                             {% endif %}
                             {% if event.registration_link %}
@@ -110,7 +110,7 @@
                         <div class="event-card__actions">
                             {% if event.talks %}
                             <span class="event-card__tag event-card__tag--talks">
-                                {{ event.talks | length }} {{ 'доклад' if event.talks | length == 1 else 'докладов' }}
+                                {% set n = event.talks | length %}{{ n }} {% if n % 10 == 1 and n % 100 != 11 %}доклад{% elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}
                             </span>
                             {% endif %}
                             <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
