@@ -5,7 +5,7 @@ date: "2024-10-10"
 company: "РТК ИТ"
 address: "Москва, Киевское ш., 6, строение 1"
 completed: true
-type: "Hybrid"
+type: "Offline + Online"
 short_description: "Митап совместно с РТК ИТ. Доклады о буднях автоматизаторов, тестировании Big Data и передаче знаний в команде."
 registration_link: "https://moscowqa.timepad.ru/event/3059057/"
 talks:

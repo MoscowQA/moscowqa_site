@@ -5,7 +5,7 @@ date: "2025-04-17"
 company: "VK Tech"
 address: "Москва, Ленинградский пр., 70, БЦ \"Алкон\""
 completed: true
-type: "Hybrid"
+type: "Offline + Online"
 short_description: "Митап совместно с VK Tech. Доклады о тестировании облака с tempest, нагрузочном тестировании с Gatling, публичных выступлениях и нетворкинге."
 registration_link: ""
 talks:

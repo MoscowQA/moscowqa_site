@@ -5,7 +5,7 @@ date: "2024-09-19"
 company: "X5 Tech"
 address: "Москва, Варшавское шоссе 33с12"
 completed: true
-type: "Hybrid"
+type: "Offline + Online"
 short_description: "Митап совместно с X5 Tech. Доклады о soft skills, нейронных сетях в тестировании и построении QA-коммьюнити."
 video_link: "https://www.youtube.com/watch?v=5POtDW4L35w"
 registration_link: "https://moscowqa.timepad.ru/event/3023660/"

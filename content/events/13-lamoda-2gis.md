@@ -5,7 +5,7 @@ date: "2025-05-22"
 company: "Lamoda & 2ГИС"
 address: "Москва, Новоданиловская набережная, 12, офис 2ГИС"
 completed: true
-type: "Hybrid"
+type: "Offline + Online"
 short_description: "Митап совместно с Lamoda и 2ГИС. Доклады о GraphQL API, исследовательском тестировании, управляемых тестовых стендах и практиках ускорения QA."
 registration_link: ""
 talks:

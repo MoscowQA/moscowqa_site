@@ -24,7 +24,7 @@
         "url": "https://t.me/moscowqa"
     },
     "eventStatus": "https://schema.org/EventScheduled",
-    "eventAttendanceMode": "https://schema.org/{{ 'OfflineEventAttendanceMode' if event.type == 'Offline' else 'MixedEventAttendanceMode' }}"
+    "eventAttendanceMode": "https://schema.org/{% if event.type == 'Online' %}OnlineEventAttendanceMode{% elif event.type == 'Offline' %}OfflineEventAttendanceMode{% else %}MixedEventAttendanceMode{% endif %}"
 }
 </script>
 <script type="application/ld+json">

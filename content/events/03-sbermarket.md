@@ -5,7 +5,7 @@ date: "2024-03-14"
 company: "СберМаркет Tech"
 address: "Москва ул. Садовническая 9А (вход по вывеской Space 1)"
 completed: true
-type: "Hybrid"
+type: "Offline + Online"
 short_description: "Митап совместно с СберМаркет Tech. Доклады инженеров из AliExpress, Сбербанк Страхование жизни, СберМаркет Tech и Garage Eight."
 video_link: "https://youtube.com/live/tX5diJQZdAY"
 registration_link: "https://moscowqa.timepad.ru/event/2801018/"

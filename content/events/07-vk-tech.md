@@ -5,7 +5,7 @@ date: "2024-11-07"
 company: "VK Tech"
 address: "Москва, Ленинградский пр., 70, БЦ «Алкон»"
 completed: true
-type: "Hybrid"
+type: "Offline + Online"
 short_description: "Митап совместно с VK Tech. Доклады о Web 3.0, нагрузочном тестировании K6-Tarantool и BDUI."
 video_link: "https://vk.com/moscow_qa?z=video-208050206_456239032"
 registration_link: "https://moscowqa.timepad.ru/event/3093333/"

@@ -5,7 +5,7 @@ date: "2025-12-11"
 company: "YADRO"
 address: "Москва, Megapolis Hall, Варшавское шоссе 33с12"
 completed: true
-type: "Hybrid"
+type: "Offline + Online"
 short_description: "Митап совместно с YADRO. Доклады о тестировании железа в радиочастотном центре и проверке устройств на конвейере, а также дискуссия о трендах QA в 2025 году."
 registration_link: ""
 talks:
