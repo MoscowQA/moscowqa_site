@@ -2,6 +2,42 @@
 {% set active_page = 'events' %}
 
 {% block title %}{{ event.title }} — {{ site.title }}{% endblock %}
+{% block description %}{{ event.short_description | default(event.title ~ ' — митап сообщества тестировщиков Moscow QA, ' ~ event.date) }}{% endblock %}
+{% block og_type %}article{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": {{ event.title | tojson }},
+    "description": {{ event.short_description | default('') | tojson }},
+    "startDate": "{{ event.date }}",
+    {% if event.address %}"location": {
+        "@type": "Place",
+        "name": "{{ event.company | default('') }}",
+        "address": {{ event.address | tojson }}
+    },{% endif %}
+    "organizer": {
+        "@type": "Organization",
+        "name": "Moscow QA",
+        "url": "https://t.me/moscowqa"
+    },
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/{{ 'OfflineEventAttendanceMode' if event.type == 'Offline' else 'MixedEventAttendanceMode' }}"
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "События", "item": "{{ site_url }}/events/"},
+        {"@type": "ListItem", "position": 2, "name": {{ event.title | tojson }}}
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <!-- Hero -->
@@ -112,7 +148,7 @@
                         <div class="talk-card__speaker">
                             <div class="talk-card__speaker-avatar">
                                 {% if speaker_by_name.get(speaker_name, {}).get('photo') %}
-                                <img src="{{ speaker_by_name[speaker_name].photo }}" alt="{{ speaker_name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                                <img src="{{ speaker_by_name[speaker_name].photo }}" alt="{{ speaker_name }}" loading="lazy" width="40" height="40" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
                                 {% else %}
                                 &#128100;
                                 {% endif %}

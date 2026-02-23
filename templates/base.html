@@ -5,11 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ site.title }}{% endblock %}</title>
     <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+    {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+    <!-- Open Graph -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{{ self.title() }}">
+    <meta property="og:description" content="{{ self.description() }}">
+    {% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}
+    <meta property="og:site_name" content="{{ site.title }}">
+    <meta property="og:locale" content="ru_RU">
+    {% block og_image %}{% endblock %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ base }}/static/css/styles.css">
     <link rel="icon" href="{{ base }}/static/images/logo.png">
+    {% block structured_data %}{% endblock %}
 </head>
 <body>
     <header class="header">

@@ -2,6 +2,23 @@
 {% set active_page = 'index' %}
 
 {% block title %}{{ site.title }} — {{ site.description }}{% endblock %}
+{% block description %}Moscow QA — сообщество тестировщиков Москвы. Бесплатные митапы с докладами по тестированию, автоматизации и QA{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Moscow QA",
+    "description": "Сообщество тестировщиков Москвы",
+    {% if site_url %}"url": "{{ site_url }}/",{% endif %}
+    "sameAs": [
+        "{{ site.telegram }}",
+        "{{ site.youtube }}"
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <main class="main">

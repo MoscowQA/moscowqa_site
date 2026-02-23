@@ -3,6 +3,36 @@
 
 {% block title %}{{ speaker.name }} — Профиль спикера — {{ site.title }}{% endblock %}
 {% block description %}{{ speaker.name }}{% if speaker.company %}, {{ speaker.company }}{% endif %} — профиль спикера сообщества Moscow QA{% endblock %}
+{% block og_type %}profile{% endblock %}
+{% block og_image %}{% if speaker.photo %}<meta property="og:image" content="{{ speaker.photo }}">{% endif %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": {{ speaker.name | tojson }},
+    {% if speaker.company %}"worksFor": {"@type": "Organization", "name": {{ speaker.company | tojson }}},{% endif %}
+    {% if speaker.photo %}"image": {{ speaker.photo | tojson }},{% endif %}
+    {% if canonical_url %}"url": "{{ canonical_url }}",{% endif %}
+    "sameAs": [
+        {% if speaker.telegram %}"https://t.me/{{ speaker.telegram }}"{% endif %}
+        {% if speaker.telegram and speaker.github %},{% endif %}
+        {% if speaker.github %}"https://github.com/{{ speaker.github }}"{% endif %}
+    ]
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Докладчики", "item": "{{ site_url }}/speakers/"},
+        {"@type": "ListItem", "position": 2, "name": {{ speaker.name | tojson }}}
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <main class="main">

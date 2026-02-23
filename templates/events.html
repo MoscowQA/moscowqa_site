@@ -2,6 +2,19 @@
 {% set active_page = 'index' %}
 
 {% block title %}Мероприятия — {{ site.title }}{% endblock %}
+{% block description %}Все мероприятия сообщества тестировщиков Moscow QA: {{ events | length }} митапов с докладами по тестированию и QA{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "События", "item": "{{ site_url }}/events/"}
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <main class="main">

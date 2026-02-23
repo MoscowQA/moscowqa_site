@@ -2,6 +2,19 @@
 {% set active_page = 'speakers' %}
 
 {% block title %}Докладчики — {{ site.title }}{% endblock %}
+{% block description %}Спикеры сообщества Moscow QA: {{ speakers | length }} докладчиков — профили, доклады, слайды и записи выступлений{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Докладчики", "item": "{{ site_url }}/speakers/"}
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <main class="main">
@@ -14,7 +27,7 @@
             <div class="speaker-card">
                 <div class="speaker-card__photo">
                     {% if speaker.photo %}
-                    <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                    <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
                     {% else %}
                     <div class="speaker-card__placeholder">&#128100;</div>
                     {% endif %}
