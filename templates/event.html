@@ -56,7 +56,7 @@
             </div>
             {% endif %}
 
-            {% if event.registration_link %}
+            {% if event.registration_link and not event.completed %}
             <a href="{{ event.registration_link }}" target="_blank" rel="noopener" style="text-decoration:none;">
                 <div class="info-card info-card--gradient">
                     <div class="info-card__header">
