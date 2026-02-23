@@ -6,4 +6,4 @@ telegram: ""
 github: ""
 ---
 
-Волонтёр, спикер Moscow QA.
+Волонтёр, орг Moscow QA.
