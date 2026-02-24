@@ -7,6 +7,7 @@ address: "Москва, Megapolis Hall, Варшавское шоссе 33с12"
 completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с YADRO. Доклады о тестировании железа в радиочастотном центре и проверке устройств на конвейере, а также дискуссия о трендах QA в 2025 году."
+photos_link: "https://vk.com/album-227064516_311028974"
 registration_link: ""
 talks:
   - title: "Как тестируется железо в радиочастотном центре"

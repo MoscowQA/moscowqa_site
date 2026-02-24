@@ -8,6 +8,7 @@ completed: true
 type: "Offline"
 short_description: "Второй митап совместно с компанией Самолет. Доклады инженеров из Самолета, Flipper Devices и more.tv."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg36FzW0esw388PGyoC2-M-hq"
+photos_link: "https://vk.com/album-227064516_305508569"
 registration_link: "https://moscowqa.timepad.ru/event/2780431/"
 talks:
   - title: "Тестируем Flipper Zero. Автотесты, электроника и синяя изолента"

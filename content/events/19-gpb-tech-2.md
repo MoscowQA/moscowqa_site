@@ -7,6 +7,7 @@ address: "Москва, Спартаковский переулок, 2с1, пр�
 completed: true
 type: "Offline + Online"
 short_description: "Новогодний митап совместно с Газпромбанк.Тех. Доклады о 3D-графике, ИИ в тестировании, личном бренде разработчика и квартирник про найм в эпоху ИИ."
+photos_link: "https://vk.com/album-227064516_311202993"
 registration_link: ""
 talks:
   - title: "3D-графика — это иллюзия"

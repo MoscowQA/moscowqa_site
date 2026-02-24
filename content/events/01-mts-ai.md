@@ -8,6 +8,7 @@ completed: true
 type: "Offline"
 short_description: "Первый оффлайн-митап сообщества Moscow QA в офисе MTS AI."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg34195pMB241ac4SGDc4Imy-"
+photos_link: "https://vk.com/album-227064516_305496716"
 registration_link: "https://moscowqa.timepad.ru/event/2730692/"
 talks:
   - title: "Особенности тестирования SmartTV-приложений"

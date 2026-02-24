@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с МТС Финтех. Доклады о юнит-тестах с Jest и Testing Library, мультипротокольном подходе к управлению качеством и самоорганизации QA без лидов."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35uGkEp2cuNIx7ky33dGsAO"
+photos_link: "https://vk.com/album-227064516_307993537"
 registration_link: ""
 talks:
   - title: "QA и юнит-тесты? Используем Jest и Testing Library"

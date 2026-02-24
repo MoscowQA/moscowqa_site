@@ -123,6 +123,22 @@
                 </div>
             </a>
             {% endif %}
+
+            {% if event.photos_link %}
+            <a href="{{ event.photos_link }}" target="_blank" rel="noopener" style="text-decoration:none;">
+                <div class="info-card">
+                    <div class="info-card__header">
+                        <div class="info-card__icon">&#128248;</div>
+                        <div>
+                            <h3 class="info-card__title">Фотографии</h3>
+                            <div style="margin-top:0.75rem;">
+                                <span class="btn btn--secondary">Посмотреть</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endif %}
         </div>
 
         {% if event.body %}

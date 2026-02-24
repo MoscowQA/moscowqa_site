@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с Lamoda и 2ГИС. Доклады о GraphQL API, исследовательском тестировании, управляемых тестовых стендах и практиках ускорения QA."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg36wkUpkO7nKUqLfu54WSqfj"
+photos_link: "https://vk.com/album-227064516_309389462"
 registration_link: ""
 talks:
   - title: "Как составить запрос в GraphQL API без автозаполнения"

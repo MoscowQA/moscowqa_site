@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с СберМаркет Tech. Доклады инженеров из AliExpress, Сбербанк Страхование жизни, СберМаркет Tech и Garage Eight."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg34gzl1YnbzFEOSyDY_YNfdQ"
+photos_link: "https://vk.com/album-227064516_305755697"
 registration_link: "https://moscowqa.timepad.ru/event/2801018/"
 talks:
   - title: "Путь к совершенству: аудит процессов качества в команде"

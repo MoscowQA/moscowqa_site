@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с Газпромбанк.Тех. Доклады о Quality Gates, борьбе с флаки-тестами, компонентном тестировании и автотестах на естественном языке."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg34MttaW7M9KUl3uf5v0mALW"
+photos_link: "https://vk.com/album-227064516_309888878"
 registration_link: ""
 talks:
   - title: "Quality Gates: путь к качеству на каждом этапе развития компании"

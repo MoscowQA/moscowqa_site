@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Юбилейный митап совместно со Школой 21. Доклады об архитектуре тестов на Playwright, автоматизации тест-кейсов, факапах QA-менеджера, безопасности npm, мобильных фермах и публичных выступлениях."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35WzFLiDs-1QJFl0r5t7ylD"
+photos_link: "https://vk.com/album-227064516_311485846"
 registration_link: ""
 talks:
   - title: "Архитектура читаемых тестов на Playwright"

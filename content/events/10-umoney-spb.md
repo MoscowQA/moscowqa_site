@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Выездной митап Moscow QA в Санкт-Петербурге совместно с ЮMoney. Доклады об Allure Report 3, аудите автотестов и правильных вопросах в QA."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35q0uC60q7m9k0iLA6n0Upu"
+photos_link: "https://vk.com/album-227064516_308269217"
 registration_link: ""
 talks:
   - title: "Allure Report 3"

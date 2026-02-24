@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Митап совместно со Школой 21. Доклады о метриках QA, сертификации ISTQB, карьерном росте тестировщика и переходе в менеджмент."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg363bJpBdtNfrkWMJ7SNxOU0"
+photos_link: "https://vk.com/album-227064516_309875445"
 registration_link: "https://moscowqa.timepad.ru/event/3522454/"
 talks:
   - title: "Как не заблудиться в лесу метрик QA"

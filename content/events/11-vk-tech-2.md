@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с VK Tech. Доклады о тестировании облака с tempest, нагрузочном тестировании с Gatling, публичных выступлениях и нетворкинге."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg37Uca8NXbbd0X9ppUX-_ZKy"
+photos_link: "https://vk.com/album-227064516_308486223"
 registration_link: ""
 talks:
   - title: "Как мы укротили tempest и тестируем с его помощью компоненты облака"

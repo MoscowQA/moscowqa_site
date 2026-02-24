@@ -7,6 +7,7 @@ address: "Москва, м. «Китай-город»"
 completed: true
 type: "Offline"
 short_description: "Благотворительный барный митап в помощь приюту «Котобюро». Острые темы, живое общение и офигенные спикеры."
+photos_link: "https://vk.com/album-227064516_308855287"
 registration_link: ""
 talks:
   - title: "Тот же самый доклад чернушная версия"

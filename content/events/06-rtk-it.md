@@ -8,6 +8,7 @@ completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с РТК ИТ. Доклады о буднях автоматизаторов, тестировании Big Data и передаче знаний в команде."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35g9rrcpBXoJm1E8Namz1ST"
+photos_link: "https://vk.com/album-227064516_306085690"
 registration_link: "https://moscowqa.timepad.ru/event/3059057/"
 talks:
   - title: "Чем мы заняты, когда не пишем автотесты"
