@@ -2,7 +2,7 @@
 name: "Виктория Дежкина"
 company: ""
 photo: "https://storage.yandexcloud.net/barbez/speaker/dezhkina.png"
-telegram: ""
+telegram: "vikon4ick"
 github: ""
 ---
 
