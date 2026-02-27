@@ -30,6 +30,11 @@ external_talks:
     date: ""
     url: "https://www.youtube.com/watch?v=Zjq3pzA7f68"
     slides_url: ""
+  - title: "Hardware-тестирование Flipper: путь синей изоленты"
+    event: "Heisenbug 2023 Spring"
+    date: "2023-04-17"
+    url: "https://heisenbug.ru/archive/2023%20Spring/talks/21e3024ab21c4d6b92be5665b36ceb72/"
+    slides_url: "https://squidex.jugru.team/api/assets/srm/07cac744-1acb-4627-a3cf-6deaa720f7a0/volkov.ks-preview-presentation.pdf"
 ---
 
 QA manager в Flipper Devices. Занимается автотестами на стыке электроники и веба.
