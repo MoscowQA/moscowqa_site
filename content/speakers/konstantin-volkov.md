@@ -35,6 +35,12 @@ external_talks:
     date: "2023-04-17"
     url: "https://heisenbug.ru/archive/2023%20Spring/talks/21e3024ab21c4d6b92be5665b36ceb72/"
     slides_url: "https://squidex.jugru.team/api/assets/srm/07cac744-1acb-4627-a3cf-6deaa720f7a0/volkov.ks-preview-presentation.pdf"
+
+  - title: "Тестируем Flipper Zero: нужна ли синяя изолента"
+    event: "SQA Days"
+    date: ""
+    url: "http://sqadays.com/ru/talk/134310"
+    slides_url: ""
 ---
 
 QA manager в Flipper Devices. Занимается автотестами на стыке электроники и веба.

@@ -15,6 +15,17 @@ external_talks:
     date: "2025-04-06"
     url: "https://heisenbug.ru/archive/2025%20Spring/talks/a1945c8c409f446990d7807814b225f9/"
     slides_url: "https://squidex.jugru.team/api/assets/srm/5ea1c537-3df1-46e9-844f-cf82d37e36ef/battl-proaktivnyi-i-reaktivnyi-podhod-k-razvitiyu-pdf-io.pdf"
+
+  - title: "Как расти и растить с помощью матрицы компетенций и индивидуального плана развития"
+    event: "SQA Days"
+    date: ""
+    url: "http://sqadays.com/ru/talk/130989"
+    slides_url: ""
+  - title: "3 Амиго на страже качества и спокойствия"
+    event: "SQA Days"
+    date: ""
+    url: "http://sqadays.com/ru/talk/125107"
+    slides_url: ""
 ---
 
 QA Lead в «Яндекс Лавке».
