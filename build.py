@@ -84,6 +84,14 @@ def load_events() -> list[dict]:
                     talk.get("slug")
                 )
 
+            # Auto-mark past events as completed
+            event_date = event.get("date")
+            if event_date:
+                if isinstance(event_date, str):
+                    event_date = date.fromisoformat(event_date)
+                if event_date < date.today():
+                    event["completed"] = True
+
             events.append(event)
     events.sort(key=lambda e: e.get("date", ""), reverse=True)
     return events
