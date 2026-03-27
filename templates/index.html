@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% set active_page = 'index' %}
 
-{% block title %}{{ site.title }} — {{ site.description }}{% endblock %}
-{% block description %}Moscow QA — сообщество тестировщиков Москвы. Бесплатные митапы с докладами по тестированию, автоматизации и QA{% endblock %}
+{% block title %}Митапы по тестированию в Москве — {{ site.title }}{% endblock %}
+{% block description %}Moscow QA — бесплатные митапы по тестированию и QA в Москве. Доклады по автоматизации тестирования, ручному тестированию, нагрузочному тестированию и обеспечению качества ПО. Присоединяйтесь к сообществу тестировщиков!{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -10,19 +10,27 @@
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Moscow QA",
-    "description": "Сообщество тестировщиков Москвы",
+    "description": "Moscow QA — бесплатные митапы по тестированию и обеспечению качества ПО в Москве. Доклады по автоматизации, ручному и нагрузочному тестированию.",
     {% if site_url %}"url": "{{ site_url }}/",{% endif %}
     "sameAs": [
         "{{ site.telegram }}",
         "{{ site.youtube }}"
-    ]
+    ],
+    "areaServed": {
+        "@type": "City",
+        "name": "Москва"
+    },
+    "knowsAbout": ["тестирование ПО", "QA", "автоматизация тестирования", "обеспечение качества"]
 }
 </script>
 {% endblock %}
 
 {% block content %}
 <main class="main">
-    <h1 class="sr-only">MoscowQA — Сообщество тестировщиков Москвы</h1>
+    <section class="hero-intro" style="text-align:center;padding:2.5rem 0 1rem;">
+        <h1>Митапы по тестированию в Москве</h1>
+        <p style="max-width:640px;margin:0.75rem auto 0;color:var(--gray-600);font-size:1.125rem;">Moscow QA — сообщество тестировщиков и QA-инженеров. Проводим бесплатные митапы с докладами по автоматизации тестирования, ручному тестированию, нагрузочному тестированию и обеспечению качества ПО.</p>
+    </section>
     <div class="container">
         {% set upcoming = [] %}
         {% set past = [] %}

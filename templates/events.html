@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% set active_page = 'index' %}
 
-{% block title %}Мероприятия — {{ site.title }}{% endblock %}
-{% block description %}Все мероприятия сообщества тестировщиков Moscow QA: {{ events | length }} митапов с докладами по тестированию и QA{% endblock %}
+{% block title %}Все митапы по тестированию в Москве — {{ site.title }}{% endblock %}
+{% block description %}{{ events | length }} митапов по тестированию в Москве от сообщества Moscow QA. Доклады по автоматизации, ручному и нагрузочному тестированию, QA-процессам и обеспечению качества ПО{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -19,8 +19,8 @@
 {% block content %}
 <main class="main">
     <div class="container">
-        <h2 class="section__title">Все мероприятия</h2>
-        <p class="text-muted" style="margin-bottom: 2rem;">{{ events | length }} мероприятий Moscow QA</p>
+        <h1 class="section__title">Все митапы по тестированию в Москве</h1>
+        <p class="text-muted" style="margin-bottom: 2rem;">{{ events | length }} митапов сообщества Moscow QA — доклады по тестированию, автоматизации и QA</p>
 
         {% for event in events %}
         <article class="event-card">

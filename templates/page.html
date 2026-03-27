@@ -2,7 +2,7 @@
 {% set active_page = page.slug %}
 
 {% block title %}{{ page.title }} — {{ site.title }}{% endblock %}
-{% block description %}{{ page.title }} — {{ site.title }}{% endblock %}
+{% block description %}{{ page.meta_description | default(page.title ~ ' — ' ~ site.title ~ '. Митапы по тестированию в Москве') }}{% endblock %}
 
 {% block content %}
 <main class="main">
