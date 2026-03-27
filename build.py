@@ -203,7 +203,7 @@ def build():
 
     site = {
         "title": "Moscow QA",
-        "description": "Митапы по тестированию и QA в Москве",
+        "description": "QA-сообщество Москвы — митапы по тестированию",
         "telegram": "https://t.me/moscowqa",
         "youtube": "https://www.youtube.com/@moscowqa",
         "timepad": "https://moscowqa.timepad.ru",
