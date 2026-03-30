@@ -34,3 +34,4 @@ external_talks:
 ---
 
 SDET с 2018 года. Certified Node.js Application Developer (JSNAD 2023). Помогаю с автоматизацией и нагрузочным тестированием. Автор TG-канала @haradkou_sdet.
+Автор библиотек playwright-labs, rslike, ajv-ts. Open source контрибьютор в playwright, puppeteer, allure, elastic kibana.
