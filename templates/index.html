@@ -32,26 +32,31 @@
         <p style="max-width:640px;margin:0.75rem auto 0;color:var(--gray-600);font-size:1.125rem;">Moscow QA — сообщество тестировщиков и QA-инженеров Москвы. Проводим бесплатные митапы с докладами по автоматизации тестирования, ручному тестированию, нагрузочному тестированию и обеспечению качества ПО.</p>
     </section>
     <div class="container">
-        {% set upcoming = [] %}
-        {% set past = [] %}
-        {% for event in events %}
-            {% if not event.completed %}
-                {% set _ = upcoming.append(event) %}
-            {% else %}
-                {% set _ = past.append(event) %}
-            {% endif %}
-        {% endfor %}
-
-        {% if upcoming %}
-        <section class="section">
+        {#
+          Upcoming/past partitioning is done on the frontend.
+          static/js/events-status.js moves cards from `[data-events-source]`
+          into the two target containers below, then removes the source and
+          hides any empty section.
+        #}
+        <section class="section" data-upcoming-section hidden>
             <h2 class="section__title">Предстоящие события</h2>
-            {% for event in upcoming %}
-            <article class="event-card">
+            <div data-events-upcoming></div>
+        </section>
+
+        <section class="section" data-past-section hidden>
+            <h2 class="section__title" style="color: var(--gray-600);">Прошедшие события</h2>
+            <div data-events-past></div>
+        </section>
+
+        <section class="section" data-events-source>
+            <h2 class="section__title">Все события</h2>
+            {% for event in events %}
+            <article class="event-card is-upcoming" data-event-date="{{ event.date }}">
                 <div class="event-card__inner">
                     <div class="event-card__badge" style="position: relative;">
                         <span class="event-card__number">{{ event.number }}</span>
                         <span class="event-card__label">MoscowQA</span>
-                        <span class="event-card__tag--upcoming">Предстоящее</span>
+                        <span class="event-card__tag--upcoming js-upcoming-only">Предстоящее</span>
                     </div>
                     <div class="event-card__body">
                         <div class="event-card__meta">
@@ -60,52 +65,13 @@
                                 <time datetime="{{ event.date }}">{{ event.date }}</time>
                             </div>
                             {% if event.address %}
-                            <div class="event-card__meta-item">
+                            <div class="event-card__meta-item js-upcoming-only">
                                 <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke-width="2"/><circle cx="12" cy="9" r="2.5" stroke-width="2"/></svg>
                                 <span>{{ event.address }}</span>
                             </div>
                             {% endif %}
-                        </div>
-                        <h3 class="event-card__title">
-                            <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
-                        </h3>
-                        <p class="event-card__desc">{{ event.short_description }}</p>
-                        <div class="event-card__actions">
-                            {% if event.talks %}
-                            <span class="event-card__tag event-card__tag--talks">
-                                {% set n = event.talks | length %}{{ n }} {% if n % 10 == 1 and n % 100 != 11 %}доклад{% elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}
-                            </span>
-                            {% endif %}
-                            {% if event.registration_link %}
-                            <a href="{{ event.registration_link }}" class="btn btn--green" target="_blank" rel="noopener">Зарегистрироваться &rarr;</a>
-                            {% endif %}
-                            <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-            {% endfor %}
-        </section>
-        {% endif %}
-
-        {% if past %}
-        <section class="section">
-            <h2 class="section__title" style="color: var(--gray-600);">Прошедшие события</h2>
-            {% for event in past %}
-            <article class="event-card">
-                <div class="event-card__inner">
-                    <div class="event-card__badge">
-                        <span class="event-card__number">{{ event.number }}</span>
-                        <span class="event-card__label">MoscowQA</span>
-                    </div>
-                    <div class="event-card__body">
-                        <div class="event-card__meta">
-                            <div class="event-card__meta-item">
-                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/></svg>
-                                <time datetime="{{ event.date }}">{{ event.date }}</time>
-                            </div>
                             {% if event.company %}
-                            <div class="event-card__meta-item">
+                            <div class="event-card__meta-item js-completed-only">
                                 <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-width="2"/></svg>
                                 <span>{{ event.company }}</span>
                             </div>
@@ -121,6 +87,9 @@
                                 {% set n = event.talks | length %}{{ n }} {% if n % 10 == 1 and n % 100 != 11 %}доклад{% elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}
                             </span>
                             {% endif %}
+                            {% if event.registration_link %}
+                            <a href="{{ event.registration_link }}" class="btn btn--green js-upcoming-only" target="_blank" rel="noopener">Зарегистрироваться &rarr;</a>
+                            {% endif %}
                             <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
                         </div>
                     </div>
@@ -128,7 +97,6 @@
             </article>
             {% endfor %}
         </section>
-        {% endif %}
 
         {% if not events %}
         <div style="text-align: center; padding: 3rem;">
