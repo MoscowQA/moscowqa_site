@@ -13,6 +13,11 @@ from datetime import date
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
+# Completed vs. upcoming status is now determined on the frontend in
+# static/js/events-status.js, based on the visitor's current date. The build
+# step intentionally does not set `event.completed`; templates render both
+# states and let JS toggle `.is-upcoming` / `.is-completed` classes.
+
 ROOT = Path(__file__).parent
 CONTENT_DIR = ROOT / "content"
 TEMPLATES_DIR = ROOT / "templates"
@@ -84,14 +89,9 @@ def load_events() -> list[dict]:
                     talk.get("slug")
                 )
 
-            # Auto-mark past events as completed
-            event_date = event.get("date")
-            if event_date:
-                if isinstance(event_date, str):
-                    event_date = date.fromisoformat(event_date)
-                if event_date < date.today():
-                    event["completed"] = True
-
+            # Note: past-vs-upcoming detection has moved to the browser
+            # (static/js/events-status.js). Templates emit `data-event-date`
+            # on cards and JS applies `.is-completed` / `.is-upcoming`.
             events.append(event)
     events.sort(key=lambda e: e.get("date", ""), reverse=True)
     return events

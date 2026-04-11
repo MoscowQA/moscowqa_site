@@ -62,7 +62,7 @@
     </div>
 </div>
 
-<main class="main">
+<main class="main is-upcoming" data-event-date="{{ event.date }}">
     <div class="container">
         <!-- Info Cards -->
         <div class="info-grid">
@@ -92,8 +92,8 @@
             </div>
             {% endif %}
 
-            {% if event.registration_link and not event.completed %}
-            <a href="{{ event.registration_link }}" target="_blank" rel="noopener" style="text-decoration:none;">
+            {% if event.registration_link %}
+            <a href="{{ event.registration_link }}" target="_blank" rel="noopener" style="text-decoration:none;" class="js-upcoming-only">
                 <div class="info-card info-card--gradient">
                     <div class="info-card__header">
                         <div class="info-card__icon">&#127915;</div>
@@ -114,7 +114,7 @@
                     <div class="info-card__header">
                         <div class="info-card__icon">&#9654;</div>
                         <div>
-                            <h3 class="info-card__title">{{ 'Запись' if event.completed else 'Трансляция' }}</h3>
+                            <h3 class="info-card__title"><span class="js-upcoming-only">Трансляция</span><span class="js-completed-only">Запись</span></h3>
                             <div style="margin-top:0.75rem;">
                                 <span class="btn btn--pink">Смотреть</span>
                             </div>

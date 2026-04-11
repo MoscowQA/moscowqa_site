@@ -1239,3 +1239,14 @@ img { max-width: 100%; height: auto; }
         justify-content: center;
     }
 }
+
+/* === Frontend-determined event status === */
+/* Templates render every event as `.is-upcoming` by default and
+   static/js/events-status.js flips past events to `.is-completed`
+   based on the visitor's local date. */
+.is-upcoming .js-completed-only { display: none !important; }
+.is-completed .js-upcoming-only { display: none !important; }
+
+/* When JS is available, hide the flat source list while the partitioning
+   script runs. Without JS, the source section stays visible as a fallback. */
+.has-js [data-events-source] { display: none; }
