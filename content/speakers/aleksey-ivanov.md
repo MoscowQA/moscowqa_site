@@ -1,82 +1,82 @@
 ---
-name: "Алексей Иванов"
-company: ""
-photo: "https://storage.yandexcloud.net/barbez/photo_2024-01-12_14-33-53.jpg"
-telegram: "alexey_qa"
-github: "dragin96"
-twitter: "dragin96"
-website: "https://t.me/dev_qa"
+name: Алексей Иванов
+company: ''
+photo: https://storage.yandexcloud.net/barbez/photo_2024-01-12_14-33-53.jpg
+telegram: alexey_qa
+github: dragin96
+twitter: dragin96
+website: https://t.me/dev_qa
 external_talks:
-  - title: "Круглый стол: факапы найма тестировщиков"
-    event: "SQA Days #33"
-    date: "2023-08-11"
-    url: "https://sqadays.com/ru/talk/112207"
-    slides_url: ""
-  - title: "Используем JS в браузере для повседневных задачек"
-    event: "Heisenbug 2023 Autumn"
-    date: "2023-10-04"
-    url: "https://www.youtube.com/watch?v=g434PMOLWfs"
-    slides_url: "https://squidex.jugru.team/api/assets/srm/471a5dfe-ea7c-42e1-a8e9-0904b980b43a/heisenbug-2023-1-pagenumber.pdf"
-  - title: "Moscowcss_23 Авито"
-    event: "Moscow CSS"
-    date: "2023-12-14"
-    url: "https://www.youtube.com/watch?v=cYgw9LGvb7k"
-    slides_url: ""
-  - title: "Браузерные инструменты на страже перформанса"
-    event: "Heisenbug 2024 Spring"
-    date: "2024-04-10"
-    url: "https://www.youtube.com/watch?v=WroJikjigpg"
-    slides_url: ""
-  - title: "Дискуссия «Уютные автотестирования»"
-    event: "Alfa QA Talks"
-    date: "2024-04-18"
-    url: "https://www.youtube.com/watch?v=nSDNye62hOk"
-    slides_url: ""
-  - title: "Браузерные инструменты: ищем проблемы рендеринга"
-    event: "Heisenbug 2024 Spring"
-    date: "2024-04-22"
-    url: "https://heisenbug.ru/archive/2024%20Spring/talks/b73f322db5094c19967e3a51ca123de3/"
-    slides_url: "https://squidex.jugru.team/api/assets/srm/5f63af31-53fb-4540-818d-ea3281ef42d7/2024-spring-ivanov-design-2-.pdf"
-  - title: "Круглый стол: факапы найма тестировщиков"
-    event: "SQA Days #35"
-    date: "2024-04-24"
-    url: "https://www.youtube.com/watch?v=OLyFXrP5KrI"
-    slides_url: ""
-  - title: "Автоматизация фронтенда: от Junior до Senior"
-    event: "SQA Days #35"
-    date: "2024-07-23"
-    url: "https://sqadays.com/ru/talk/125231"
-    slides_url: ""
-  - title: "Путь в профессию QA: интервью с основателями MoscowQA"
-    event: "IT всему голова"
-    date: "2024-11-24"
-    url: "https://www.youtube.com/watch?v=bZzAbHWYjrw"
-    slides_url: ""
-  - title: "Падаем красиво в Playwright-тестах"
-    event: "Heisenbug 2025 Spring"
-    date: "2025-04-05"
-    url: "https://heisenbug.ru/archive/2025%20Spring/talks/57de2defdad04622b3b1f8335ec32521/"
-    slides_url: "https://squidex.jugru.team/api/assets/srm/f3017408-fdde-4e17-bcd0-ca1e4b4cc126/gei-zen2025.pdf"
-  - title: "Автоматизация фронтенда: от Junior до Senior"
-    event: "SQA Days #36"
-    date: "2025-05-03"
-    url: "https://www.youtube.com/watch?v=dGFVXt9YVT4"
-    slides_url: ""
-  - title: "Падаем красиво в Playwright-тестах"
-    event: "Heisenbug 2025 Autumn"
-    date: "2025-09-10"
-    url: "https://www.youtube.com/watch?v=PYQBSpwAquw"
-    slides_url: ""
-  - title: "Митап по QA: тестирование без рутины — практики, кейсы, инструменты"
-    event: "Evrone"
-    date: "2025-09-25"
-    url: "https://www.youtube.com/watch?v=vA5Y17dglEU"
-    slides_url: ""
-  - title: "Браузерные инструменты: пишем свое расширение"
-    event: "Heisenbug 2025 Autumn"
-    date: "2025-10-20"
-    url: "https://heisenbug.ru/archive/2025%20Autumn/talks/7c267e3ab12e440694b246eddd752f4b/"
-    slides_url: "https://squidex.jugru.team/api/assets/srm/ec2c8931-10c1-4c8a-964b-f778c8ffe717/gei-zen-2025-.pdf"
+- title: 'Круглый стол: факапы найма тестировщиков'
+  event: 'SQA Days #33'
+  date: '2023-08-11'
+  url: https://sqadays.com/ru/talk/112207
+  slides_url: ''
+- title: Moscowcss_23 Авито
+  event: Moscow CSS
+  date: '2023-12-14'
+  url: https://www.youtube.com/watch?v=cYgw9LGvb7k
+  slides_url: ''
+- title: Дискуссия «Уютные автотестирования»
+  event: Alfa QA Talks
+  date: '2024-04-18'
+  url: https://www.youtube.com/watch?v=nSDNye62hOk
+  slides_url: ''
+- title: 'Браузерные инструменты: ищем проблемы рендеринга'
+  event: Heisenbug 2024 Spring
+  date: '2024-04-22'
+  url: https://heisenbug.ru/archive/2024%20Spring/talks/b73f322db5094c19967e3a51ca123de3/
+  slides_url: https://squidex.jugru.team/api/assets/srm/5f63af31-53fb-4540-818d-ea3281ef42d7/2024-spring-ivanov-design-2-.pdf
+- title: 'Круглый стол: факапы найма тестировщиков'
+  event: 'SQA Days #35'
+  date: '2024-04-24'
+  url: https://www.youtube.com/watch?v=OLyFXrP5KrI
+  slides_url: ''
+- title: 'Автоматизация фронтенда: от Junior до Senior'
+  event: 'SQA Days #35'
+  date: '2024-07-23'
+  url: https://sqadays.com/ru/talk/125231
+  slides_url: ''
+- title: 'Путь в профессию QA: интервью с основателями MoscowQA'
+  event: IT всему голова
+  date: '2024-11-24'
+  url: https://www.youtube.com/watch?v=bZzAbHWYjrw
+  slides_url: ''
+- title: Падаем красиво в Playwright-тестах
+  event: Heisenbug 2025 Spring
+  date: '2025-04-05'
+  url: https://heisenbug.ru/archive/2025%20Spring/talks/57de2defdad04622b3b1f8335ec32521/
+  slides_url: https://squidex.jugru.team/api/assets/srm/f3017408-fdde-4e17-bcd0-ca1e4b4cc126/gei-zen2025.pdf
+- title: 'Автоматизация фронтенда: от Junior до Senior'
+  event: 'SQA Days #36'
+  date: '2025-05-03'
+  url: https://www.youtube.com/watch?v=dGFVXt9YVT4
+  slides_url: ''
+- title: Падаем красиво в Playwright-тестах
+  event: Heisenbug 2025 Autumn
+  date: '2025-09-10'
+  url: https://www.youtube.com/watch?v=PYQBSpwAquw
+  slides_url: ''
+- title: 'Митап по QA: тестирование без рутины — практики, кейсы, инструменты'
+  event: Evrone
+  date: '2025-09-25'
+  url: https://www.youtube.com/watch?v=vA5Y17dglEU
+  slides_url: ''
+- title: 'Браузерные инструменты: пишем свое расширение'
+  event: Heisenbug 2025 Autumn
+  date: '2025-10-20'
+  url: https://heisenbug.ru/archive/2025%20Autumn/talks/7c267e3ab12e440694b246eddd752f4b/
+  slides_url: https://squidex.jugru.team/api/assets/srm/ec2c8931-10c1-4c8a-964b-f778c8ffe717/gei-zen-2025-.pdf
+- title: Браузерные инструменты на страже перформанса
+  event: Heisenbug 2023 Autumn
+  date: '2023-10-16'
+  url: https://heisenbug.ru/archive/2023%20Autumn/talks/91c018e737d84ecf859e1e8a902cdb35/
+  slides_url: https://squidex.jugru.team/api/assets/srm/1111ee6b-4d85-4f46-bf1a-a96b1408d8c1/ivanov-end.pdf
+- title: Используем JS в браузере для повседневных задачек
+  event: Heisenbug 2023 Spring
+  date: '2023-04-17'
+  url: https://heisenbug.ru/archive/2023%20Spring/talks/14e78d4c963b42ee90c267800ceb5e44/
+  slides_url: https://squidex.jugru.team/api/assets/srm/471a5dfe-ea7c-42e1-a8e9-0904b980b43a/heisenbug-2023-1-pagenumber.pdf
 ---
 
 Увлекаюсь тестированием и ценю качество продуктов. Особенно по душе писать код, который проверяет код, а также заниматься программированием ради удовольствия.

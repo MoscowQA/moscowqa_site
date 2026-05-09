@@ -35,7 +35,7 @@ def load_speakers() -> list[dict]:
                 "meta": meta,
                 "body": body,
                 "existing_urls": {
-                    t.get("url", "") for t in (meta.get("external_talks") or [])
+                    t.get("url", "").lower() for t in (meta.get("external_talks") or [])
                 },
             }
         )
@@ -72,9 +72,9 @@ def save_speaker(speaker: dict, new_talks: list[dict]) -> int:
     """
     added = []
     for talk in new_talks:
-        if talk.get("url", "") not in speaker["existing_urls"]:
+        if talk.get("url", "").lower() not in speaker["existing_urls"]:
             added.append(talk)
-            speaker["existing_urls"].add(talk.get("url", ""))
+            speaker["existing_urls"].add(talk.get("url", "").lower())
 
     if not added:
         return 0

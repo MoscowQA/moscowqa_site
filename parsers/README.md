@@ -1,57 +1,61 @@
 # Parsers
 
-Scripts to collect external speaker talks from conference sites and update speaker `.md` files.
-
-## Setup
+## Первый запуск
 
 ```bash
-cd parsers
-pip install -r requirements.txt
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r parsers/requirements.txt
 ```
 
-## Heisenbug
+---
 
-Parses all editions from `heisenbug.ru/archive/`.
+## Добавить доклады с Heisenbug
+
+### Когда вышел новый сезон
 
 ```bash
-# Dry run — see matches without writing anything
-python parse_heisenbug.py --dry-run
-
-# Actually write to speaker files
-python parse_heisenbug.py
-
-# Also fetch individual talk pages (more accurate title/date/slides, ~3× slower)
-python parse_heisenbug.py --detail
+python parsers/collect_heisenbug.py --edition "2026 Spring"
+python parsers/sync_heisenbug.py
+python build.py
 ```
 
-## SQA Days
-
-Parses the talks listing from `sqadays.com/ru/talks` (paginated).
+### Полная пересборка с нуля
 
 ```bash
-# Dry run
-python parse_sqadays.py --dry-run
-
-# All pages
-python parse_sqadays.py
-
-# Specific page range (faster for testing)
-python parse_sqadays.py --pages 1-10
-
-# Fetch individual talk pages for speaker names + slides
-python parse_sqadays.py --detail
+python parsers/collect_heisenbug.py
+python parsers/sync_heisenbug.py
+python build.py
 ```
 
-## How it works
+---
 
-1. Loads speaker names from `content/speakers/*.md`
-2. Scrapes conference talk listings
-3. Matches speaker names (exact + partial)
-4. Appends new entries to `external_talks:` in the speaker files
-5. Skips talks already recorded (by URL)
+## Добавить доклады с SQA Days
 
-## Tips
+```bash
+python parsers/parse_sqadays.py
+python build.py
+```
 
-- Run with `--dry-run` first to see what would be added
-- Speaker name matching is approximate: "Алексей Иванов" matches "Алексей Иванов (МoscowQA)" etc.
-- After running, review the changes with `git diff content/speakers/` before committing
+---
+
+## Посмотреть изменения перед применением
+
+К любому скрипту добавьте `--dry-run`:
+
+```bash
+python parsers/sync_heisenbug.py --dry-run
+python parsers/parse_sqadays.py --dry-run
+```
+
+---
+
+## Добавить нового спикера MoscowQA
+
+1. Создайте файл в `content/speakers/`
+2. Запустите синхронизацию — доклады с Heisenbug подтянутся автоматически:
+
+```bash
+python parsers/sync_heisenbug.py
+python build.py
+```
