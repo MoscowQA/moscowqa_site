@@ -131,6 +131,8 @@ def generate_sitemap(events, speakers, pages):
     urls.append({"loc": f"{SITE_URL}/events/", "changefreq": "weekly", "priority": "0.9"})
     # Speakers list
     urls.append({"loc": f"{SITE_URL}/speakers/", "changefreq": "weekly", "priority": "0.8"})
+    # Presentations (external talks aggregator)
+    urls.append({"loc": f"{SITE_URL}/presentations/", "changefreq": "weekly", "priority": "0.75"})
 
     # Individual events
     for event in events:
@@ -307,6 +309,31 @@ def build():
         speaker_dir = OUTPUT_DIR / "speakers" / speaker["slug"]
         speaker_dir.mkdir(parents=True, exist_ok=True)
         (speaker_dir / "index.html").write_text(html, encoding="utf-8")
+
+    # Build presentations (all external talks) page
+    all_talks = []
+    for speaker in speakers:
+        for talk in speaker.get("external_talks") or []:
+            all_talks.append({
+                **talk,
+                "speaker_name": speaker["name"],
+                "speaker_slug": speaker["slug"],
+                "speaker_company": speaker.get("company", ""),
+            })
+    all_talks.sort(key=lambda t: t.get("date") or "", reverse=True)
+    speakers_with_talks = sum(
+        1 for s in speakers if s.get("external_talks")
+    )
+    tpl = env.get_template("presentations.html")
+    html = tpl.render(
+        **common,
+        all_talks=all_talks,
+        total_count=len(all_talks),
+        speakers_with_talks=speakers_with_talks,
+        canonical_url=f"{SITE_URL}/presentations/",
+    )
+    (OUTPUT_DIR / "presentations").mkdir(exist_ok=True)
+    (OUTPUT_DIR / "presentations" / "index.html").write_text(html, encoding="utf-8")
 
     # Build extra pages (about, cfp, etc.)
     tpl = env.get_template("page.html")
