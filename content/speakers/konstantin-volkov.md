@@ -35,11 +35,6 @@ external_talks:
   date: ''
   url: http://sqadays.com/ru/talk/134310
   slides_url: ''
-- title: QA и open source. Тестирование в open source-проектах. Интеграция продуктов
-  event: Heisenbug 2024 Autumn
-  date: '2024-10-17'
-  url: https://www.youtube.com/watch?v=QJmfjqlI9LM
-  slides_url: https://squidex.jugru.team/api/assets/srm/a7d76b9e-8639-4fbc-a95c-6656ceafb27c/heisenbug-autumn-2024.pdf
 - title: Zero to Hero. Production QA
   event: Heisenbug 2024 Spring
   date: '2024-04-22'
@@ -50,6 +45,11 @@ external_talks:
   date: '2023-10-15'
   url: https://heisenbug.ru/archive/2023%20Autumn/talks/85e92e5e6fe44ece92028def717216f5/
   slides_url: https://squidex.jugru.team/api/assets/srm/1cbaeee5-738e-4693-acd5-5a87d81c1158/volkovks.pdf
+- title: QA и open source. Тестирование в open source-проектах. Интеграция продуктов
+  event: Heisenbug 2024 Autumn
+  date: '2024-10-17'
+  url: https://heisenbug.ru/archive/2024%20Autumn/talks/44e86bac62294705bf2176a167b8dfa4/
+  slides_url: https://squidex.jugru.team/api/assets/srm/a7d76b9e-8639-4fbc-a95c-6656ceafb27c/heisenbug-autumn-2024.pdf
 ---
 
 QA manager в Flipper Devices. Занимается автотестами на стыке электроники и веба.

@@ -4,6 +4,11 @@ import time
 import yaml
 from pathlib import Path
 
+
+def norm_url(url: str) -> str:
+    """Normalize URL for deduplication: lowercase, strip protocol and trailing slash."""
+    return re.sub(r"^https?://", "", (url or "").lower()).rstrip("/")
+
 SPEAKERS_DIR = Path(__file__).parent.parent / "content" / "speakers"
 
 HEADERS = {
@@ -35,7 +40,7 @@ def load_speakers() -> list[dict]:
                 "meta": meta,
                 "body": body,
                 "existing_urls": {
-                    t.get("url", "").lower() for t in (meta.get("external_talks") or [])
+                    norm_url(t.get("url", "")) for t in (meta.get("external_talks") or [])
                 },
             }
         )
@@ -72,9 +77,9 @@ def save_speaker(speaker: dict, new_talks: list[dict]) -> int:
     """
     added = []
     for talk in new_talks:
-        if talk.get("url", "").lower() not in speaker["existing_urls"]:
+        if norm_url(talk.get("url", "")) not in speaker["existing_urls"]:
             added.append(talk)
-            speaker["existing_urls"].add(talk.get("url", "").lower())
+            speaker["existing_urls"].add(norm_url(talk.get("url", "")))
 
     if not added:
         return 0

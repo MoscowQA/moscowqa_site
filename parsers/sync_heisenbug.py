@@ -19,6 +19,7 @@ from common import (
     build_name_index,
     find_speaker,
     save_speaker,
+    norm_url,
 )
 
 HEISENBUG_JSON = Path(__file__).parent.parent / "heisenbug_speakers.json"
@@ -69,7 +70,7 @@ def main():
         new_entries = []
         for t in talks:
             url = t["url"]
-            url_key = url.lower()
+            url_key = norm_url(url)
             if url_key in mq_speaker["existing_urls"] or url_key in seen_in_batch:
                 continue
             seen_in_batch.add(url_key)
