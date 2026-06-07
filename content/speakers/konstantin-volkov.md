@@ -1,6 +1,6 @@
 ---
 name: Константин Волков
-company: Flipper Devices
+company: Veai
 photo: https://storage.yandexcloud.net/barbez/speaker/volkov3.png
 telegram: Kostya_Volkov
 github: ''
