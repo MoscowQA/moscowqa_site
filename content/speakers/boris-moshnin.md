@@ -1,6 +1,6 @@
 ---
 name: Борис Мошнин
-company: SM Lab
+company: Wildberries & Russ
 photo: https://storage.yandexcloud.net/barbez/speaker/moshnin.png
 telegram: ''
 github: ''
@@ -22,4 +22,4 @@ external_talks:
   slides_url: ''
 ---
 
-Инженер качества в SM Lab. Занимается вопросами самоорганизации и развития профессиональных компетенций QA специалистов.
+Инженер качества в Wildberries & Russ. Занимается вопросами самоорганизации и развития профессиональных компетенций QA специалистов.

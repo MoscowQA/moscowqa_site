@@ -1,6 +1,6 @@
 ---
 name: Константин Волков
-company: Flipper Devices
+company: Veai
 photo: https://storage.yandexcloud.net/barbez/speaker/volkov3.png
 telegram: Kostya_Volkov
 github: ''
@@ -52,4 +52,4 @@ external_talks:
   slides_url: https://squidex.jugru.team/api/assets/srm/a7d76b9e-8639-4fbc-a95c-6656ceafb27c/heisenbug-autumn-2024.pdf
 ---
 
-QA manager в Flipper Devices. Занимается автотестами на стыке электроники и веба.
+15+ лет инженерного опыта: от highload-систем до устройств для взлома. Помогаю компаниям внедрять AI-агентов, держать их под контролем и честно оценивать эффект. Пытаюсь внести инженерный подход в чайка-менеджмент, и иногда это даже работает.

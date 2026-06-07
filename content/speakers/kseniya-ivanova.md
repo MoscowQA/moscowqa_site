@@ -1,7 +1,7 @@
 ---
 name: "Ксения Иванова"
 company: ""
-photo: ""
+photo: "https://storage.yandexcloud.net/barbez/speaker/ivanovaXeniya.png"
 telegram: ""
 github: ""
 ---
