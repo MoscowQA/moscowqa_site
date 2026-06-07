@@ -26,12 +26,14 @@
     </div>
 
     <div class="container">
-        {% macro person_card(name) %}
-        {% set speaker = speaker_by_name.get(name) %}
+        {% macro person_card(person) %}
+        {% set speaker = speaker_by_name.get(person.name) %}
+        {% set photo = (speaker.photo if speaker else none) or person.photo %}
+        {% set company = (speaker.company if speaker else none) or person.company %}
         <div class="speaker-card">
             <div class="speaker-card__photo">
-                {% if speaker and speaker.photo %}
-                <img src="{{ speaker.photo }}" alt="{{ name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                {% if photo %}
+                <img src="{{ photo }}" alt="{{ person.name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
                 {% else %}
                 <div class="speaker-card__placeholder">&#128100;</div>
                 {% endif %}
@@ -39,13 +41,13 @@
             <div class="speaker-card__info">
                 <div class="speaker-card__name">
                     {% if speaker %}
-                    <a href="{{ base }}/speakers/{{ speaker.slug }}/">{{ name }}</a>
+                    <a href="{{ base }}/speakers/{{ speaker.slug }}/">{{ person.name }}</a>
                     {% else %}
-                    {{ name }}
+                    {{ person.name }}
                     {% endif %}
                 </div>
-                {% if speaker and speaker.company %}
-                <div class="speaker-card__company">{{ speaker.company }}</div>
+                {% if company %}
+                <div class="speaker-card__company">{{ company }}</div>
                 {% endif %}
                 {% if speaker %}
                 <a href="{{ base }}/speakers/{{ speaker.slug }}/" class="btn btn--pink" style="font-size:0.85rem; padding:0.5rem 1.25rem;">Профиль спикера</a>
@@ -57,8 +59,8 @@
         {% if page.organizers %}
         <h2 class="section__title">Организаторы</h2>
         <div class="speakers-grid">
-            {% for name in page.organizers %}
-            {{ person_card(name) }}
+            {% for person in page.organizers %}
+            {{ person_card(person) }}
             {% endfor %}
         </div>
         {% endif %}
@@ -66,8 +68,8 @@
         {% if page.program_committee %}
         <h2 class="section__title">Программный комитет</h2>
         <div class="speakers-grid">
-            {% for name in page.program_committee %}
-            {{ person_card(name) }}
+            {% for person in page.program_committee %}
+            {{ person_card(person) }}
             {% endfor %}
         </div>
         {% endif %}
