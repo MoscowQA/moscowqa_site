@@ -335,9 +335,26 @@ def build():
     (OUTPUT_DIR / "presentations").mkdir(exist_ok=True)
     (OUTPUT_DIR / "presentations" / "index.html").write_text(html, encoding="utf-8")
 
+    # Page slugs that use a dedicated template instead of the generic page.html
+    custom_page_templates = {"organizers": "organizers.html"}
+
     # Build extra pages (about, cfp, etc.)
     tpl = env.get_template("page.html")
     for slug, page in pages.items():
+        if slug in custom_page_templates:
+            continue
+        canonical = f"{SITE_URL}/{slug}/"
+        html = tpl.render(**common, page=page, canonical_url=canonical)
+        page_dir = OUTPUT_DIR / slug
+        page_dir.mkdir(parents=True, exist_ok=True)
+        (page_dir / "index.html").write_text(html, encoding="utf-8")
+
+    # Build pages with dedicated templates (e.g. organizers)
+    for slug, template_name in custom_page_templates.items():
+        page = pages.get(slug)
+        if not page:
+            continue
+        tpl = env.get_template(template_name)
         canonical = f"{SITE_URL}/{slug}/"
         html = tpl.render(**common, page=page, canonical_url=canonical)
         page_dir = OUTPUT_DIR / slug

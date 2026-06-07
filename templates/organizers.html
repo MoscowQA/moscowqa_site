@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% set active_page = page.slug %}
+
+{% block title %}{{ page.title }} — {{ site.title }}{% endblock %}
+{% block description %}{{ page.meta_description | default(page.title ~ ' — ' ~ site.title ~ '. Митапы по тестированию в Москве') }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Организаторы", "item": "{{ site_url }}/organizers/"}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <div class="container container--narrow">
+        <h1 class="section__title">{{ page.title }}</h1>
+        {% if page.body %}
+        <div class="md-content">{{ page.body | safe }}</div>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        {% macro person_card(name) %}
+        {% set speaker = speaker_by_name.get(name) %}
+        <div class="speaker-card">
+            <div class="speaker-card__photo">
+                {% if speaker and speaker.photo %}
+                <img src="{{ speaker.photo }}" alt="{{ name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                {% else %}
+                <div class="speaker-card__placeholder">&#128100;</div>
+                {% endif %}
+            </div>
+            <div class="speaker-card__info">
+                <div class="speaker-card__name">
+                    {% if speaker %}
+                    <a href="{{ base }}/speakers/{{ speaker.slug }}/">{{ name }}</a>
+                    {% else %}
+                    {{ name }}
+                    {% endif %}
+                </div>
+                {% if speaker and speaker.company %}
+                <div class="speaker-card__company">{{ speaker.company }}</div>
+                {% endif %}
+                {% if speaker %}
+                <a href="{{ base }}/speakers/{{ speaker.slug }}/" class="btn btn--pink" style="font-size:0.85rem; padding:0.5rem 1.25rem;">Профиль спикера</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endmacro %}
+
+        {% if page.organizers %}
+        <h2 class="section__title">Организаторы</h2>
+        <div class="speakers-grid">
+            {% for name in page.organizers %}
+            {{ person_card(name) }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if page.program_committee %}
+        <h2 class="section__title">Программный комитет</h2>
+        <div class="speakers-grid">
+            {% for name in page.program_committee %}
+            {{ person_card(name) }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
