@@ -6,4 +6,4 @@ telegram: "kus_qa"
 github: ""
 ---
 
-Волонтёр, орг Moscow QA.
+Организатор Moscow QA, амбассадор бездомных котиков.
