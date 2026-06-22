@@ -7,7 +7,7 @@ address: "Москва, Пресненская набережная, 10"
 completed: false
 type: "Offline + Online"
 short_description: "Митап совместно с командой Ozon Tech. Доклады про эволюцию QA в эпоху ИИ и автоматизацию API тестов без рук."
-registration_link: ""
+registration_link: "https://moscowqa.timepad.ru/event/4046132/"
 video_link: ""
 photos_link: ""
 talks:
