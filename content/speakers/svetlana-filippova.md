@@ -1,7 +1,7 @@
 ---
 name: "Светлана Филиппова"
 company: ""
-photo: ""
+photo: "/static/images/speakers/filipovaSveta.png"
 telegram: ""
 github: ""
 ---
