@@ -47,6 +47,12 @@ external_talks:
 | `company` | Текущая компания | `"2ГИС"` |
 | `photo` | URL к вашему фото | `"https://storage.yandexcloud.net/barbez/speaker/aleksey-ivanov.png"` |
 
+Если фото заливается локально в `static/images/speakers/` (например `photo: "/static/images/speakers/ivan-ivanov.png"`), перед коммитом сожмите его до ~1080px по длинной стороне:
+
+```bash
+python3 scripts/compress_photo.py static/images/speakers/ivan-ivanov.png
+```
+
 ### Необязательные поля (социальные сети)
 
 Вы можете добавить ссылки на свои социальные сети и сайт. Если не хотите указывать какую-то соцсеть, просто оставьте пустые кавычки `""` или не указывайте это поле.
