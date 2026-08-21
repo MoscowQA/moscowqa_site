@@ -6,7 +6,7 @@ company: "Мир Plat.Form"
 address: "Москва, пространство «Ludwig Hall»"
 type: "Offline"
 short_description: "Финал лета вместе с «Мир Plat.Form» в пространстве «Ludwig Hall». Доклады про метрики автоматизации, работу аналитика с тестировщиком, интеграционные тесты как сервис и место QA в эпоху нейронок."
-registration_link: ""
+registration_link: "https://mir-platform.ru/qameetup?utm_source=moscowqa&utm_medium=tg&utm_campaign=qameetup"
 video_link: ""
 photos_link: ""
 talks:
