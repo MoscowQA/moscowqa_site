@@ -1,7 +1,7 @@
 ---
 name: "Регина Зимакова"
 company: "Системный аналитик"
-photo: ""
+photo: "/static/images/speakers/regina-zimakova.png"
 telegram: ""
 github: ""
 ---
