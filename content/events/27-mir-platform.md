@@ -3,7 +3,7 @@ title: "Moscow QA #27 x Мир Plat.Form"
 number: 27
 date: "2026-09-05"
 company: "Мир Plat.Form"
-address: "Москва, пространство «Ludwig Hall»"
+address: "Москва, улица Жужа, 3"
 type: "Offline"
 short_description: "Финал лета вместе с «Мир Plat.Form» в пространстве «Ludwig Hall». Доклады про метрики автоматизации, работу аналитика с тестировщиком, интеграционные тесты как сервис и место QA в эпоху нейронок."
 registration_link: "https://mir-platform.ru/qameetup?utm_source=moscowqa&utm_medium=tg&utm_campaign=qameetup"
@@ -56,6 +56,6 @@ talks:
 
 ## Площадка:
 
-Встреча пройдет в Москве, в пространстве «Ludwig Hall». Старт в 15:00.
+Встреча пройдет по адресу: Москва, улица Жужа, 3 — пространство «Ludwig Hall». Старт в 15:00.
 
 Следите за нашими анонсами в информационных каналах: [telegram](https://t.me/moscowqa) и [telegram chat](https://t.me/moscowqa_chat), а также [YouTube](https://www.youtube.com/@moscowqa)
