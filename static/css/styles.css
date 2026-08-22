@@ -361,6 +361,27 @@ img { max-width: 100%; height: auto; }
     }
 }
 
+/* Cover image instead of the number badge — for events without a
+   sequential MoscowQA number (e.g. community tracks at conferences) */
+.event-card__badge--cover {
+    padding: 0;
+    background: #000;
+    min-height: 0;
+}
+
+.event-card__cover {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+@media (min-width: 1024px) {
+    .event-card__cover {
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
 .event-card__number {
     font-size: 5rem;
     font-weight: 800;
@@ -493,6 +514,30 @@ img { max-width: 100%; height: auto; }
     font-size: 3.5rem;
     font-weight: 800;
     line-height: 1;
+}
+
+.event-hero__top--cover {
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.event-hero__cover {
+    width: 22rem;
+    max-width: 40%;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-lg);
+    display: block;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .event-hero__top--cover {
+        flex-wrap: wrap;
+    }
+    .event-hero__cover {
+        width: 100%;
+        max-width: 100%;
+    }
 }
 
 .event-hero__title {

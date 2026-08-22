@@ -4,6 +4,7 @@
 {% block title %}{{ event.title }} — митап по тестированию в Москве — {{ site.title }}{% endblock %}
 {% block description %}{{ event.short_description | default(event.title ~ ' — митап по тестированию в Москве от сообщества Moscow QA, ' ~ event.date) }}{% endblock %}
 {% block og_type %}article{% endblock %}
+{% block og_image %}{% if event.cover %}<meta property="og:image" content="{{ site_url }}{{ event.cover }}">{% endif %}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -43,8 +44,12 @@
 <!-- Hero -->
 <div class="event-hero">
     <div class="event-hero__inner">
-        <div class="event-hero__top">
+        <div class="event-hero__top{% if event.cover %} event-hero__top--cover{% endif %}">
+            {% if event.cover %}
+            <img class="event-hero__cover" src="{{ base }}{{ event.cover }}" alt="{{ event.title }}">
+            {% else %}
             <div class="event-hero__number">#{{ event.number }}</div>
+            {% endif %}
             <h1 class="event-hero__title">{{ event.title }}</h1>
         </div>
         <div class="event-hero__meta">
