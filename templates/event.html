@@ -1,5 +1,13 @@
 {% extends "base.html" %}
+{% import "partials/cover.html" as cover %}
+{% import "partials/timepad.html" as timepad %}
 {% set active_page = 'events' %}
+
+{# How the Timepad registration widget is shown on this page: 'inline' (a form
+   further down the page), 'popup' (opened by the registration card) or 'off'.
+   Resolved in build.py from the event front matter. #}
+{% set tp_mode = event.timepad_widget_mode | default('off') if site.timepad_widget.enabled else 'off' %}
+{% set tp_url = site.timepad ~ '/event/' ~ event.timepad_event_id ~ '/' if event.timepad_event_id else '' %}
 
 {% block title %}{{ event.title }} — митап по тестированию в Москве — {{ site.title }}{% endblock %}
 {% block description %}{{ event.short_description | default(event.title ~ ' — митап по тестированию в Москве от сообщества Moscow QA, ' ~ event.date) }}{% endblock %}
@@ -46,7 +54,7 @@
     <div class="event-hero__inner">
         <div class="event-hero__top{% if event.cover %} event-hero__top--cover{% endif %}">
             {% if event.cover %}
-            <img class="event-hero__cover" src="{{ base }}{{ event.cover }}" alt="{{ event.title }}">
+            {{ cover.cover(event, base, "event-hero__cover", loading="") }}
             {% else %}
             <div class="event-hero__number">#{{ event.number }}</div>
             {% endif %}
@@ -97,8 +105,12 @@
             </div>
             {% endif %}
 
-            {% if event.registration_link %}
-            <a href="{{ event.registration_link }}" target="_blank" rel="noopener" style="text-decoration:none;" class="js-upcoming-only">
+            {% if event.registration_link or tp_url %}
+            {%- set reg_url = event.registration_link or tp_url %}
+            <a href="{{ '#registration' if tp_mode == 'inline' else reg_url }}"
+               {%- if tp_mode != 'inline' %} target="_blank" rel="noopener"{% endif %}
+               style="text-decoration:none;"
+               class="js-upcoming-only{% if tp_mode == 'popup' %} js-timepad-trigger{% endif %}">
                 <div class="info-card info-card--gradient">
                     <div class="info-card__header">
                         <div class="info-card__icon">&#127915;</div>
@@ -194,6 +206,8 @@
             </div>
         </section>
         {% endif %}
+
+        {{ timepad.registration(event, site) }}
 
         <p class="back-link"><a href="{{ base }}/events/">&larr; Все мероприятия</a></p>
     </div>

@@ -1,0 +1,28 @@
+{#
+  Event cover image.
+
+  Events may ship a second variant for wide screens (`cover_desktop` in the
+  front matter) — the layout gives the cover a tall slot on desktop and a full
+  width strip on mobile, and one crop rarely works for both. When there is no
+  second variant, the markup stays a plain <img>.
+
+  The class goes on the outer element (<picture> or <img>), so the existing
+  `.event-card__cover` / `.event-hero__cover` rules keep applying; sizing of
+  the inner <img> is handled by the `.event-*__cover img` rules in styles.css.
+
+  `cover` is also what og:image points at — link previews get the mobile
+  variant, which is the one closer to a 1.91:1 crop.
+#}
+{% macro cover(event, base, css_class, loading='lazy') %}
+{%- set attrs -%}
+src="{{ base }}{{ event.cover }}" alt="{{ event.title }}"{% if loading %} loading="{{ loading }}"{% endif %}
+{%- endset -%}
+{%- if event.cover_desktop -%}
+<picture class="{{ css_class }}">
+    <source media="(min-width: 1024px)" srcset="{{ base }}{{ event.cover_desktop }}">
+    <img {{ attrs }}>
+</picture>
+{%- else -%}
+<img class="{{ css_class }}" {{ attrs }}>
+{%- endif -%}
+{% endmacro %}
