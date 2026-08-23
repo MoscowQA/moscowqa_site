@@ -3,27 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>document.documentElement.classList.add('has-js');</script>
     <title>{% block title %}{{ site.title }}{% endblock %}</title>
     <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+    {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+    <!-- Open Graph -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{{ self.title() }}">
+    <meta property="og:description" content="{{ self.description() }}">
+    {% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}
+    <meta property="og:site_name" content="{{ site.title }}">
+    <meta property="og:locale" content="ru_RU">
+    {% block og_image %}{% endblock %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@600&family=Ubuntu:wght@300;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23F7DF1F'/><text y='72' x='12' font-size='60' font-family='sans-serif' font-weight='bold'>QA</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ base }}/static/css/styles.css">
+    <link rel="icon" href="{{ base }}/static/images/logo.png">
+    {% block structured_data %}{% endblock %}
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <header class="header">
         <div class="header__inner">
-            <a href="/" class="header__logo">
-                <div class="header__logo-icon">QA</div>
-                Moscow QA
+            <a href="{{ base }}/" class="header__logo">
+                <img src="{{ base }}/static/images/logo.png" alt="MoscowQA Logo" class="header__logo-img">
+                <span class="header__logo-text">MoscowQA</span>
             </a>
             <button class="header__burger" onclick="document.querySelector('.header__nav').classList.toggle('open')" aria-label="Меню">&#9776;</button>
             <nav class="header__nav">
-                <a href="/" {% if active_page == 'index' %}class="active"{% endif %}>Главная</a>
-                <a href="/events/" {% if active_page == 'events' %}class="active"{% endif %}>Мероприятия</a>
-                <a href="/speakers/" {% if active_page == 'speakers' %}class="active"{% endif %}>Спикеры</a>
-                <a href="/cfp/" {% if active_page == 'cfp' %}class="active"{% endif %}>CFP</a>
+                <a href="{{ base }}/" {% if active_page == 'index' %}class="active"{% endif %}>События</a>
+                <a href="{{ base }}/speakers/" {% if active_page == 'speakers' %}class="active"{% endif %}>Докладчики</a>
+                <a href="{{ base }}/organizers/" {% if active_page == 'organizers' %}class="active"{% endif %}>Организаторы</a>
+                <a href="{{ base }}/cfp/" {% if active_page == 'cfp' %}class="active"{% endif %}>Подать доклад</a>
+                <a href="{{ base }}/venues/" {% if active_page == 'venues' %}class="active"{% endif %}>Для площадок</a>
             </nav>
         </div>
     </header>
@@ -33,11 +46,13 @@
     <footer class="footer">
         <div class="footer__inner">
             <div class="footer__col">
-                <div class="footer__copyright">&copy; 2024 &mdash; {{ now_year }}, Moscow QA Team</div>
+                <div class="footer__copyright">&copy; 2024 &mdash; 2026, Moscow QA Team</div>
                 <div class="footer__links">
-                    <a href="/events/">Мероприятия</a>
-                    <a href="/speakers/">Спикеры</a>
-                    <a href="/cfp/">Стать спикером</a>
+                    <a href="{{ base }}/">События</a>
+                    <a href="{{ base }}/speakers/">Докладчики</a>
+                    <a href="{{ base }}/organizers/">Организаторы</a>
+                    <a href="{{ base }}/cfp/">Подать доклад</a>
+                    <a href="{{ base }}/venues/">Для площадок</a>
                 </div>
             </div>
             <div class="footer__col">
@@ -49,5 +64,7 @@
             </div>
         </div>
     </footer>
+    <script src="{{ base }}/static/js/events-status.js"></script>
+    <script src="{{ base }}/static/js/timepad-widget.js"></script>
 </body>
 </html>

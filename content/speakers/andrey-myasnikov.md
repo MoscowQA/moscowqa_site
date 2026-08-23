@@ -1,0 +1,80 @@
+---
+name: Андрей Мясников
+company: more.tv
+photo: https://storage.yandexcloud.net/barbez/speaker/miyasnikov.jpg
+telegram: ''
+github: ''
+external_talks:
+- title: 'Круглый стол: Верить ли разработчику?'
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/121762
+  slides_url: ''
+- title: Я люблю свою работу, я приду туда в субботу!
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/118847
+  slides_url: ''
+- title: 'Круглый стол: факапы найма тестировщиков'
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/112207
+  slides_url: ''
+- title: Элементарная математика в тестировании
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/103137
+  slides_url: ''
+- title: Практическое приложение базовой теории
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/91872
+  slides_url: ''
+- title: Итак, вы -- Доктор Франкенштейн...
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/82787
+  slides_url: ''
+- title: TAS уполномочен заявить!
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/73407
+  slides_url: ''
+- title: Вредные привычки в тест-менеджменте
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/52282
+  slides_url: ''
+- title: 'Авторский контроль: вы все это делаете, просто не знаете об этом'
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/47703
+  slides_url: ''
+- title: Вредные привычки в тестировании
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/40066
+  slides_url: ''
+- title: Практическое пособие по разрушению отдела тестирования
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/36597
+  slides_url: ''
+- title: BDD. Gherkin+Ruby или автотесты для гуманитариев
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/33170
+  slides_url: ''
+- title: Почти Github Flow в вёб-разработке или как мы делаем Русторию
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/25948
+  slides_url: ''
+- title: 'Вы и Заказчик: решаем проблемы, а не отрабатываем требования'
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/19084
+  slides_url: ''
+---
+
+Head of QA в more.tv. Рассказывает о мотивации и борьбе с выгоранием в IT.

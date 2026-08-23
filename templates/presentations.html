@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% set active_page = 'speakers' %}
+
+{% block title %}Внешние выступления — {{ site.title }}{% endblock %}
+{% block description %}Все внешние выступления спикеров сообщества Moscow QA на конференциях и митапах: {{ total_count }} докладов от {{ speakers_with_talks }} спикеров{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Докладчики", "item": "{{ site_url }}/speakers/"},
+        {"@type": "ListItem", "position": 2, "name": "Внешние выступления", "item": "{{ site_url }}/presentations/"}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <div class="container">
+        <h2 class="section__title">Внешние выступления</h2>
+        <p class="text-muted" style="margin-bottom: 2rem;">
+            {{ total_count }} {% if total_count % 10 == 1 and total_count % 100 != 11 %}выступление{% elif total_count % 10 in [2,3,4] and total_count % 100 not in [12,13,14] %}выступления{% else %}выступлений{% endif %}
+            от {{ speakers_with_talks }} {% if speakers_with_talks % 10 == 1 and speakers_with_talks % 100 != 11 %}спикера{% elif speakers_with_talks % 10 in [2,3,4] and speakers_with_talks % 100 not in [12,13,14] %}спикеров{% else %}спикеров{% endif %}
+            на внешних площадках
+        </p>
+
+        <section class="speaker-talks">
+            {% for talk in all_talks %}
+            <div class="talk-item">
+                <div class="talk-item__meta">
+                    <span class="talk-item__event-badge">{{ talk.event }}</span>
+                    {% if talk.date %}
+                    <time datetime="{{ talk.date }}">{{ talk.date }}</time>
+                    {% endif %}
+                    &mdash;
+                    <a href="{{ base }}/speakers/{{ talk.speaker_slug }}/" style="color:var(--pink);font-weight:600;">{{ talk.speaker_name }}</a>
+                    {% if talk.speaker_company %}
+                    <span class="text-muted">, {{ talk.speaker_company }}</span>
+                    {% endif %}
+                </div>
+                <div class="talk-item__title">{{ talk.title }}</div>
+                {% if talk.description %}
+                <p class="talk-item__desc">{{ talk.description }}</p>
+                {% endif %}
+                <div class="talk-links">
+                    {% if talk.slides_url %}
+                    <a href="{{ talk.slides_url }}" target="_blank" rel="noopener">&#128196; Слайды</a>
+                    {% endif %}
+                    {% if talk.url %}
+                    <a href="{{ talk.url }}" target="_blank" rel="noopener">&#9654; Запись / подробнее</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <p class="back-link"><a href="{{ base }}/speakers/">&larr; Все докладчики</a></p>
+    </div>
+</main>
+{% endblock %}

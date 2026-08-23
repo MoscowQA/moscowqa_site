@@ -1,0 +1,90 @@
+---
+name: Руслан Остропольский
+company: Test IT
+photo: https://storage.yandexcloud.net/barbez/speaker/ostropol.png
+telegram: ''
+github: ''
+external_talks:
+- title: 'ОКR: как достичь амбициозных целей в теории и на практике'
+  event: Heisenbug 2023 Spring
+  date: '2023-04-11'
+  url: https://heisenbug.ru/archive/2023%20Spring/talks/b0703c200ad846b491b45631edd447b8/
+  slides_url: ''
+- title: Системный подход в работе лида/хеда QA
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/145005
+  slides_url: ''
+- title: ИИ в QA спустя год хайпа
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/138763
+  slides_url: ''
+- title: Качество через призму бизнеса
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/131166
+  slides_url: ''
+- title: Как не заблудиться в лесу метрик QA. Подходы к построению и лайфхаки
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/124896
+  slides_url: ''
+- title: 'Круглый стол: Верить ли разработчику?'
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/121762
+  slides_url: ''
+- title: Тренды QA 2024
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/119118
+  slides_url: ''
+- title: QA - стеклянный потолок или новые старые пути развития
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/112795
+  slides_url: ''
+- title: Типология QA лида, ожидания коллег на разных уровнях
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/102292
+  slides_url: ''
+- title: Подходы и инструменты онбординга удаленной команды
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/86943
+  slides_url: ''
+- title: Эффективная распределенная QA команда
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/84232
+  slides_url: ''
+- title: Автоматизация рутины - увеличиваем эффективность работы людей
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/76176
+  slides_url: ''
+- title: Трансформация процесса найма на этапе скоростного роста команды с 3 до 25 человек за год
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/71248
+  slides_url: ''
+- title: Как запускать 10-часовые UI тесты за 5 мин в условиях 30 релизов в день
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/65695
+  slides_url: ''
+- title: Дашборд тестировщика или как собирать метрики в одном месте
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/58917
+  slides_url: ''
+- title: CI для тестировщиков или как отказаться от релизов
+  event: SQA Days
+  date: ''
+  url: http://sqadays.com/ru/talk/46686
+  slides_url: ''
+---
+
+CPO в Test IT.

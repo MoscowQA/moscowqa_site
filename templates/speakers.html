@@ -1,26 +1,49 @@
 {% extends "base.html" %}
 {% set active_page = 'speakers' %}
-{% set now_year = 2026 %}
 
-{% block title %}Спикеры — {{ site.title }}{% endblock %}
+{% block title %}Докладчики — {{ site.title }}{% endblock %}
+{% block description %}Спикеры сообщества Moscow QA: {{ speakers | length }} докладчиков — профили, доклады, слайды и записи выступлений{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Докладчики", "item": "{{ site_url }}/speakers/"}
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Спикеры</h1>
-    <p class="text-muted">Все спикеры Moscow QA — {{ speakers | length }} человек</p>
+<main class="main">
+    <div class="container">
+        <h2 class="section__title">Докладчики</h2>
+        <p class="text-muted" style="margin-bottom: 2rem;">{{ speakers | length }} спикеров Moscow QA</p>
 
-    <div class="speakers-grid">
-        {% for speaker in speakers %}
-        <div class="speaker-card">
-            <div class="speaker-card__photo">
-                <div class="speaker-card__placeholder">&#128100;</div>
+        <div class="speakers-grid">
+            {% for speaker in speakers %}
+            <div class="speaker-card">
+                <div class="speaker-card__photo">
+                    {% if speaker.photo %}
+                    <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                    {% else %}
+                    <div class="speaker-card__placeholder">&#128100;</div>
+                    {% endif %}
+                </div>
+                <div class="speaker-card__info">
+                    <div class="speaker-card__name">
+                        <a href="{{ base }}/speakers/{{ speaker.slug }}/">{{ speaker.name }}</a>
+                    </div>
+                    {% if speaker.company %}
+                    <div class="speaker-card__company">{{ speaker.company }}</div>
+                    {% endif %}
+                    <a href="{{ base }}/speakers/{{ speaker.slug }}/" class="btn btn--pink" style="font-size:0.85rem; padding:0.5rem 1.25rem;">Подробнее</a>
+                </div>
             </div>
-            <div class="speaker-card__name">
-                <a href="/speakers/{{ speaker.slug }}/">{{ speaker.name }}</a>
-            </div>
-            <div class="speaker-card__company">{{ speaker.company }}</div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
+</main>
 {% endblock %}

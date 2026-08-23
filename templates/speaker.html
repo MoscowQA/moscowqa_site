@@ -1,74 +1,175 @@
 {% extends "base.html" %}
 {% set active_page = 'speakers' %}
-{% set now_year = 2026 %}
 
-{% block title %}{{ speaker.name }} — {{ site.title }}{% endblock %}
+{% block title %}{{ speaker.name }} — Профиль спикера — {{ site.title }}{% endblock %}
+{% block description %}{{ speaker.name }}{% if speaker.company %}, {{ speaker.company }}{% endif %} — профиль спикера сообщества Moscow QA{% endblock %}
+{% block og_type %}profile{% endblock %}
+{% block og_image %}{% if speaker.photo %}<meta property="og:image" content="{{ speaker.photo }}">{% endif %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": {{ speaker.name | tojson }},
+    {% if speaker.company %}"worksFor": {"@type": "Organization", "name": {{ speaker.company | tojson }}},{% endif %}
+    {% if speaker.photo %}"image": {{ speaker.photo | tojson }},{% endif %}
+    {% if canonical_url %}"url": "{{ canonical_url }}",{% endif %}
+    "sameAs": [
+        {% if speaker.telegram %}"https://t.me/{{ speaker.telegram }}"{% endif %}
+        {% if speaker.telegram and speaker.github %},{% endif %}
+        {% if speaker.github %}"https://github.com/{{ speaker.github }}"{% endif %}
+    ]
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Докладчики", "item": "{{ site_url }}/speakers/"},
+        {"@type": "ListItem", "position": 2, "name": {{ speaker.name | tojson }}}
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <article>
-        <div class="item">
-            <div class="item__image item__image--m">
-                <div class="speaker-card__photo" style="width: 150px; height: 150px;">
-                    <div class="speaker-card__placeholder">&#128100;</div>
+<main class="main">
+    <div class="container">
+        <div class="speaker-detail">
+            <div class="speaker-detail__photo">
+                <div class="speaker-detail__photo-img">
+                    {% if speaker.photo %}
+                    <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                    {% else %}
+                    <div class="speaker-card__placeholder" style="font-size: 5rem;">&#128100;</div>
+                    {% endif %}
                 </div>
             </div>
-            <div class="item__content">
-                <h1>{{ speaker.name }}</h1>
+            <div class="speaker-detail__info">
+                <h1 class="speaker-detail__name">{{ speaker.name }}</h1>
                 {% if speaker.company %}
-                <p class="text-muted">{{ speaker.company }}</p>
+                <p class="speaker-detail__company">{{ speaker.company }}</p>
                 {% endif %}
 
                 {% if speaker.body %}
-                <div class="md-content">{{ speaker.body | safe }}</div>
+                <div class="speaker-detail__bio md-content">{{ speaker.body | safe }}</div>
                 {% endif %}
 
-                <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                {% if speaker.telegram or speaker.github or speaker.twitter or speaker.website %}
+                <div class="speaker-detail__social">
                     {% if speaker.telegram %}
-                    <div>Telegram: <a href="https://t.me/{{ speaker.telegram }}">@{{ speaker.telegram }}</a></div>
+                    <a href="https://t.me/{{ speaker.telegram }}" target="_blank" rel="noopener" class="social-btn social-btn--telegram">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+                        </svg>
+                        <span>Telegram</span>
+                    </a>
                     {% endif %}
                     {% if speaker.github %}
-                    <div>GitHub: <a href="https://github.com/{{ speaker.github }}">@{{ speaker.github }}</a></div>
+                    <a href="https://github.com/{{ speaker.github }}" target="_blank" rel="noopener" class="social-btn social-btn--github">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        <span>GitHub</span>
+                    </a>
                     {% endif %}
                     {% if speaker.twitter %}
-                    <div>Twitter: <a href="https://twitter.com/{{ speaker.twitter }}">@{{ speaker.twitter }}</a></div>
+                    <a href="https://twitter.com/{{ speaker.twitter }}" target="_blank" rel="noopener" class="social-btn social-btn--twitter">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        <span>Twitter</span>
+                    </a>
+                    {% endif %}
+                    {% if speaker.website %}
+                    <a href="{{ speaker.website }}" target="_blank" rel="noopener" class="social-btn social-btn--other">
+                        <svg class="social-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        <span>Другое</span>
+                    </a>
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
         </div>
 
+        {% set total_talks = (speaker_talks | length) + (speaker.external_talks | default([], true) | length) %}
+        {% if total_talks > 0 %}
+        <div class="speaker-stats">
+            <div class="speaker-stats__item">
+                <span class="speaker-stats__number">{{ total_talks }}</span>
+                <span class="speaker-stats__label">{% if total_talks % 10 == 1 and total_talks % 100 != 11 %}доклад{% elif total_talks % 10 in [2,3,4] and total_talks % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}</span>
+            </div>
+            {% if speaker_talks %}
+            <div class="speaker-stats__item">
+                <span class="speaker-stats__number">{{ speaker_talks | length }}</span>
+                <span class="speaker-stats__label">на Moscow QA</span>
+            </div>
+            {% endif %}
+            {% if speaker.external_talks | default([], true) | length > 0 %}
+            <div class="speaker-stats__item">
+                <span class="speaker-stats__number">{{ speaker.external_talks | length }}</span>
+                <span class="speaker-stats__label">на других площадках</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         {% if speaker_talks %}
-        <section class="section">
-            <h2>Доклады</h2>
+        <section class="section speaker-talks">
+            <h2 class="section__title" style="color: var(--gray-900);">Доклады на Moscow QA</h2>
             {% for talk in speaker_talks %}
-            <div class="item">
-                <div class="item__image item__image--s">
-                    <div class="event-badge event-badge--small">#{{ talk.event.number }}</div>
+            <div class="talk-item">
+                <div class="talk-item__meta">
+                    <a href="{{ base }}/events/{{ talk.event.slug }}/">{{ talk.event.title }}</a>,
+                    <time datetime="{{ talk.event.date }}">{{ talk.event.date }}</time>
                 </div>
-                <div class="item__content">
-                    <div class="item__meta">
-                        <a href="/events/{{ talk.event.slug }}/">{{ talk.event.title }}</a>,
-                        <time datetime="{{ talk.event.date }}">{{ talk.event.date }}</time>
-                    </div>
-                    <div class="item__title">{{ talk.title }}</div>
-                    {% if talk.description %}
-                    <p>{{ talk.description }}</p>
+                <div class="talk-item__title">
+                    <a href="{{ base }}/events/{{ talk.event.slug }}/talks/{{ talk.slug }}/" style="color:inherit;text-decoration:none;">
+                        {{ talk.title }}
+                    </a>
+                </div>
+                {% if talk.description %}
+                <p class="talk-item__desc">{{ talk.description }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if speaker.external_talks | default([], true) | length > 0 %}
+        <section class="section speaker-talks speaker-external-talks">
+            <h2 class="section__title" style="color: var(--gray-900);">Внешние выступления</h2>
+            {% for talk in speaker.external_talks %}
+            <div class="talk-item">
+                <div class="talk-item__meta">
+                    <span class="talk-item__event-badge">{{ talk.event }}</span>
+                    {% if talk.date %}
+                    <time datetime="{{ talk.date }}">{{ talk.date }}</time>
                     {% endif %}
-                    <div class="talk-links">
-                        {% if talk.slides_url %}
-                        <a href="{{ talk.slides_url }}">&#128196; Слайды</a>
-                        {% endif %}
-                        {% if talk.record %}
-                        <a href="{{ talk.record }}">&#9654; Запись</a>
-                        {% endif %}
-                    </div>
+                </div>
+                <div class="talk-item__title">{{ talk.title }}</div>
+                {% if talk.description %}
+                <p class="talk-item__desc">{{ talk.description }}</p>
+                {% endif %}
+                <div class="talk-links">
+                    {% if talk.slides_url %}
+                    <a href="{{ talk.slides_url }}">&#128196; Слайды</a>
+                    {% endif %}
+                    {% if talk.url %}
+                    <a href="{{ talk.url }}">&#9654; Запись</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
         </section>
         {% endif %}
 
-        <p><a href="/speakers/">&larr; Все спикеры</a></p>
-    </article>
-</div>
+        <p class="back-link"><a href="{{ base }}/speakers/">&larr; Все докладчики</a></p>
+    </div>
+</main>
 {% endblock %}
