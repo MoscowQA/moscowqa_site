@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "partials/timepad.html" as timepad %}
 {% set active_page = 'index' %}
 
 {% block title %}Митапы по тестированию и QA в Москве — {{ site.title }}{% endblock %}
@@ -21,6 +22,10 @@
     <div class="container">
         <h1 class="section__title">Митапы по тестированию и QA в Москве</h1>
         <p class="text-muted" style="margin-bottom: 2rem;">{{ events | length }} митапов сообщества QA-инженеров Москвы — доклады по тестированию, автоматизации и обеспечению качества</p>
+
+        {# Live announcements from Timepad. Off unless TIMEPAD_ORG_ID and
+           TIMEPAD_LIST_WIDGET=1 are set — see TIMEPAD_WIDGET.md. #}
+        {{ timepad.event_list(site) }}
 
         {% for event in events %}
         <article class="event-card is-upcoming" data-event-date="{{ event.date }}">

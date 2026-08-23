@@ -1,0 +1,111 @@
+{#
+  Timepad widget embeds.
+
+  Both macros only render a placeholder: the actual <script> embed code is
+  injected by static/js/timepad-widget.js once the block is about to become
+  visible. That keeps Timepad's loader off pages that do not need it (past
+  events, visitors who never scroll that far) while the markup below stays a
+  plain link for crawlers and for visitors without JS.
+
+  Docs: https://dev.timepad.ru/widget/what-widget-can/
+#}
+
+{#
+  Registration widget for a single event.
+
+  Renders nothing unless the event has a Timepad id and the widget is enabled
+  (see `timepad_widget` in the event front matter and TIMEPAD_* env vars).
+
+  mode "inline" — the registration form is embedded in the page.
+  mode "popup"  — the form opens over the page when the visitor clicks an
+                  element matching `site.timepad_widget.trigger_selector`;
+                  only an invisible config holder is rendered here.
+#}
+{% macro registration(event, site, heading='Регистрация') %}
+{%- set tp = site.timepad_widget -%}
+{%- set mode = event.timepad_widget_mode | default('off') -%}
+{%- if tp.enabled and event.timepad_event_id and mode != 'off' -%}
+{%- set fallback_url = event.registration_link
+      if 'timepad.ru' in (event.registration_link or '')
+      else site.timepad ~ '/event/' ~ event.timepad_event_id ~ '/' -%}
+{%- set common = {
+      "event": {"id": event.timepad_event_id},
+      "locale": tp.locale,
+      "hidePreloading": true,
+      "utmForward": true,
+      "noScrollToWidgetOnViewChange": true
+    } -%}
+{%- if mode == 'popup' -%}
+{%- set config = dict(common,
+      display="popup",
+      popup={"triggerSelector": tp.trigger_selector,
+             "autoShrink": true,
+             "minViewport": 320,
+             "outerClose": true}) -%}
+<div class="timepad-widget timepad-widget--popup js-upcoming-only"
+     data-timepad-widget="event_register"
+     data-timepad-loader="{{ tp.loader }}"
+     {%- if tp.customization_id %} data-timepad-customization="{{ tp.customization_id }}"{% endif %}
+     data-timepad-eager="1"
+     data-event-date="{{ event.date }}"
+     data-timepad-config='{{ config | tojson }}'>
+    <div class="timepad-widget__mount"></div>
+</div>
+{%- else -%}
+{%- set config = dict(common,
+      display="iframe",
+      iframe={"width": "100%", "autoHeight": true, "background": "transparent"}) -%}
+<section class="section timepad-widget js-upcoming-only" id="registration"
+         data-timepad-widget="event_register"
+         data-timepad-loader="{{ tp.loader }}"
+         {%- if tp.customization_id %} data-timepad-customization="{{ tp.customization_id }}"{% endif %}
+         data-event-date="{{ event.date }}"
+         data-timepad-config='{{ config | tojson }}'>
+    <h2 class="section__title">{{ heading }}</h2>
+    <div class="timepad-widget__box">
+        <div class="timepad-widget__mount"></div>
+        <p class="timepad-widget__fallback">
+            Форма регистрации загружается&hellip; Если она не появилась,
+            <a href="{{ fallback_url }}" target="_blank" rel="noopener">зарегистрируйтесь на Timepad</a>.
+        </p>
+    </div>
+</section>
+{%- endif -%}
+{%- endif -%}
+{% endmacro %}
+
+{#
+  Event list ("афиша") widget — every upcoming public event of the
+  organization, straight from Timepad. Needs a numeric org id
+  (TIMEPAD_ORG_ID) and is opt-in via TIMEPAD_LIST_WIDGET=1.
+#}
+{% macro event_list(site, heading='Ближайшие события на Timepad', count=6) %}
+{%- set tp = site.timepad_widget -%}
+{%- if tp.enabled and tp.list_enabled -%}
+{%- set config = {
+      "locale": tp.locale,
+      "display": "iframe",
+      "hidePreloading": true,
+      "iframe": {"width": "100%", "autoHeight": true, "background": "transparent"},
+      "requestOptions": {"orgs_include": tp.org_id,
+                         "count": count,
+                         "sort": "date_start",
+                         "order": "asc"},
+      "eventInfoView": {"mode": "redirect"}
+    } -%}
+<section class="section timepad-widget"
+         data-timepad-widget="event_list"
+         data-timepad-loader="{{ tp.loader }}"
+         {%- if tp.customization_id %} data-timepad-customization="{{ tp.customization_id }}"{% endif %}
+         data-timepad-config='{{ config | tojson }}'>
+    <h2 class="section__title">{{ heading }}</h2>
+    <div class="timepad-widget__box">
+        <div class="timepad-widget__mount"></div>
+        <p class="timepad-widget__fallback">
+            Афиша загружается&hellip; Если она не появилась, откройте
+            <a href="{{ site.timepad }}" target="_blank" rel="noopener">страницу сообщества на Timepad</a>.
+        </p>
+    </div>
+</section>
+{%- endif -%}
+{% endmacro %}

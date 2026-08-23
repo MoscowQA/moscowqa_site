@@ -27,6 +27,7 @@ python3 build.py       # собрать сайт в dist/
   python3 parsers/sync_heisenbug.py
   ```
   Это подтягивает прошлые доклады спикера с SQA Days и Heisenbug в `external_talks`. Для уже существующих спикеров повторный прогон не обязателен.
+- **Виджет Timepad подключается сам.** Если `registration_link` события ведёт на Timepad, на странице появляется встроенная форма регистрации — ID вытаскивается из ссылки автоматически. Управляется полем `timepad_widget` (`inline` / `popup` / `false`), подробности — в [`TIMEPAD_WIDGET.md`](./TIMEPAD_WIDGET.md).
 - **Фото спикеров**: приводите к размеру ~1080×1080 (как у большинства существующих фото), не заливайте оригиналы в несколько мегабайт без сжатия. Для этого есть скрипт:
   ```bash
   python3 scripts/compress_photo.py static/images/speakers/photo.png

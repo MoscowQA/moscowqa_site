@@ -27,6 +27,93 @@ OUTPUT_DIR = ROOT / "dist"
 BASE_URL = os.environ.get("BASE_URL", "")
 SITE_URL = os.environ.get("SITE_URL", "https://moscowqa.ru")
 
+
+def env_flag(name: str, default: bool = False) -> bool:
+    """Read a boolean setting from the environment."""
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+# --- Timepad widget -------------------------------------------------------
+# Registration/announcement widgets are embedded from Timepad's loader. See
+# TIMEPAD_WIDGET.md for the whole picture; everything here is overridable
+# through the environment so the same build works on staging and production.
+TIMEPAD_LOADER = os.environ.get(
+    "TIMEPAD_LOADER", "https://timepad.ru/js/tpwf/loader/min/loader.js"
+)
+# ID of the Timepad-side customization (styles/templates/behaviour). Empty
+# means "use Timepad's default customization".
+TIMEPAD_CUSTOMIZATION_ID = os.environ.get("TIMEPAD_CUSTOMIZATION_ID", "")
+# Numeric Timepad organization id — only needed for the event list widget.
+TIMEPAD_ORG_ID = os.environ.get("TIMEPAD_ORG_ID", "")
+TIMEPAD_LOCALE = os.environ.get("TIMEPAD_LOCALE", "ru")
+# Master switch and the mode used by events that do not pick one themselves.
+TIMEPAD_WIDGET_ENABLED = env_flag("TIMEPAD_WIDGET", default=True)
+TIMEPAD_DEFAULT_MODE = os.environ.get("TIMEPAD_WIDGET_MODE", "inline")
+# The event list ("афиша") widget is off until an org id is configured.
+TIMEPAD_LIST_WIDGET_ENABLED = env_flag("TIMEPAD_LIST_WIDGET", default=False)
+# Selector of the elements that open the widget in popup mode.
+TIMEPAD_TRIGGER_SELECTOR = os.environ.get(
+    "TIMEPAD_TRIGGER_SELECTOR", ".js-timepad-trigger"
+)
+
+# Timepad event URLs look like https://moscowqa.timepad.ru/event/4046132/ —
+# the trailing number is the event id the widget needs.
+TIMEPAD_EVENT_URL_RE = re.compile(
+    r"^https?://(?:[\w-]+\.)?timepad\.ru/event/(\d+)", re.IGNORECASE
+)
+
+# Accepted values of the per-event `timepad_widget` front matter field.
+TIMEPAD_MODE_ALIASES = {
+    "inline": "inline",
+    "iframe": "inline",
+    "form": "inline",
+    "popup": "popup",
+    "button": "popup",
+    "off": "off",
+    "none": "off",
+    "no": "off",
+    "false": "off",
+}
+
+
+def parse_timepad_event_id(event: dict) -> str:
+    """Return the Timepad event id for an event, or "" when there is none.
+
+    An explicit `timepad_event_id` in the front matter wins; otherwise the id
+    is taken from `registration_link` when it points at Timepad. Events hosted
+    elsewhere (a partner's landing page) simply get no widget.
+    """
+    explicit = event.get("timepad_event_id")
+    if explicit not in (None, ""):
+        return str(explicit).strip()
+
+    link = (event.get("registration_link") or "").strip()
+    match = TIMEPAD_EVENT_URL_RE.match(link)
+    return match.group(1) if match else ""
+
+
+def resolve_timepad_mode(event: dict, default_mode: str) -> str:
+    """Resolve how the registration widget is shown for a single event.
+
+    Returns "inline" (a form in the page), "popup" (opened by a button) or
+    "off". Events without a Timepad id are always "off".
+    """
+    if not event.get("timepad_event_id"):
+        return "off"
+
+    raw = event.get("timepad_widget")
+    if raw is None or raw == "":
+        return default_mode
+    if raw is True:
+        return default_mode
+    if raw is False:
+        return "off"
+    return TIMEPAD_MODE_ALIASES.get(str(raw).strip().lower(), default_mode)
+
+
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
 
 
@@ -88,6 +175,13 @@ def load_events() -> list[dict]:
                     talk["title"],
                     talk.get("slug")
                 )
+
+            # Timepad registration widget: the id comes from the event's
+            # Timepad link unless the front matter names one explicitly.
+            event["timepad_event_id"] = parse_timepad_event_id(event)
+            event["timepad_widget_mode"] = resolve_timepad_mode(
+                event, TIMEPAD_DEFAULT_MODE
+            )
 
             # Note: past-vs-upcoming detection has moved to the browser
             # (static/js/events-status.js). Templates emit `data-event-date`
@@ -210,6 +304,17 @@ def build():
         "youtube": "https://www.youtube.com/@moscowqa",
         "timepad": "https://moscowqa.timepad.ru",
         "base_url": BASE_URL,
+        # Consumed by templates/partials/timepad.html — see TIMEPAD_WIDGET.md.
+        "timepad_widget": {
+            "enabled": TIMEPAD_WIDGET_ENABLED,
+            "loader": TIMEPAD_LOADER,
+            "customization_id": TIMEPAD_CUSTOMIZATION_ID,
+            "org_id": TIMEPAD_ORG_ID,
+            "locale": TIMEPAD_LOCALE,
+            "trigger_selector": TIMEPAD_TRIGGER_SELECTOR,
+            "default_mode": TIMEPAD_DEFAULT_MODE,
+            "list_enabled": TIMEPAD_LIST_WIDGET_ENABLED and bool(TIMEPAD_ORG_ID),
+        },
     }
 
     # Map speaker display names to their file slugs and data for URL/photo generation
@@ -370,7 +475,15 @@ def build():
     (OUTPUT_DIR / "robots.txt").write_text(robots, encoding="utf-8")
 
     talk_count = sum(len(e.get("talks", [])) for e in events)
+    widget_count = sum(
+        1 for e in events if e.get("timepad_widget_mode", "off") != "off"
+    )
     print(f"Built {len(events)} events, {talk_count} talks, {len(speakers)} speakers, {len(pages)} pages")
+    if TIMEPAD_WIDGET_ENABLED:
+        print(f"Timepad widget: {widget_count}/{len(events)} events, "
+              f"list widget {'on' if site['timepad_widget']['list_enabled'] else 'off'}")
+    else:
+        print("Timepad widget: disabled (TIMEPAD_WIDGET=0)")
     print(f"Output: {OUTPUT_DIR}")
 
 

@@ -1295,3 +1295,45 @@ img { max-width: 100%; height: auto; }
 /* When JS is available, hide the flat source list while the partitioning
    script runs. Without JS, the source section stays visible as a fallback. */
 .has-js [data-events-source] { display: none; }
+
+/* === Timepad widget === */
+/* Placeholder rendered by templates/partials/timepad.html; the embed code is
+   injected by static/js/timepad-widget.js once the block scrolls into view. */
+.timepad-widget__box {
+    background: #fff;
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 1.25rem;
+}
+
+.timepad-widget__mount iframe {
+    display: block;
+    width: 100%;
+    border: 0;
+}
+
+.timepad-widget__fallback {
+    margin: 0;
+    padding: 1rem 0;
+    text-align: center;
+    color: var(--gray-600);
+    font-size: 0.95rem;
+}
+
+/* Once the widget has rendered, its own UI replaces the fallback line. */
+.timepad-widget--ready .timepad-widget__fallback {
+    display: none;
+}
+
+/* Popup widgets have no in-page UI: the embed code only needs a place to
+   live, and the form opens over the page from the registration button. The
+   holder is left unstyled on purpose — an empty container already takes no
+   space, and clipping it could hide the popup if Timepad ever attaches the
+   overlay next to the embed code instead of to <body>. */
+
+@media (max-width: 640px) {
+    .timepad-widget__box {
+        padding: 0.75rem;
+    }
+}
