@@ -50,8 +50,10 @@ TIMEPAD_CUSTOMIZATION_ID = os.environ.get("TIMEPAD_CUSTOMIZATION_ID", "")
 TIMEPAD_ORG_ID = os.environ.get("TIMEPAD_ORG_ID", "")
 TIMEPAD_LOCALE = os.environ.get("TIMEPAD_LOCALE", "ru")
 # Master switch and the mode used by events that do not pick one themselves.
+# Default is "popup": the form opens over the page from the registration card,
+# so visitors don't have to scroll past the programme to reach it.
 TIMEPAD_WIDGET_ENABLED = env_flag("TIMEPAD_WIDGET", default=True)
-TIMEPAD_DEFAULT_MODE = os.environ.get("TIMEPAD_WIDGET_MODE", "inline")
+TIMEPAD_DEFAULT_MODE = os.environ.get("TIMEPAD_WIDGET_MODE", "popup")
 # The event list ("афиша") widget is off until an org id is configured.
 TIMEPAD_LIST_WIDGET_ENABLED = env_flag("TIMEPAD_LIST_WIDGET", default=False)
 # Selector of the elements that open the widget in popup mode.
