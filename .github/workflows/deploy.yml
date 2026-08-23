@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main, claude/static-site-generator-HWt2j]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
