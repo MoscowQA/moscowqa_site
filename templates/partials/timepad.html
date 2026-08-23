@@ -1,14 +1,68 @@
 {#
   Timepad widget embeds.
 
-  Both macros only render a placeholder: the actual <script> embed code is
+  Macros here only render a placeholder: the actual <script> embed code is
   injected by static/js/timepad-widget.js once the block is about to become
-  visible. That keeps Timepad's loader off pages that do not need it (past
-  events, visitors who never scroll that far) while the markup below stays a
-  plain link for crawlers and for visitors without JS.
+  visible (popup holders are mounted right away). That keeps Timepad's loader
+  off pages that do not need it (past events, visitors who never scroll that
+  far) while the markup stays a plain link for crawlers and for visitors
+  without JS.
 
   Docs: https://dev.timepad.ru/widget/what-widget-can/
 #}
+
+{# Per-event trigger class: a page may list several events, and each popup
+   widget has to bind to its own button — the site-wide
+   `site.timepad_widget.trigger_selector` would open the same form for all of
+   them. #}
+{% set TRIGGER_PREFIX = 'js-timepad-trigger-' %}
+
+{#
+  Class that turns an element into the popup trigger of a given event.
+  Renders nothing when the event has no popup widget, so the element stays an
+  ordinary link to Timepad.
+#}
+{% macro trigger_class(event, site) %}
+{%- if site.timepad_widget.enabled and event.timepad_event_id
+       and (event.timepad_widget_mode | default('off')) == 'popup' -%}
+{{ TRIGGER_PREFIX }}{{ event.timepad_event_id }}
+{%- endif -%}
+{% endmacro %}
+
+{#
+  Invisible holder carrying the settings of a popup registration form.
+
+  `trigger` is the CSS selector of the elements that open it; by default the
+  site-wide selector (`.js-timepad-trigger`), which is what the event page
+  uses. Lists pass the per-event selector instead — see `card_popups()`.
+#}
+{% macro popup_holder(event, site, trigger='') %}
+{%- set tp = site.timepad_widget -%}
+{%- if tp.enabled and event.timepad_event_id
+       and (event.timepad_widget_mode | default('off')) == 'popup' -%}
+{%- set config = {
+      "event": {"id": event.timepad_event_id},
+      "locale": tp.locale,
+      "hidePreloading": true,
+      "utmForward": true,
+      "noScrollToWidgetOnViewChange": true,
+      "display": "popup",
+      "popup": {"triggerSelector": trigger or tp.trigger_selector,
+                "autoShrink": true,
+                "minViewport": 320,
+                "outerClose": true}
+    } -%}
+<div class="timepad-widget timepad-widget--popup js-upcoming-only"
+     data-timepad-widget="event_register"
+     data-timepad-loader="{{ tp.loader }}"
+     {%- if tp.customization_id %} data-timepad-customization="{{ tp.customization_id }}"{% endif %}
+     data-timepad-eager="1"
+     data-event-date="{{ event.date }}"
+     data-timepad-config='{{ config | tojson }}'>
+    <div class="timepad-widget__mount"></div>
+</div>
+{%- endif -%}
+{% endmacro %}
 
 {#
   Registration widget for a single event.
@@ -25,36 +79,21 @@
 {%- set tp = site.timepad_widget -%}
 {%- set mode = event.timepad_widget_mode | default('off') -%}
 {%- if tp.enabled and event.timepad_event_id and mode != 'off' -%}
+{%- if mode == 'popup' -%}
+{{ popup_holder(event, site) }}
+{%- else -%}
 {%- set fallback_url = event.registration_link
       if 'timepad.ru' in (event.registration_link or '')
       else site.timepad ~ '/event/' ~ event.timepad_event_id ~ '/' -%}
-{%- set common = {
+{%- set config = {
       "event": {"id": event.timepad_event_id},
       "locale": tp.locale,
       "hidePreloading": true,
       "utmForward": true,
-      "noScrollToWidgetOnViewChange": true
+      "noScrollToWidgetOnViewChange": true,
+      "display": "iframe",
+      "iframe": {"width": "100%", "autoHeight": true, "background": "transparent"}
     } -%}
-{%- if mode == 'popup' -%}
-{%- set config = dict(common,
-      display="popup",
-      popup={"triggerSelector": tp.trigger_selector,
-             "autoShrink": true,
-             "minViewport": 320,
-             "outerClose": true}) -%}
-<div class="timepad-widget timepad-widget--popup js-upcoming-only"
-     data-timepad-widget="event_register"
-     data-timepad-loader="{{ tp.loader }}"
-     {%- if tp.customization_id %} data-timepad-customization="{{ tp.customization_id }}"{% endif %}
-     data-timepad-eager="1"
-     data-event-date="{{ event.date }}"
-     data-timepad-config='{{ config | tojson }}'>
-    <div class="timepad-widget__mount"></div>
-</div>
-{%- else -%}
-{%- set config = dict(common,
-      display="iframe",
-      iframe={"width": "100%", "autoHeight": true, "background": "transparent"}) -%}
 <section class="section timepad-widget js-upcoming-only" id="registration"
          data-timepad-widget="event_register"
          data-timepad-loader="{{ tp.loader }}"
@@ -72,6 +111,22 @@
 </section>
 {%- endif -%}
 {%- endif -%}
+{% endmacro %}
+
+{#
+  Popup holders for a list of events (index page, /events/).
+
+  Rendered as one block after the cards, not inside them: cards on the index
+  page are moved around by static/js/events-status.js, which walks
+  `[data-event-date]` nodes, and holders carry that attribute too.
+
+  The registration button of every card gets `trigger_class(event, site)`, so
+  each holder binds to its own card.
+#}
+{% macro card_popups(events, site) %}
+{%- for event in events -%}
+{{ popup_holder(event, site, '.' ~ TRIGGER_PREFIX ~ event.timepad_event_id) }}
+{%- endfor -%}
 {% endmacro %}
 
 {#

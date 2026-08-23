@@ -369,14 +369,19 @@ img { max-width: 100%; height: auto; }
     min-height: 0;
 }
 
-.event-card__cover {
+/* The cover is an <img>, or a <picture> when the event ships a separate
+   desktop variant (see templates/partials/cover.html) — hence the rules
+   repeated for the inner <img>. */
+.event-card__cover,
+.event-card__cover img {
     width: 100%;
     height: auto;
     display: block;
 }
 
 @media (min-width: 1024px) {
-    .event-card__cover {
+    .event-card__cover,
+    .event-card__cover img {
         height: 100%;
         object-fit: contain;
     }
@@ -528,6 +533,13 @@ img { max-width: 100%; height: auto; }
     box-shadow: var(--shadow-lg);
     display: block;
     flex-shrink: 0;
+}
+
+/* Same as above: with a desktop variant the cover is a <picture>. */
+.event-hero__cover img {
+    width: 100%;
+    display: block;
+    border-radius: inherit;
 }
 
 @media (max-width: 768px) {

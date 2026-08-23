@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "partials/cover.html" as cover %}
 {% import "partials/timepad.html" as timepad %}
 {% set active_page = 'index' %}
 
@@ -32,7 +33,7 @@
             <div class="event-card__inner">
                 <div class="event-card__badge{% if event.cover %} event-card__badge--cover{% endif %}" style="position: relative;">
                     {% if event.cover %}
-                    <img class="event-card__cover" src="{{ base }}{{ event.cover }}" alt="{{ event.title }}" loading="lazy">
+                    {{ cover.cover(event, base, "event-card__cover") }}
                     {% else %}
                     <span class="event-card__number">{{ event.number }}</span>
                     <span class="event-card__label">MoscowQA</span>
@@ -70,12 +71,21 @@
                             {% set n = event.talks | length %}{{ n }} {% if n % 10 == 1 and n % 100 != 11 %}доклад{% elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}
                         </span>
                         {% endif %}
+                        {% if event.registration_link %}
+                        {#- Timepad popup opens over the list; without the
+                            widget the link works as usual. -#}
+                        {% set tp_trigger = timepad.trigger_class(event, site) %}
+                        <a href="{{ event.registration_link }}" class="btn btn--green js-upcoming-only{{ ' ' ~ tp_trigger if tp_trigger }}" target="_blank" rel="noopener">Зарегистрироваться &rarr;</a>
+                        {% endif %}
                         <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
                     </div>
                 </div>
             </div>
         </article>
         {% endfor %}
+
+        {# Settings of the popup registration forms of the cards above. #}
+        {{ timepad.card_popups(events, site) }}
     </div>
 </main>
 {% endblock %}

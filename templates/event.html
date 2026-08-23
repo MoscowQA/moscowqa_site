@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "partials/cover.html" as cover %}
 {% import "partials/timepad.html" as timepad %}
 {% set active_page = 'events' %}
 
@@ -53,7 +54,7 @@
     <div class="event-hero__inner">
         <div class="event-hero__top{% if event.cover %} event-hero__top--cover{% endif %}">
             {% if event.cover %}
-            <img class="event-hero__cover" src="{{ base }}{{ event.cover }}" alt="{{ event.title }}">
+            {{ cover.cover(event, base, "event-hero__cover", loading="") }}
             {% else %}
             <div class="event-hero__number">#{{ event.number }}</div>
             {% endif %}
