@@ -1,7 +1,7 @@
 ---
 name: "Роман Троицкий"
 company: "Сбер"
-photo: ""
+photo: "/static/images/speakers/roman-troitskiy.jpg"
 telegram: ""
 github: ""
 ---
