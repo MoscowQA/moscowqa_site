@@ -1,6 +1,6 @@
 ---
 name: "Роман Троицкий"
-company: ""
+company: "Сбер"
 photo: ""
 telegram: ""
 github: ""
