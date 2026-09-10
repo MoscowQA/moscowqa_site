@@ -760,6 +760,85 @@ img { max-width: 100%; height: auto; }
     color: var(--pink-dark);
 }
 
+/* === Speakers Search === */
+/* Progressive enhancement: the form is revealed only when
+   static/js/speakers-search.js can drive it, so a JS-less visitor still gets
+   the complete list instead of a dead input. */
+.speakers-search {
+    display: none;
+    margin-bottom: 1rem;
+}
+
+.has-js .speakers-search {
+    display: block;
+}
+
+.speakers-search__field {
+    position: relative;
+    max-width: 32rem;
+}
+
+.speakers-search__input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font: inherit;
+    color: var(--gray-800);
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.speakers-search__input::placeholder {
+    color: var(--gray-500);
+}
+
+.speakers-search__input:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink-light);
+}
+
+/* The custom clear button replaces the WebKit one so both engines look alike. */
+.speakers-search__input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.speakers-search__clear {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--gray-500);
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.speakers-search__clear:hover {
+    color: var(--pink);
+    background: var(--pink-light);
+}
+
+.speakers-count {
+    margin-bottom: 2rem;
+}
+
+.speakers-empty {
+    color: var(--gray-600);
+    margin-bottom: 3rem;
+}
+
 /* === Speakers Grid === */
 .speakers-grid {
     display: grid;

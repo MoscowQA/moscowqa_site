@@ -145,6 +145,66 @@ def slugify_talk(title: str, manual_slug: str = None) -> str:
     return slug.strip('-')[:80]
 
 
+def normalize_search_text(text: str) -> str:
+    """Fold text to the form the frontend search compares against.
+
+    Lowercase, "ё" folded to "е" and whitespace collapsed, so a visitor gets
+    the same matches no matter how they type. static/js/speakers-search.js
+    applies exactly the same rules to the query.
+    """
+    return re.sub(r"\s+", " ", text.lower().replace("ё", "е")).strip()
+
+
+def build_talks_by_speaker(events: list[dict]) -> dict[str, list[dict]]:
+    """Map a speaker's display name to their MoscowQA talks.
+
+    The link is the exact name match documented in CLAUDE.md: values in
+    `talks[].speakers` must equal the `name` of a file in content/speakers/.
+    Events arrive sorted newest first, so each list keeps that order.
+    """
+    talks_by_speaker: dict[str, list[dict]] = {}
+    for event in events:
+        for talk in event.get("talks", []):
+            for speaker_name in talk.get("speakers", []):
+                talks_by_speaker.setdefault(speaker_name, []).append({
+                    **talk,
+                    "event": event,
+                })
+    return talks_by_speaker
+
+
+def speaker_search_text(speaker: dict, talks: list[dict]) -> str:
+    """Build the haystack the speakers page is filtered by in the browser.
+
+    Covers the name, the company and the titles of both MoscowQA and external
+    talks, so a visitor can look a speaker up by topic as well as by name. The
+    slug goes in too: it is a latin transliteration of the name, which makes
+    "klenov" find "Александр Кленов".
+    """
+    parts = [
+        speaker.get("name", ""),
+        speaker.get("company", ""),
+        (speaker.get("slug") or "").replace("-", " "),
+    ]
+    for talk in talks:
+        parts.append(talk.get("title", ""))
+    for talk in speaker.get("external_talks") or []:
+        parts.append(talk.get("title", ""))
+        # Conference name, e.g. "Heisenbug 2025 Autumn".
+        parts.append(talk.get("event", ""))
+
+    # Speakers with dozens of external talks repeat the same conference name
+    # over and over; dropping the duplicates keeps the attribute readable.
+    seen = set()
+    unique = []
+    for part in parts:
+        normalized = normalize_search_text(part or "")
+        if normalized and normalized not in seen:
+            seen.add(normalized)
+            unique.append(normalized)
+    return " ".join(unique)
+
+
 def parse_md_file(filepath: Path) -> dict:
     """Parse a markdown file with YAML front matter."""
     text = filepath.read_text(encoding="utf-8")
@@ -323,6 +383,14 @@ def build():
     speaker_slugs = {s["name"]: s["slug"] for s in speakers}
     speaker_by_name = {s["name"]: s for s in speakers}
 
+    # Talks per speaker: used both by the individual speaker pages and by the
+    # search index of the speakers list.
+    talks_by_speaker = build_talks_by_speaker(events)
+    for speaker in speakers:
+        speaker["search_text"] = speaker_search_text(
+            speaker, talks_by_speaker.get(speaker["name"], [])
+        )
+
     common = {"site": site, "events": events, "speakers": speakers, "base": BASE_URL,
               "speaker_slugs": speaker_slugs, "speaker_by_name": speaker_by_name,
               "site_url": SITE_URL}
@@ -399,17 +467,7 @@ def build():
     # Build individual speaker pages
     tpl = env.get_template("speaker.html")
     for speaker in speakers:
-        # Find talks by this speaker
-        speaker_talks = []
-        for event in events:
-            for talk in event.get("talks", []):
-                if speaker["name"] in talk.get("speakers", []):
-                    # Include both talk data and event data with slug
-                    speaker_talks.append({
-                        **talk,
-                        "event": {**event, "slug": event["slug"]},
-                        "slug": talk["slug"]
-                    })
+        speaker_talks = talks_by_speaker.get(speaker["name"], [])
         canonical = f"{SITE_URL}/speakers/{speaker['slug']}/"
         html = tpl.render(**common, speaker=speaker, speaker_talks=speaker_talks,
                           canonical_url=canonical)
