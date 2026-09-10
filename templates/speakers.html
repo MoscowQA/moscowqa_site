@@ -20,11 +20,34 @@
 <main class="main">
     <div class="container">
         <h2 class="section__title">Докладчики</h2>
-        <p class="text-muted" style="margin-bottom: 2rem;">{{ speakers | length }} спикеров Moscow QA</p>
 
-        <div class="speakers-grid">
+        {# Search is progressive enhancement: hidden until static/js/speakers-search.js takes over. #}
+        <form class="speakers-search" role="search" data-speakers-search onsubmit="return false;">
+            <label class="sr-only" for="speakers-search-input">Поиск по докладчикам</label>
+            <div class="speakers-search__field">
+                <input id="speakers-search-input"
+                       class="speakers-search__input"
+                       type="search"
+                       placeholder="Имя, компания или тема доклада"
+                       autocomplete="off"
+                       spellcheck="false"
+                       data-speakers-search-input>
+                <button type="button"
+                        class="speakers-search__clear"
+                        aria-label="Очистить поиск"
+                        data-speakers-search-clear
+                        hidden>&times;</button>
+            </div>
+        </form>
+
+        <p class="text-muted speakers-count"
+           data-speakers-count
+           data-speakers-total="{{ speakers | length }}"
+           aria-live="polite">{{ speakers | length }} спикеров Moscow QA</p>
+
+        <div class="speakers-grid" data-speakers-grid>
             {% for speaker in speakers %}
-            <div class="speaker-card">
+            <div class="speaker-card" data-speaker-card data-speaker-search="{{ speaker.search_text }}">
                 <div class="speaker-card__photo">
                     {% if speaker.photo %}
                     <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
@@ -44,6 +67,14 @@
             </div>
             {% endfor %}
         </div>
+
+        <p class="speakers-empty" data-speakers-empty hidden>
+            Никого не нашли. Попробуйте другое имя, компанию или тему доклада.
+        </p>
     </div>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ base }}/static/js/speakers-search.js"></script>
 {% endblock %}
