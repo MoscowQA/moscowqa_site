@@ -268,6 +268,20 @@ img { max-width: 100%; height: auto; }
     color: #fff;
 }
 
+/* Light-surface counterpart of .btn--outline: the outline variant is white on
+   purpose (it lives on the gradient heroes) and disappears on a white card. */
+.btn--secondary {
+    border: 2px solid var(--gray-300);
+    color: var(--gray-700);
+    background: #fff;
+}
+
+.btn--secondary:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+    text-decoration: none;
+}
+
 .btn--pink {
     background: var(--pink);
     color: #fff;
@@ -1427,4 +1441,32 @@ img { max-width: 100%; height: auto; }
     .timepad-widget__box {
         padding: 0.75rem;
     }
+}
+
+/* === 404 === */
+/* GitHub Pages serves dist/404.html for any unknown path (see templates/404.html). */
+.error-page__code {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.error-page__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+/* === "В календарь" (см. templates/event.html) === */
+.calendar-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
 }

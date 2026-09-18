@@ -9,8 +9,9 @@ import re
 import shutil
 import yaml
 import markdown
-from datetime import date
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlencode
 from jinja2 import Environment, FileSystemLoader
 
 # Completed vs. upcoming status is now determined on the frontend in
@@ -114,6 +115,174 @@ def resolve_timepad_mode(event: dict, default_mode: str) -> str:
     if raw is False:
         return "off"
     return TIMEPAD_MODE_ALIASES.get(str(raw).strip().lower(), default_mode)
+
+
+# --- Calendar -------------------------------------------------------------
+# Every event page ships an .ics file next to it and a Google Calendar link,
+# so "иду" does not depend on the visitor remembering the date.
+#
+# Times are written in UTC: Moscow has been a fixed UTC+3 with no DST since
+# 2014, so the conversion is unambiguous and the file needs no VTIMEZONE.
+MOSCOW_OFFSET = timedelta(hours=3)
+# Events only have to announce a `date`. A `time` ("19:00", optionally with
+# `end_time`) turns the calendar entry into a real interval; without it the
+# entry is an all-day one, which is the honest rendering of "we announced the
+# day, not the hour".
+DEFAULT_EVENT_DURATION = timedelta(hours=3)
+
+TIME_RE = re.compile(r"^(\d{1,2})[:.](\d{2})$")
+
+
+def parse_event_date(value) -> date | None:
+    """Read a front matter `date` — a quoted ISO string or a YAML date."""
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    try:
+        return date.fromisoformat(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def parse_event_time(value) -> time | None:
+    """Read a front matter `time`/`end_time` ("19:00"), or None when absent."""
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value.time()
+    if isinstance(value, time):
+        return value
+    match = TIME_RE.match(str(value).strip())
+    if not match:
+        return None
+    hour, minute = int(match.group(1)), int(match.group(2))
+    if hour > 23 or minute > 59:
+        return None
+    return time(hour, minute)
+
+
+def event_calendar_span(event: dict):
+    """Return (start, end, all_day) for an event, or None without a date.
+
+    For an all-day entry the bounds are dates and `end` is the exclusive next
+    day — the form both iCalendar and Google Calendar expect. Otherwise they
+    are timezone-aware datetimes in UTC.
+    """
+    day = parse_event_date(event.get("date"))
+    if day is None:
+        return None
+
+    start_time = parse_event_time(event.get("time"))
+    if start_time is None:
+        return day, day + timedelta(days=1), True
+
+    start = datetime.combine(day, start_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
+    end_time = parse_event_time(event.get("end_time"))
+    if end_time is None:
+        return start, start + DEFAULT_EVENT_DURATION, False
+
+    end = datetime.combine(day, end_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
+    if end <= start:
+        # An event that runs past midnight, e.g. 19:00 — 00:30.
+        end += timedelta(days=1)
+    return start, end, False
+
+
+def escape_ics_text(value: str) -> str:
+    """Escape a value for an iCalendar TEXT field (RFC 5545 §3.3.11)."""
+    return (
+        str(value)
+        .replace("\\", "\\\\")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+        .replace("\r\n", "\\n")
+        .replace("\n", "\\n")
+    )
+
+
+def fold_ics_line(line: str) -> str:
+    """Fold one content line to the 75-octet limit (RFC 5545 §3.1).
+
+    Folding counts bytes, not characters, and Cyrillic titles are two bytes
+    apiece — so the split walks characters and never cuts one in half.
+    """
+    limit = 75
+    folded, current, size = [], [], 0
+    for char in line:
+        char_size = len(char.encode("utf-8"))
+        if size + char_size > limit:
+            folded.append("".join(current))
+            # Continuation lines start with a space, which eats one octet.
+            current, size, limit = [char], char_size, 74
+        else:
+            current.append(char)
+            size += char_size
+    folded.append("".join(current))
+    return "\r\n ".join(folded)
+
+
+def build_ics(event: dict, url: str, now: datetime = None) -> str:
+    """Render a single-event iCalendar file, or "" for an event with no date."""
+    span = event_calendar_span(event)
+    if span is None:
+        return ""
+    start, end, all_day = span
+
+    if all_day:
+        start_line = f"DTSTART;VALUE=DATE:{start.strftime('%Y%m%d')}"
+        end_line = f"DTEND;VALUE=DATE:{end.strftime('%Y%m%d')}"
+    else:
+        start_line = f"DTSTART:{start.strftime('%Y%m%dT%H%M%SZ')}"
+        end_line = f"DTEND:{end.strftime('%Y%m%dT%H%M%SZ')}"
+
+    stamp = (now or datetime.now(timezone.utc)).strftime("%Y%m%dT%H%M%SZ")
+    description = " ".join(
+        part for part in [event.get("short_description") or "", url] if part
+    )
+
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Moscow QA//moscowqa.ru//RU",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        f"UID:{event.get('slug', 'event')}@moscowqa.ru",
+        f"DTSTAMP:{stamp}",
+        start_line,
+        end_line,
+        f"SUMMARY:{escape_ics_text(event.get('title', 'Moscow QA'))}",
+        f"DESCRIPTION:{escape_ics_text(description)}",
+    ]
+    if event.get("address"):
+        lines.append(f"LOCATION:{escape_ics_text(event['address'])}")
+    if url:
+        lines.append(f"URL:{url}")
+    lines += ["STATUS:CONFIRMED", "END:VEVENT", "END:VCALENDAR"]
+
+    return "".join(fold_ics_line(line) + "\r\n" for line in lines)
+
+
+def google_calendar_url(event: dict, url: str) -> str:
+    """Build a "add to Google Calendar" link, or "" for an event with no date."""
+    span = event_calendar_span(event)
+    if span is None:
+        return ""
+    start, end, all_day = span
+    fmt = "%Y%m%d" if all_day else "%Y%m%dT%H%M%SZ"
+
+    params = {
+        "action": "TEMPLATE",
+        "text": event.get("title", "Moscow QA"),
+        "dates": f"{start.strftime(fmt)}/{end.strftime(fmt)}",
+        "details": " ".join(
+            part for part in [event.get("short_description") or "", url] if part
+        ),
+    }
+    if event.get("address"):
+        params["location"] = event["address"]
+    return "https://calendar.google.com/calendar/render?" + urlencode(params)
 
 
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
@@ -243,6 +412,13 @@ def load_events() -> list[dict]:
             event["timepad_event_id"] = parse_timepad_event_id(event)
             event["timepad_widget_mode"] = resolve_timepad_mode(
                 event, TIMEPAD_DEFAULT_MODE
+            )
+
+            # "Add to calendar": the .ics file is written next to the event
+            # page in build(); the Google link is built here because it needs
+            # the absolute URL of that page.
+            event["google_calendar_url"] = google_calendar_url(
+                event, f"{SITE_URL}/events/{event['slug']}/"
             )
 
             # Note: past-vs-upcoming detection has moved to the browser
@@ -416,6 +592,14 @@ def build():
         event_dir.mkdir(parents=True, exist_ok=True)
         (event_dir / "index.html").write_text(html, encoding="utf-8")
 
+        # iCalendar file for the "в календарь" button. newline="" keeps the
+        # CRLF line endings RFC 5545 asks for on every platform.
+        ics = build_ics(event, canonical)
+        if ics:
+            (event_dir / "event.ics").write_text(
+                ics, encoding="utf-8", newline=""
+            )
+
     # Build individual talk pages
     tpl = env.get_template("talk.html")
     for event in events:
@@ -525,6 +709,13 @@ def build():
         page_dir = OUTPUT_DIR / slug
         page_dir.mkdir(parents=True, exist_ok=True)
         (page_dir / "index.html").write_text(html, encoding="utf-8")
+
+    # 404 page: GitHub Pages serves it for any unknown path. It is not part of
+    # the sitemap on purpose — it must never be indexed.
+    tpl = env.get_template("404.html")
+    (OUTPUT_DIR / "404.html").write_text(
+        tpl.render(**common, canonical_url=""), encoding="utf-8"
+    )
 
     # Generate sitemap.xml
     sitemap = generate_sitemap(events, speakers, pages)

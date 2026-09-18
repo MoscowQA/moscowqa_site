@@ -2,6 +2,7 @@
 title: "Moscow QA #28 x Чёрный митап 18+"
 number: 28
 date: "2026-10-01"
+time: "18:00"
 company: ""
 address: "Москва, район м. Добрынинская"
 type: "Offline"

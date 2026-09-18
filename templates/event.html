@@ -125,6 +125,30 @@
             </a>
             {% endif %}
 
+            {# "В календарь": the .ics file sits next to this page, the Google
+               link is built in build.py. Both are upcoming-only — nobody adds
+               last year's meetup to their calendar. #}
+            {% if event.google_calendar_url %}
+            <div class="info-card js-upcoming-only">
+                <div class="info-card__header">
+                    <div class="info-card__icon">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/><path d="M12 13v5M9.5 15.5h5" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="info-card__title">В календарь</h3>
+                        <div class="calendar-links">
+                            <a class="btn btn--secondary btn--sm"
+                               href="{{ base }}/events/{{ event.slug }}/event.ics"
+                               download="moscowqa-{{ event.slug }}.ics">Скачать .ics</a>
+                            <a class="btn btn--secondary btn--sm"
+                               href="{{ event.google_calendar_url }}"
+                               target="_blank" rel="noopener">Google Календарь</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             {% if event.video_link %}
             <a href="{{ event.video_link }}" target="_blank" rel="noopener" style="text-decoration:none;">
                 <div class="info-card">
