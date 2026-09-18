@@ -12,6 +12,7 @@ photos_link: "https://vk.com/album-227064516_305496716"
 registration_link: "https://moscowqa.timepad.ru/event/2730692/"
 talks:
   - title: "Особенности тестирования SmartTV-приложений"
+    tags: ["железо и устройства", "инструменты"]
     speakers:
       - "Михаил Гамаюнов"
     company: "VK Видео"
@@ -19,6 +20,7 @@ talks:
     slides_url: "/static/slides/01-mts-ai_osobennosti-testirovaniya-smarttv-prilozheniy.pdf"
     record: "https://www.youtube.com/watch?v=jgNvx9udfZs"
   - title: "Браузерные инструменты на страже перформанса"
+    tags: ["фронтенд", "инструменты"]
     speakers:
       - "Алексей Иванов"
     company: "Самолет"
@@ -26,6 +28,7 @@ talks:
     slides_url: "/static/slides/01-mts-ai_brauzernye-instrumenty-na-strazhe-performansa.pdf"
     record: "https://www.youtube.com/watch?v=oBKbUoFtAEw"
   - title: "Когнитивные искажения при разработке и тестировании ПО"
+    tags: ["софт-скиллы"]
     speakers:
       - "Игорь Поповкин"
     company: "Senior QA Engineer"

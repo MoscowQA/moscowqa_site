@@ -1247,6 +1247,96 @@ img { max-width: 100%; height: auto; }
     color: var(--purple);
 }
 
+/* Topic tags (см. templates/tag.html, tags.html): chips under a talk and the
+   cloud on /tags/. Unlike the status tags above these are links. */
+.tag--topic {
+    background: var(--pink-light);
+    color: var(--pink);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.tag--topic:hover {
+    background: var(--pink);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Same chip on the gradient hero of a talk page. */
+.tag--topic-invert {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.tag--topic-invert:hover {
+    background: rgba(255,255,255,0.32);
+    color: #fff;
+    text-decoration: none;
+}
+
+.topic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.topic-tags--hero {
+    margin-top: 1rem;
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 2rem 0;
+}
+
+.tag-cloud__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 9999px;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+    color: var(--gray-800);
+    font-weight: 600;
+}
+
+.tag-cloud__item:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+    text-decoration: none;
+}
+
+.tag-cloud__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.4rem;
+    border-radius: 9999px;
+    background: var(--pink-light);
+    color: var(--pink);
+    font-size: 0.8rem;
+}
+
+/* Event + date line on a tag page, where a talk is out of its meetup's context. */
+.talk-card__meta {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    color: var(--gray-500);
+}
+
+.talk-card__meta-sep {
+    margin: 0 0.4rem;
+}
+
 /* === Page content (from markdown) === */
 .md-content h2 {
     margin-top: 2rem;

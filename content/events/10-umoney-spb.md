@@ -12,18 +12,21 @@ photos_link: "https://vk.com/album-227064516_308269217"
 registration_link: ""
 talks:
   - title: "Allure Report 3"
+    tags: ["инструменты", "автоматизация"]
     speakers:
       - "Артём Ерошенко"
     company: "Allure Team"
     description: "Новая версия Allure Report: доступные фичи, планы на будущее. Много технических примеров и лайвкодинга."
     record: "https://www.youtube.com/watch?v=Uytpx8t4po0"
   - title: "Аудит автотестов"
+    tags: ["автоматизация", "процессы качества"]
     speakers:
       - "Дмитрий Сергиенко"
     company: "ЮMoney"
     description: "Как снять «розовые очки» и трезво оценить покрытие процессов автотестами. Почему важно измерять покрытие и возможно ли приблизиться к 100%."
     record: "https://www.youtube.com/watch?v=GZbaDYe0Dhs"
   - title: "Топ-5 вопросов на все случаи жизни"
+    tags: ["софт-скиллы"]
     speakers:
       - "Тая Толстунова"
     company: "VK Tech"

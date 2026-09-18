@@ -12,24 +12,28 @@ photos_link: "https://vk.com/album-227064516_309389462"
 registration_link: ""
 talks:
   - title: "Как составить запрос в GraphQL API без автозаполнения"
+    tags: ["API и интеграции", "ручное тестирование"]
     speakers:
       - "Ольга Назина"
     company: ""
     description: "Как составить запрос в GraphQL API, опираясь на схему, когда инструментов типа Apollo или Postman нет под рукой."
     record: "https://www.youtube.com/watch?v=9fZvQZOf-f4"
   - title: "Исследовательское тестирование на существующих наработках"
+    tags: ["ручное тестирование"]
     speakers:
       - "Григорий Ромашов"
     company: "Align Technology"
     description: "Идея использования существующих наработок и артефактов для тестирования новой функциональности с примерами из практики."
     record: "https://www.youtube.com/watch?v=rLTpjiKz7a0"
   - title: "Управляемые тестовые стенды: от скриптов к UI и системе связанных сервисов"
+    tags: ["инфраструктура"]
     speakers:
       - "Александра Кучина"
     company: "Lamoda Tech"
     description: "Переход от ручных скриптов и манифестов к удобному UI с изолированными, управляемыми тестовыми стендами. Совместная работа QA и DevOps над инфраструктурными задачами."
     record: "https://www.youtube.com/watch?v=ff1eP176sBs"
   - title: "Тестируем быстрее: практики ускорения QA без потери качества"
+    tags: ["процессы качества"]
     speakers:
       - "Кирилл Храбров"
     company: "2ГИС"

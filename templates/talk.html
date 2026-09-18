@@ -65,6 +65,13 @@
     <div class="talk-hero__inner">
         <div class="talk-hero__tag">Доклад</div>
         <h1 class="talk-hero__title">{{ talk.title }}</h1>
+        {% if talk.tag_links %}
+        <div class="topic-tags topic-tags--hero">
+            {% for link in talk.tag_links %}
+            <a class="tag tag--topic-invert" href="{{ base }}/tags/{{ link.slug }}/">{{ link.name }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </div>
 

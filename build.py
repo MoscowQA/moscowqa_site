@@ -288,11 +288,8 @@ def google_calendar_url(event: dict, url: str) -> str:
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
 
 
-def slugify_talk(title: str, manual_slug: str = None) -> str:
-    """Generate URL-friendly slug from Russian talk title."""
-    if manual_slug:
-        return manual_slug
-
+def slugify(text: str) -> str:
+    """Transliterate Russian text into a URL-friendly slug."""
     translit_map = {
         'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
         'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
@@ -300,9 +297,8 @@ def slugify_talk(title: str, manual_slug: str = None) -> str:
         'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
         'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
     }
-    text = title.lower()
     result = []
-    for char in text:
+    for char in text.lower():
         if char in translit_map:
             result.append(translit_map[char])
         elif char.isalnum():
@@ -312,6 +308,60 @@ def slugify_talk(title: str, manual_slug: str = None) -> str:
     slug = ''.join(result)
     slug = re.sub(r'-+', '-', slug)
     return slug.strip('-')[:80]
+
+
+def slugify_talk(title: str, manual_slug: str = None) -> str:
+    """Generate URL-friendly slug from Russian talk title."""
+    if manual_slug:
+        return manual_slug
+    return slugify(title)
+
+
+# --- Topic tags -----------------------------------------------------------
+# Talks carry free-form `tags` in the front matter ("автоматизация",
+# "нагрузочное", "AI"). Every tag gets a page at /tags/{слаг}/ listing the
+# talks under it — a hundred talks are otherwise only reachable through the
+# meetup they happened at.
+
+
+def normalize_tag(value) -> str:
+    """Trim a tag as written in the front matter and collapse its spaces."""
+    return re.sub(r"\s+", " ", str(value).strip())
+
+
+def talk_tag_links(talk: dict) -> list[dict]:
+    """Return [{name, slug}] for a talk, skipping blanks and duplicates."""
+    links, seen = [], set()
+    for raw in talk.get("tags") or []:
+        name = normalize_tag(raw)
+        slug = slugify(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        links.append({"name": name, "slug": slug})
+    return links
+
+
+def collect_tags(events: list[dict]) -> list[dict]:
+    """Group talks by tag, most used first, then alphabetically.
+
+    Events arrive newest first, so each tag's talks keep that order. Tags that
+    differ only in case or spacing share a slug and therefore a page; the
+    spelling that reaches the page title is the one used by the newest talk.
+    """
+    by_slug: dict[str, dict] = {}
+    for event in events:
+        for talk in event.get("talks", []):
+            for link in talk.get("tag_links") or []:
+                entry = by_slug.setdefault(
+                    link["slug"],
+                    {"name": link["name"], "slug": link["slug"], "talks": []},
+                )
+                entry["talks"].append({**talk, "event": event})
+
+    tags = list(by_slug.values())
+    tags.sort(key=lambda tag: (-len(tag["talks"]), tag["name"].lower()))
+    return tags
 
 
 def normalize_search_text(text: str) -> str:
@@ -406,6 +456,7 @@ def load_events() -> list[dict]:
                     talk["title"],
                     talk.get("slug")
                 )
+                talk["tag_links"] = talk_tag_links(talk)
 
             # Timepad registration widget: the id comes from the event's
             # Timepad link unless the front matter names one explicitly.
@@ -452,7 +503,7 @@ def load_pages() -> dict:
     return pages
 
 
-def generate_sitemap(events, speakers, pages):
+def generate_sitemap(events, speakers, pages, tags=()):
     """Generate sitemap.xml for search engines."""
     today = date.today().isoformat()
     urls = []
@@ -492,6 +543,20 @@ def generate_sitemap(events, speakers, pages):
             "changefreq": "monthly",
             "priority": "0.6",
         })
+
+    # Topic tags
+    if tags:
+        urls.append({
+            "loc": f"{SITE_URL}/tags/",
+            "changefreq": "weekly",
+            "priority": "0.6",
+        })
+        for tag in tags:
+            urls.append({
+                "loc": f"{SITE_URL}/tags/{tag['slug']}/",
+                "changefreq": "monthly",
+                "priority": "0.55",
+            })
 
     # Extra pages
     for slug in pages:
@@ -567,9 +632,12 @@ def build():
             speaker, talks_by_speaker.get(speaker["name"], [])
         )
 
+    # Topic tags: talks grouped by the `tags` of their front matter.
+    tags = collect_tags(events)
+
     common = {"site": site, "events": events, "speakers": speakers, "base": BASE_URL,
               "speaker_slugs": speaker_slugs, "speaker_by_name": speaker_by_name,
-              "site_url": SITE_URL}
+              "site_url": SITE_URL, "tags": tags}
 
     # Build index page
     tpl = env.get_template("index.html")
@@ -684,6 +752,21 @@ def build():
     (OUTPUT_DIR / "presentations").mkdir(exist_ok=True)
     (OUTPUT_DIR / "presentations" / "index.html").write_text(html, encoding="utf-8")
 
+    # Build tag pages: an index of every topic plus one page per tag.
+    if tags:
+        tpl = env.get_template("tags.html")
+        html = tpl.render(**common, canonical_url=f"{SITE_URL}/tags/")
+        (OUTPUT_DIR / "tags").mkdir(exist_ok=True)
+        (OUTPUT_DIR / "tags" / "index.html").write_text(html, encoding="utf-8")
+
+        tpl = env.get_template("tag.html")
+        for tag in tags:
+            canonical = f"{SITE_URL}/tags/{tag['slug']}/"
+            html = tpl.render(**common, tag=tag, canonical_url=canonical)
+            tag_dir = OUTPUT_DIR / "tags" / tag["slug"]
+            tag_dir.mkdir(parents=True, exist_ok=True)
+            (tag_dir / "index.html").write_text(html, encoding="utf-8")
+
     # Page slugs that use a dedicated template instead of the generic page.html
     custom_page_templates = {"organizers": "organizers.html"}
 
@@ -718,7 +801,7 @@ def build():
     )
 
     # Generate sitemap.xml
-    sitemap = generate_sitemap(events, speakers, pages)
+    sitemap = generate_sitemap(events, speakers, pages, tags)
     (OUTPUT_DIR / "sitemap.xml").write_text(sitemap, encoding="utf-8")
 
     # Generate robots.txt
@@ -729,7 +812,11 @@ def build():
     widget_count = sum(
         1 for e in events if e.get("timepad_widget_mode", "off") != "off"
     )
+    tagged_talks = sum(
+        1 for e in events for t in e.get("talks", []) if t.get("tag_links")
+    )
     print(f"Built {len(events)} events, {talk_count} talks, {len(speakers)} speakers, {len(pages)} pages")
+    print(f"Tags: {len(tags)} topics, {tagged_talks}/{talk_count} talks tagged")
     if TIMEPAD_WIDGET_ENABLED:
         print(f"Timepad widget: {widget_count}/{len(events)} events, "
               f"list widget {'on' if site['timepad_widget']['list_enabled'] else 'off'}")

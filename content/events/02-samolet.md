@@ -12,6 +12,7 @@ photos_link: "https://vk.com/album-227064516_305508569"
 registration_link: "https://moscowqa.timepad.ru/event/2780431/"
 talks:
   - title: "Тестируем Flipper Zero. Автотесты, электроника и синяя изолента"
+    tags: ["железо и устройства", "автоматизация"]
     speakers:
       - "Константин Волков"
     company: "Flipper Devices"
@@ -19,6 +20,7 @@ talks:
     slides_url: "/static/slides/02-samolet_testiruem-flipper-zero-avtotesty-elektronika-i-sinyaya-izolenta.pptx"
     record: "https://www.youtube.com/watch?v=-AJ8xO5darE"
   - title: "Практическая сторона тестов"
+    tags: ["автоматизация"]
     speakers:
       - "Александр Винокуров"
     company: "Самолет"
@@ -26,6 +28,7 @@ talks:
     slides_url: "/static/slides/02-samolet_prakticheskaya-storona-testov.pdf"
     record: "https://www.youtube.com/watch?v=1DY33iv83VI"
   - title: "Я люблю свою работу, я приду сюда в субботу"
+    tags: ["софт-скиллы", "карьера"]
     speakers:
       - "Андрей Мясников"
     company: "more.tv"

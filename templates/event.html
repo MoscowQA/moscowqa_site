@@ -203,6 +203,13 @@
                     {% if talk.description %}
                     <p class="talk-card__desc">{{ talk.description }}</p>
                     {% endif %}
+                    {% if talk.tag_links %}
+                    <div class="topic-tags">
+                        {% for link in talk.tag_links %}
+                        <a class="tag tag--topic" href="{{ base }}/tags/{{ link.slug }}/">{{ link.name }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     {% if talk.speakers %}
                     <div class="talk-card__speakers">
                         {% for speaker_name in talk.speakers %}

@@ -12,24 +12,28 @@ photos_link: "https://vk.com/album-227064516_309875445"
 registration_link: "https://moscowqa.timepad.ru/event/3522454/"
 talks:
   - title: "Как не заблудиться в лесу метрик QA"
+    tags: ["процессы качества"]
     speakers:
       - "Руслан Остропольский"
     company: "Test IT"
     description: "Различные подходы к построению метрик QA, возможные трудности и лайфхаки для создания удобных и информативных дашбордов."
     record: "https://www.youtube.com/watch?v=NmnZEHN4_as"
   - title: "ISTQB сегодня. Что почём?"
+    tags: ["карьера"]
     speakers:
       - "Анастасия Нестерова"
     company: ""
     description: "Что из себя представляет ISTQB сегодня: направления, советы для самостоятельной подготовки, полезные ссылки и квиз по пробным экзаменам."
     record: "https://www.youtube.com/watch?v=fc0OS13T8lw"
   - title: "Куда расти тестировщику?"
+    tags: ["карьера"]
     speakers:
       - "Иван Приходько"
     company: "Ozon"
     description: "Возможности роста в тестировании и скиллсеты, необходимые для различных позиций."
     record: "https://www.youtube.com/watch?v=O1uSb59F1d4"
   - title: "Теперь менеджер — это я"
+    tags: ["команда и лидерство", "карьера"]
     speakers:
       - "Серафима Чекулаева"
     company: "self."

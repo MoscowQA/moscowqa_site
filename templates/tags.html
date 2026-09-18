@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% set active_page = 'tags' %}
+
+{% block title %}Темы докладов — {{ site.title }}{% endblock %}
+{% block description %}Доклады митапов Moscow QA по темам: {{ tags | map(attribute='name') | join(', ') }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Темы докладов", "item": "{{ site_url }}/tags/"}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <div class="container">
+        <h1 class="section__title">Темы докладов</h1>
+        <p class="text-muted">
+            {{ tags | length }} тем — по ним разложены доклады всех митапов Moscow QA.
+        </p>
+
+        <div class="tag-cloud">
+            {% for tag in tags %}
+            <a class="tag-cloud__item" href="{{ base }}/tags/{{ tag.slug }}/">
+                <span class="tag-cloud__name">{{ tag.name }}</span>
+                <span class="tag-cloud__count">{{ tag.talks | length }}</span>
+            </a>
+            {% endfor %}
+        </div>
+
+        <p class="back-link"><a href="{{ base }}/events/">&larr; Все мероприятия</a></p>
+    </div>
+</main>
+{% endblock %}

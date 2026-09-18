@@ -11,18 +11,21 @@ video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg34g8aJ8hsUytd-cnLA
 registration_link: "https://moscowqa.timepad.ru/event/3093333/"
 talks:
   - title: "Web 3.0: архитектура и тестирование децентрализованных приложений"
+    tags: ["фронтенд", "API и интеграции"]
     speakers:
       - "Даниил Швецов"
     company: ""
     description: "Как построить архитектуру современного приложения с помощью блокчейна. Отличия от клиент-серверных приложений и инструменты для тестирования и аудита."
     record: "https://www.youtube.com/watch?v=5Te9TIyc86A"
   - title: "Как начать нагрузочное тестирование на примере К6-Тарантул"
+    tags: ["нагрузочное тестирование", "инструменты"]
     speakers:
       - "Александр Кленов"
     company: "VK Tech"
     description: "Решение для нагрузочного тестирования продуктов, которое применяется в команде Tarantool DB, как и почему к этому пришли."
     record: "https://www.youtube.com/watch?v=gZuZ7AB4M6I"
   - title: "BDUI: эволюция динамических интерфейсов"
+    tags: ["фронтенд"]
     speakers:
       - "Елена Кислякова"
     company: "Яндекс Маркет"
