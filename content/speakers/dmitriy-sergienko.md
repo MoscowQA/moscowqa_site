@@ -1,7 +1,7 @@
 ---
 name: "Дмитрий Сергиенко"
 company: "ЮMoney"
-photo: "https://storage.yandexcloud.net/barbez/speaker/sergienko.png"
+photo: "/static/images/speakers/dmitriy-sergienko.webp"
 telegram: ""
 github: ""
 ---

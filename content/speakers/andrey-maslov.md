@@ -1,7 +1,7 @@
 ---
 name: "Андрей Маслов"
 company: "2ГИС"
-photo: "https://storage.yandexcloud.net/barbez/speaker/maslov.png"
+photo: "/static/images/speakers/andrey-maslov.webp"
 telegram: ""
 github: ""
 ---

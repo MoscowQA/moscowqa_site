@@ -1,7 +1,7 @@
 ---
 name: "Иван Приходько"
 company: "Ozon"
-photo: "https://storage.yandexcloud.net/barbez/speaker/prihod.png"
+photo: "/static/images/speakers/ivan-prihodko.webp"
 telegram: ""
 github: ""
 external_talks:

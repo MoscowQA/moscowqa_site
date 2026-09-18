@@ -1,7 +1,7 @@
 ---
 name: Сергей Лебедев
 company: Яндекс Лавка
-photo: https://storage.yandexcloud.net/barbez/speaker/lebedev.png
+photo: "/static/images/speakers/sergey-lebedev.webp"
 telegram: ''
 github: ''
 external_talks:

@@ -1,7 +1,7 @@
 ---
 name: Ольга Назина
 company: ''
-photo: https://storage.yandexcloud.net/barbez/speaker/nazina.png
+photo: "/static/images/speakers/olga-nazina.webp"
 telegram: ''
 github: ''
 external_talks:

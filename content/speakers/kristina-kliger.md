@@ -1,7 +1,7 @@
 ---
 name: "Кристина Клигер"
 company: "Газпромбанк.Тех"
-photo: "https://storage.yandexcloud.net/barbez/speaker/kliger.png"
+photo: "/static/images/speakers/kristina-kliger.webp"
 telegram: ""
 github: ""
 ---

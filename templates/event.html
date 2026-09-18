@@ -125,6 +125,30 @@
             </a>
             {% endif %}
 
+            {# "В календарь": the .ics file sits next to this page, the Google
+               link is built in build.py. Both are upcoming-only — nobody adds
+               last year's meetup to their calendar. #}
+            {% if event.google_calendar_url %}
+            <div class="info-card js-upcoming-only">
+                <div class="info-card__header">
+                    <div class="info-card__icon">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/><path d="M12 13v5M9.5 15.5h5" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="info-card__title">В календарь</h3>
+                        <div class="calendar-links">
+                            <a class="btn btn--secondary btn--sm"
+                               href="{{ base }}/events/{{ event.slug }}/event.ics"
+                               download="moscowqa-{{ event.slug }}.ics">Скачать .ics</a>
+                            <a class="btn btn--secondary btn--sm"
+                               href="{{ event.google_calendar_url }}"
+                               target="_blank" rel="noopener">Google Календарь</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             {% if event.video_link %}
             <a href="{{ event.video_link }}" target="_blank" rel="noopener" style="text-decoration:none;">
                 <div class="info-card">
@@ -179,13 +203,20 @@
                     {% if talk.description %}
                     <p class="talk-card__desc">{{ talk.description }}</p>
                     {% endif %}
+                    {% if talk.tag_links %}
+                    <div class="topic-tags">
+                        {% for link in talk.tag_links %}
+                        <a class="tag tag--topic" href="{{ base }}/tags/{{ link.slug }}/">{{ link.name }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     {% if talk.speakers %}
                     <div class="talk-card__speakers">
                         {% for speaker_name in talk.speakers %}
                         <div class="talk-card__speaker">
                             <div class="talk-card__speaker-avatar">
                                 {% if speaker_by_name.get(speaker_name, {}).get('photo') %}
-                                <img src="{{ speaker_by_name[speaker_name].photo }}" alt="{{ speaker_name }}" loading="lazy" width="40" height="40" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                                <img src="{{ speaker_by_name[speaker_name].photo_variants.small }}" alt="{{ speaker_name }}" loading="lazy" width="40" height="40" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
                                 {% else %}
                                 &#128100;
                                 {% endif %}

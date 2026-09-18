@@ -1,7 +1,7 @@
 ---
 name: Александра Чичелева
 company: X5 Tech
-photo: https://storage.yandexcloud.net/barbez/speaker/chicheleva.png
+photo: "/static/images/speakers/aleksandra-chicheleva.webp"
 telegram: ''
 github: ''
 external_talks:

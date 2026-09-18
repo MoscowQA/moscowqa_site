@@ -1,7 +1,7 @@
 ---
 name: "Александр Крылов"
 company: "Штурвал"
-photo: "https://storage.yandexcloud.net/barbez/speaker/krilov.png"
+photo: "/static/images/speakers/aleksandr-krylov.webp"
 telegram: ""
 github: ""
 ---

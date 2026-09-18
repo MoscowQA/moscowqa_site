@@ -1,7 +1,7 @@
 ---
 name: Александр Михайлов
 company: ЮМани
-photo: "/static/images/speakers/aleksandr-mihaylov.png"
+photo: "/static/images/speakers/aleksandr-mihaylov.webp"
 telegram: ''
 github: ''
 ---

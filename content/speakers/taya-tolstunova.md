@@ -1,7 +1,7 @@
 ---
 name: "Тая Толстунова"
 company: "VK Tech"
-photo: "https://storage.yandexcloud.net/barbez/speaker/taya.png"
+photo: "/static/images/speakers/taya-tolstunova.webp"
 telegram: ""
 github: ""
 ---

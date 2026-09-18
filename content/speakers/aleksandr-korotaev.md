@@ -1,7 +1,7 @@
 ---
 name: "Александр Коротаев"
 company: ""
-photo: "https://storage.yandexcloud.net/barbez/speaker/korotaev.png"
+photo: "/static/images/speakers/aleksandr-korotaev.webp"
 telegram: ""
 github: ""
 ---

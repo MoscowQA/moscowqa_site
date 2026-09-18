@@ -24,14 +24,18 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    <a class="skip-link" href="#content">К содержимому</a>
     <header class="header">
         <div class="header__inner">
             <a href="{{ base }}/" class="header__logo">
                 <img src="{{ base }}/static/images/logo.png" alt="MoscowQA Logo" class="header__logo-img">
                 <span class="header__logo-text">MoscowQA</span>
             </a>
-            <button class="header__burger" onclick="document.querySelector('.header__nav').classList.toggle('open')" aria-label="Меню">&#9776;</button>
-            <nav class="header__nav">
+            {# The burger is wired up in static/js/nav.js: it keeps aria-expanded
+               in sync and closes the menu on Esc or a tap outside. #}
+            <button type="button" class="header__burger" aria-label="Меню"
+                    aria-expanded="false" aria-controls="site-nav" data-nav-toggle>&#9776;</button>
+            <nav class="header__nav" id="site-nav" data-nav>
                 <a href="{{ base }}/" {% if active_page == 'index' %}class="active"{% endif %}>События</a>
                 <a href="{{ base }}/speakers/" {% if active_page == 'speakers' %}class="active"{% endif %}>Докладчики</a>
                 <a href="{{ base }}/organizers/" {% if active_page == 'organizers' %}class="active"{% endif %}>Организаторы</a>
@@ -41,7 +45,12 @@
         </div>
     </header>
 
-    {% block content %}{% endblock %}
+    {# Target of the skip link. tabindex="-1" makes it focusable, so screen
+       readers and keyboard users actually land here instead of jumping the
+       scroll position only. #}
+    <div id="content" tabindex="-1">
+        {% block content %}{% endblock %}
+    </div>
 
     <footer class="footer">
         <div class="footer__inner">
@@ -50,20 +59,31 @@
                 <div class="footer__links">
                     <a href="{{ base }}/">События</a>
                     <a href="{{ base }}/speakers/">Докладчики</a>
+                    <a href="{{ base }}/tags/">Темы докладов</a>
                     <a href="{{ base }}/organizers/">Организаторы</a>
                     <a href="{{ base }}/cfp/">Подать доклад</a>
                     <a href="{{ base }}/venues/">Для площадок</a>
                 </div>
             </div>
             <div class="footer__col">
+                {# Real brand marks instead of the typographic ✉ ▶ ★ that used
+                   to stand in for them and read as broken glyphs. Timepad has
+                   no brand mark of its own, so it gets a ticket. #}
                 <div class="footer__social">
-                    <a href="{{ site.telegram }}" title="Telegram" aria-label="Telegram">&#9993;</a>
-                    <a href="{{ site.youtube }}" title="YouTube" aria-label="YouTube">&#9654;</a>
-                    <a href="{{ site.timepad }}" title="Timepad" aria-label="Timepad">&#9733;</a>
+                    <a href="{{ site.telegram }}" title="Telegram" aria-label="Telegram" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    </a>
+                    <a href="{{ site.youtube }}" title="YouTube" aria-label="YouTube" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </a>
+                    <a href="{{ site.timepad }}" title="Timepad" aria-label="Timepad — регистрация на митапы" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h13A1.5 1.5 0 0 1 20 8.5v1.25a2.25 2.25 0 0 0 0 4.5v1.25a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 15.5v-1.25a2.25 2.25 0 0 0 0-4.5V8.5Z"/><path d="M14 7.5v9" stroke-dasharray="2 2.5" stroke-linecap="round"/></svg>
+                    </a>
                 </div>
             </div>
         </div>
     </footer>
+    <script src="{{ base }}/static/js/nav.js"></script>
     <script src="{{ base }}/static/js/events-status.js"></script>
     <script src="{{ base }}/static/js/timepad-widget.js"></script>
 {%- block scripts %}{% endblock %}

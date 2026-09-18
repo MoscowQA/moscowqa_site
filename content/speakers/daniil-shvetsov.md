@@ -1,7 +1,7 @@
 ---
 name: "Даниил Швецов"
 company: ""
-photo: "https://storage.yandexcloud.net/barbez/speaker/Shvecov.png"
+photo: "/static/images/speakers/daniil-shvetsov.webp"
 telegram: ""
 github: ""
 external_talks:

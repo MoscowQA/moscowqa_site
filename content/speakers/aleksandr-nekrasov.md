@@ -1,7 +1,7 @@
 ---
 name: "Александр Некрасов"
 company: "МТС Диджитал"
-photo: "https://storage.yandexcloud.net/barbez/speaker/nekrasov.png"
+photo: "/static/images/speakers/aleksandr-nekrasov.webp"
 telegram: ""
 github: ""
 external_talks:

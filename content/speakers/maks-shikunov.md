@@ -1,7 +1,7 @@
 ---
 name: "Макс Шикунов"
 company: "AliExpress CIS"
-photo: "https://storage.yandexcloud.net/barbez/speaker/shikunov.jpg"
+photo: "/static/images/speakers/maks-shikunov.webp"
 telegram: ""
 github: ""
 ---

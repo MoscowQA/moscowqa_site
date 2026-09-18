@@ -1,7 +1,7 @@
 ---
 name: "Екатерина Лахтина"
 company: "2ГИС"
-photo: "https://storage.yandexcloud.net/barbez/speaker/lahtina.png"
+photo: "/static/images/speakers/ekaterina-lahtina.webp"
 telegram: "katglu"
 github: ""
 ---

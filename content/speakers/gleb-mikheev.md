@@ -1,7 +1,7 @@
 ---
 name: Глеб Михеев
 company: Сбер
-photo: https://storage.yandexcloud.net/barbez/speaker/miheev.png
+photo: "/static/images/speakers/gleb-mikheev.webp"
 telegram: ''
 github: ''
 external_talks:

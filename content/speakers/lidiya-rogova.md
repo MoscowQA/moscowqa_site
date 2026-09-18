@@ -1,7 +1,7 @@
 ---
 name: Лидия Рогова
 company: ''
-photo: https://storage.yandexcloud.net/barbez/speaker/rogova.png
+photo: "/static/images/speakers/lidiya-rogova.webp"
 telegram: ''
 github: ''
 external_talks:

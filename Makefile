@@ -16,9 +16,9 @@ DIST := dist
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install install-parsers venv build serve clean check \
+.PHONY: help install install-dev install-parsers venv build serve clean check test validate \
 	sync sync-dry sync-heisenbug sync-sqadays \
-	collect-heisenbug collect-sqadays photo
+	collect-heisenbug collect-sqadays photo photos
 
 help: ## Показать этот список
 	@awk 'BEGIN {FS = ":.*##"} \
@@ -32,6 +32,9 @@ help: ## Показать этот список
 install: ## Установить зависимости сборки
 	$(PYTHON) -m pip install -r requirements.txt
 
+install-dev: ## Установить зависимости для тестов
+	$(PYTHON) -m pip install -r requirements-dev.txt
+
 build: ## Собрать сайт в dist/
 	$(PYTHON) build.py
 
@@ -42,6 +45,12 @@ serve: build ## Собрать и поднять локальный сервер
 clean: ## Удалить dist/ и кэш Python
 	rm -rf $(DIST)
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
+
+test: ## Прогнать тесты (pytest)
+	$(PYTHON) -m pytest -q
+
+validate: build ## Проверить контент и ссылки в собранном сайте
+	$(PYTHON) scripts/validate_content.py
 
 check: ## Проверить синтаксис Python и прогнать сборку
 	$(PYTHON) -m compileall -q build.py parsers scripts
@@ -57,7 +66,7 @@ install-parsers: ## Установить зависимости парсеров
 
 venv: ## Создать .venv и поставить в него все зависимости
 	$(PYTHON) -m venv $(VENV)
-	$(VENV)/bin/pip install -r requirements.txt -r parsers/requirements.txt
+	$(VENV)/bin/pip install -r requirements-dev.txt -r parsers/requirements.txt
 	@echo "Активировать: source $(VENV)/bin/activate"
 
 sync: sync-heisenbug sync-sqadays ## Подтянуть внешние доклады спикеров (обязательно после добавления нового спикера)
@@ -83,3 +92,6 @@ collect-sqadays: ## Заново собрать данные с sqadays.com (ARG
 photo: ## Сжать фото спикера до ~1080px (FILE=static/images/speakers/name.png)
 	@test -n "$(FILE)" || { echo "Укажите файл: make photo FILE=static/images/speakers/name.png"; exit 1; }
 	$(PYTHON) scripts/compress_photo.py $(FILE) $(ARGS)
+
+photos: ## Перенести фото спикеров к себе в webp (ARGS="ivan-ivanov" или --dry-run)
+	$(PYTHON) scripts/localize_speaker_photos.py $(ARGS)

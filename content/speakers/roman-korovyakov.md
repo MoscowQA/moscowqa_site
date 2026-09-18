@@ -1,7 +1,7 @@
 ---
 name: "Роман Коровяков"
 company: "Мир Plat.Form"
-photo: "/static/images/speakers/roman-korovyakov.png"
+photo: "/static/images/speakers/roman-korovyakov.webp"
 telegram: ""
 github: ""
 ---

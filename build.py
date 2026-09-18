@@ -9,9 +9,11 @@ import re
 import shutil
 import yaml
 import markdown
-from datetime import date
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlencode
 from jinja2 import Environment, FileSystemLoader
+from PIL import Image
 
 # Completed vs. upcoming status is now determined on the frontend in
 # static/js/events-status.js, based on the visitor's current date. The build
@@ -116,14 +118,179 @@ def resolve_timepad_mode(event: dict, default_mode: str) -> str:
     return TIMEPAD_MODE_ALIASES.get(str(raw).strip().lower(), default_mode)
 
 
+# --- Calendar -------------------------------------------------------------
+# Every event page ships an .ics file next to it and a Google Calendar link,
+# so "иду" does not depend on the visitor remembering the date.
+#
+# Times are written in UTC: Moscow has been a fixed UTC+3 with no DST since
+# 2014, so the conversion is unambiguous and the file needs no VTIMEZONE.
+MOSCOW_OFFSET = timedelta(hours=3)
+# Events only have to announce a `date`. A `time` ("19:00", optionally with
+# `end_time`) turns the calendar entry into a real interval; without it the
+# entry is an all-day one, which is the honest rendering of "we announced the
+# day, not the hour".
+DEFAULT_EVENT_DURATION = timedelta(hours=3)
+
+TIME_RE = re.compile(r"^(\d{1,2})[:.](\d{2})$")
+
+
+def parse_event_date(value) -> date | None:
+    """Read a front matter `date` — a quoted ISO string or a YAML date."""
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    try:
+        return date.fromisoformat(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def parse_event_time(value) -> time | None:
+    """Read a front matter `time`/`end_time` ("19:00"), or None when absent."""
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value.time()
+    if isinstance(value, time):
+        return value
+    match = TIME_RE.match(str(value).strip())
+    if not match:
+        return None
+    hour, minute = int(match.group(1)), int(match.group(2))
+    if hour > 23 or minute > 59:
+        return None
+    return time(hour, minute)
+
+
+def event_calendar_span(event: dict):
+    """Return (start, end, all_day) for an event, or None without a date.
+
+    For an all-day entry the bounds are dates and `end` is the exclusive next
+    day — the form both iCalendar and Google Calendar expect. Otherwise they
+    are timezone-aware datetimes in UTC.
+    """
+    day = parse_event_date(event.get("date"))
+    if day is None:
+        return None
+
+    start_time = parse_event_time(event.get("time"))
+    if start_time is None:
+        return day, day + timedelta(days=1), True
+
+    start = datetime.combine(day, start_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
+    end_time = parse_event_time(event.get("end_time"))
+    if end_time is None:
+        return start, start + DEFAULT_EVENT_DURATION, False
+
+    end = datetime.combine(day, end_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
+    if end <= start:
+        # An event that runs past midnight, e.g. 19:00 — 00:30.
+        end += timedelta(days=1)
+    return start, end, False
+
+
+def escape_ics_text(value: str) -> str:
+    """Escape a value for an iCalendar TEXT field (RFC 5545 §3.3.11)."""
+    return (
+        str(value)
+        .replace("\\", "\\\\")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+        .replace("\r\n", "\\n")
+        .replace("\n", "\\n")
+    )
+
+
+def fold_ics_line(line: str) -> str:
+    """Fold one content line to the 75-octet limit (RFC 5545 §3.1).
+
+    Folding counts bytes, not characters, and Cyrillic titles are two bytes
+    apiece — so the split walks characters and never cuts one in half.
+    """
+    limit = 75
+    folded, current, size = [], [], 0
+    for char in line:
+        char_size = len(char.encode("utf-8"))
+        if size + char_size > limit:
+            folded.append("".join(current))
+            # Continuation lines start with a space, which eats one octet.
+            current, size, limit = [char], char_size, 74
+        else:
+            current.append(char)
+            size += char_size
+    folded.append("".join(current))
+    return "\r\n ".join(folded)
+
+
+def build_ics(event: dict, url: str, now: datetime = None) -> str:
+    """Render a single-event iCalendar file, or "" for an event with no date."""
+    span = event_calendar_span(event)
+    if span is None:
+        return ""
+    start, end, all_day = span
+
+    if all_day:
+        start_line = f"DTSTART;VALUE=DATE:{start.strftime('%Y%m%d')}"
+        end_line = f"DTEND;VALUE=DATE:{end.strftime('%Y%m%d')}"
+    else:
+        start_line = f"DTSTART:{start.strftime('%Y%m%dT%H%M%SZ')}"
+        end_line = f"DTEND:{end.strftime('%Y%m%dT%H%M%SZ')}"
+
+    stamp = (now or datetime.now(timezone.utc)).strftime("%Y%m%dT%H%M%SZ")
+    description = " ".join(
+        part for part in [event.get("short_description") or "", url] if part
+    )
+
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Moscow QA//moscowqa.ru//RU",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        f"UID:{event.get('slug', 'event')}@moscowqa.ru",
+        f"DTSTAMP:{stamp}",
+        start_line,
+        end_line,
+        f"SUMMARY:{escape_ics_text(event.get('title', 'Moscow QA'))}",
+        f"DESCRIPTION:{escape_ics_text(description)}",
+    ]
+    if event.get("address"):
+        lines.append(f"LOCATION:{escape_ics_text(event['address'])}")
+    if url:
+        lines.append(f"URL:{url}")
+    lines += ["STATUS:CONFIRMED", "END:VEVENT", "END:VCALENDAR"]
+
+    return "".join(fold_ics_line(line) + "\r\n" for line in lines)
+
+
+def google_calendar_url(event: dict, url: str) -> str:
+    """Build a "add to Google Calendar" link, or "" for an event with no date."""
+    span = event_calendar_span(event)
+    if span is None:
+        return ""
+    start, end, all_day = span
+    fmt = "%Y%m%d" if all_day else "%Y%m%dT%H%M%SZ"
+
+    params = {
+        "action": "TEMPLATE",
+        "text": event.get("title", "Moscow QA"),
+        "dates": f"{start.strftime(fmt)}/{end.strftime(fmt)}",
+        "details": " ".join(
+            part for part in [event.get("short_description") or "", url] if part
+        ),
+    }
+    if event.get("address"):
+        params["location"] = event["address"]
+    return "https://calendar.google.com/calendar/render?" + urlencode(params)
+
+
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
 
 
-def slugify_talk(title: str, manual_slug: str = None) -> str:
-    """Generate URL-friendly slug from Russian talk title."""
-    if manual_slug:
-        return manual_slug
-
+def slugify(text: str) -> str:
+    """Transliterate Russian text into a URL-friendly slug."""
     translit_map = {
         'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
         'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
@@ -131,9 +298,8 @@ def slugify_talk(title: str, manual_slug: str = None) -> str:
         'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
         'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
     }
-    text = title.lower()
     result = []
-    for char in text:
+    for char in text.lower():
         if char in translit_map:
             result.append(translit_map[char])
         elif char.isalnum():
@@ -143,6 +309,60 @@ def slugify_talk(title: str, manual_slug: str = None) -> str:
     slug = ''.join(result)
     slug = re.sub(r'-+', '-', slug)
     return slug.strip('-')[:80]
+
+
+def slugify_talk(title: str, manual_slug: str = None) -> str:
+    """Generate URL-friendly slug from Russian talk title."""
+    if manual_slug:
+        return manual_slug
+    return slugify(title)
+
+
+# --- Topic tags -----------------------------------------------------------
+# Talks carry free-form `tags` in the front matter ("автоматизация",
+# "нагрузочное", "AI"). Every tag gets a page at /tags/{слаг}/ listing the
+# talks under it — a hundred talks are otherwise only reachable through the
+# meetup they happened at.
+
+
+def normalize_tag(value) -> str:
+    """Trim a tag as written in the front matter and collapse its spaces."""
+    return re.sub(r"\s+", " ", str(value).strip())
+
+
+def talk_tag_links(talk: dict) -> list[dict]:
+    """Return [{name, slug}] for a talk, skipping blanks and duplicates."""
+    links, seen = [], set()
+    for raw in talk.get("tags") or []:
+        name = normalize_tag(raw)
+        slug = slugify(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        links.append({"name": name, "slug": slug})
+    return links
+
+
+def collect_tags(events: list[dict]) -> list[dict]:
+    """Group talks by tag, most used first, then alphabetically.
+
+    Events arrive newest first, so each tag's talks keep that order. Tags that
+    differ only in case or spacing share a slug and therefore a page; the
+    spelling that reaches the page title is the one used by the newest talk.
+    """
+    by_slug: dict[str, dict] = {}
+    for event in events:
+        for talk in event.get("talks", []):
+            for link in talk.get("tag_links") or []:
+                entry = by_slug.setdefault(
+                    link["slug"],
+                    {"name": link["name"], "slug": link["slug"], "talks": []},
+                )
+                entry["talks"].append({**talk, "event": event})
+
+    tags = list(by_slug.values())
+    tags.sort(key=lambda tag: (-len(tag["talks"]), tag["name"].lower()))
+    return tags
 
 
 def normalize_search_text(text: str) -> str:
@@ -205,6 +425,46 @@ def speaker_search_text(speaker: dict, talks: list[dict]) -> str:
     return " ".join(unique)
 
 
+# --- Speaker photos -------------------------------------------------------
+# Photos live in static/images/speakers/ as two WebP variants written by
+# scripts/localize_speaker_photos.py: {slug}.webp (~1080px) and
+# {slug}-540.webp. Cards and avatars are far smaller than 1080px, so the
+# templates get a srcset and the browser picks the cheaper file.
+PHOTO_CARD_WIDTH = 540
+
+
+def speaker_photo_variants(photo: str) -> dict:
+    """Return {"src", "small", "srcset"} for a speaker photo.
+
+    `srcset` is empty for a photo hosted elsewhere or one without the smaller
+    variant on disk — those are rendered as a plain <img> exactly as before.
+    """
+    photo = (photo or "").strip()
+    if not photo:
+        return {"src": "", "small": "", "srcset": "", "absolute": ""}
+
+    # og:image and schema.org need an absolute URL; a local photo is a path.
+    absolute = f"{SITE_URL}{photo}" if photo.startswith("/") else photo
+    variants = {"src": photo, "small": photo, "srcset": "", "absolute": absolute}
+    if not photo.startswith("/static/"):
+        return variants
+
+    full_path = ROOT / photo.lstrip("/")
+    small_path = full_path.with_name(f"{full_path.stem}-{PHOTO_CARD_WIDTH}.webp")
+    if not (full_path.exists() and small_path.exists()):
+        return variants
+
+    small_url = f"{photo.rsplit('/', 1)[0]}/{small_path.name}"
+    with Image.open(full_path) as image:
+        full_width = image.width
+
+    variants["small"] = small_url
+    variants["srcset"] = (
+        f"{small_url} {PHOTO_CARD_WIDTH}w, {photo} {full_width}w"
+    )
+    return variants
+
+
 def parse_md_file(filepath: Path) -> dict:
     """Parse a markdown file with YAML front matter."""
     text = filepath.read_text(encoding="utf-8")
@@ -237,12 +497,20 @@ def load_events() -> list[dict]:
                     talk["title"],
                     talk.get("slug")
                 )
+                talk["tag_links"] = talk_tag_links(talk)
 
             # Timepad registration widget: the id comes from the event's
             # Timepad link unless the front matter names one explicitly.
             event["timepad_event_id"] = parse_timepad_event_id(event)
             event["timepad_widget_mode"] = resolve_timepad_mode(
                 event, TIMEPAD_DEFAULT_MODE
+            )
+
+            # "Add to calendar": the .ics file is written next to the event
+            # page in build(); the Google link is built here because it needs
+            # the absolute URL of that page.
+            event["google_calendar_url"] = google_calendar_url(
+                event, f"{SITE_URL}/events/{event['slug']}/"
             )
 
             # Note: past-vs-upcoming detection has moved to the browser
@@ -261,6 +529,7 @@ def load_speakers() -> list[dict]:
         for f in speakers_dir.glob("*.md"):
             speaker = parse_md_file(f)
             speaker["slug"] = f.stem
+            speaker["photo_variants"] = speaker_photo_variants(speaker.get("photo"))
             speakers.append(speaker)
     speakers.sort(key=lambda s: s.get("name", ""))
     return speakers
@@ -276,7 +545,7 @@ def load_pages() -> dict:
     return pages
 
 
-def generate_sitemap(events, speakers, pages):
+def generate_sitemap(events, speakers, pages, tags=()):
     """Generate sitemap.xml for search engines."""
     today = date.today().isoformat()
     urls = []
@@ -316,6 +585,20 @@ def generate_sitemap(events, speakers, pages):
             "changefreq": "monthly",
             "priority": "0.6",
         })
+
+    # Topic tags
+    if tags:
+        urls.append({
+            "loc": f"{SITE_URL}/tags/",
+            "changefreq": "weekly",
+            "priority": "0.6",
+        })
+        for tag in tags:
+            urls.append({
+                "loc": f"{SITE_URL}/tags/{tag['slug']}/",
+                "changefreq": "monthly",
+                "priority": "0.55",
+            })
 
     # Extra pages
     for slug in pages:
@@ -391,9 +674,12 @@ def build():
             speaker, talks_by_speaker.get(speaker["name"], [])
         )
 
+    # Topic tags: talks grouped by the `tags` of their front matter.
+    tags = collect_tags(events)
+
     common = {"site": site, "events": events, "speakers": speakers, "base": BASE_URL,
               "speaker_slugs": speaker_slugs, "speaker_by_name": speaker_by_name,
-              "site_url": SITE_URL}
+              "site_url": SITE_URL, "tags": tags}
 
     # Build index page
     tpl = env.get_template("index.html")
@@ -416,6 +702,14 @@ def build():
         event_dir.mkdir(parents=True, exist_ok=True)
         (event_dir / "index.html").write_text(html, encoding="utf-8")
 
+        # iCalendar file for the "в календарь" button. newline="" keeps the
+        # CRLF line endings RFC 5545 asks for on every platform.
+        ics = build_ics(event, canonical)
+        if ics:
+            (event_dir / "event.ics").write_text(
+                ics, encoding="utf-8", newline=""
+            )
+
     # Build individual talk pages
     tpl = env.get_template("talk.html")
     for event in events:
@@ -434,7 +728,9 @@ def build():
                 talk_speakers.append({
                     "name": speaker_name,
                     "slug": speaker_slugs.get(speaker_name, ""),
-                    "photo": speaker_data.get("photo"),
+                    # Avatars are 40–80px, so the card-sized variant is plenty.
+                    "photo": (speaker_data.get("photo_variants") or {}).get("small")
+                             or speaker_data.get("photo"),
                     "company": speaker_data.get("company", talk.get("company")),
                 })
             talk_data["speaker_details"] = talk_speakers
@@ -500,6 +796,21 @@ def build():
     (OUTPUT_DIR / "presentations").mkdir(exist_ok=True)
     (OUTPUT_DIR / "presentations" / "index.html").write_text(html, encoding="utf-8")
 
+    # Build tag pages: an index of every topic plus one page per tag.
+    if tags:
+        tpl = env.get_template("tags.html")
+        html = tpl.render(**common, canonical_url=f"{SITE_URL}/tags/")
+        (OUTPUT_DIR / "tags").mkdir(exist_ok=True)
+        (OUTPUT_DIR / "tags" / "index.html").write_text(html, encoding="utf-8")
+
+        tpl = env.get_template("tag.html")
+        for tag in tags:
+            canonical = f"{SITE_URL}/tags/{tag['slug']}/"
+            html = tpl.render(**common, tag=tag, canonical_url=canonical)
+            tag_dir = OUTPUT_DIR / "tags" / tag["slug"]
+            tag_dir.mkdir(parents=True, exist_ok=True)
+            (tag_dir / "index.html").write_text(html, encoding="utf-8")
+
     # Page slugs that use a dedicated template instead of the generic page.html
     custom_page_templates = {"organizers": "organizers.html"}
 
@@ -526,8 +837,15 @@ def build():
         page_dir.mkdir(parents=True, exist_ok=True)
         (page_dir / "index.html").write_text(html, encoding="utf-8")
 
+    # 404 page: GitHub Pages serves it for any unknown path. It is not part of
+    # the sitemap on purpose — it must never be indexed.
+    tpl = env.get_template("404.html")
+    (OUTPUT_DIR / "404.html").write_text(
+        tpl.render(**common, canonical_url=""), encoding="utf-8"
+    )
+
     # Generate sitemap.xml
-    sitemap = generate_sitemap(events, speakers, pages)
+    sitemap = generate_sitemap(events, speakers, pages, tags)
     (OUTPUT_DIR / "sitemap.xml").write_text(sitemap, encoding="utf-8")
 
     # Generate robots.txt
@@ -538,7 +856,11 @@ def build():
     widget_count = sum(
         1 for e in events if e.get("timepad_widget_mode", "off") != "off"
     )
+    tagged_talks = sum(
+        1 for e in events for t in e.get("talks", []) if t.get("tag_links")
+    )
     print(f"Built {len(events)} events, {talk_count} talks, {len(speakers)} speakers, {len(pages)} pages")
+    print(f"Tags: {len(tags)} topics, {tagged_talks}/{talk_count} talks tagged")
     if TIMEPAD_WIDGET_ENABLED:
         print(f"Timepad widget: {widget_count}/{len(events)} events, "
               f"list widget {'on' if site['timepad_widget']['list_enabled'] else 'off'}")

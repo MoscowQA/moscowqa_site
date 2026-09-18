@@ -4,7 +4,7 @@
 {% block title %}{{ speaker.name }} — Профиль спикера — {{ site.title }}{% endblock %}
 {% block description %}{{ speaker.name }}{% if speaker.company %}, {{ speaker.company }}{% endif %} — профиль спикера сообщества Moscow QA{% endblock %}
 {% block og_type %}profile{% endblock %}
-{% block og_image %}{% if speaker.photo %}<meta property="og:image" content="{{ speaker.photo }}">{% endif %}{% endblock %}
+{% block og_image %}{% if speaker.photo %}<meta property="og:image" content="{{ speaker.photo_variants.absolute }}">{% endif %}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -13,7 +13,7 @@
     "@type": "Person",
     "name": {{ speaker.name | tojson }},
     {% if speaker.company %}"worksFor": {"@type": "Organization", "name": {{ speaker.company | tojson }}},{% endif %}
-    {% if speaker.photo %}"image": {{ speaker.photo | tojson }},{% endif %}
+    {% if speaker.photo %}"image": {{ speaker.photo_variants.absolute | tojson }},{% endif %}
     {% if canonical_url %}"url": "{{ canonical_url }}",{% endif %}
     "sameAs": [
         {% if speaker.telegram %}"https://t.me/{{ speaker.telegram }}"{% endif %}
@@ -41,7 +41,9 @@
             <div class="speaker-detail__photo">
                 <div class="speaker-detail__photo-img">
                     {% if speaker.photo %}
-                    <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                    <img src="{{ speaker.photo_variants.src }}"
+                         {% if speaker.photo_variants.srcset %}srcset="{{ speaker.photo_variants.srcset }}" sizes="(max-width: 768px) 70vw, 320px"{% endif %}
+                         alt="{{ speaker.name }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
                     {% else %}
                     <div class="speaker-card__placeholder" style="font-size: 5rem;">&#128100;</div>
                     {% endif %}

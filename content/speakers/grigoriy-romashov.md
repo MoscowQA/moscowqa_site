@@ -1,7 +1,7 @@
 ---
 name: "Григорий Ромашов"
 company: "Align Technology"
-photo: "https://storage.yandexcloud.net/barbez/speaker/romashev.png"
+photo: "/static/images/speakers/grigoriy-romashov.webp"
 telegram: ""
 github: ""
 ---

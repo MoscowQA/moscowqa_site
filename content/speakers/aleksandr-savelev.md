@@ -1,7 +1,7 @@
 ---
 name: "Александр Савельев"
 company: "MWS"
-photo: "https://storage.yandexcloud.net/barbez/speaker/savelev.png"
+photo: "/static/images/speakers/aleksandr-savelev.webp"
 telegram: ""
 github: ""
 ---

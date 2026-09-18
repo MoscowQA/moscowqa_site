@@ -1,7 +1,7 @@
 ---
 name: Виктория Капаева
 company: Диасофт
-photo: "/static/images/speakers/viktoriya-kapaeva.jpg"
+photo: "/static/images/speakers/viktoriya-kapaeva.webp"
 telegram: Dark_Lady_of_The_Sith
 github: ''
 ---

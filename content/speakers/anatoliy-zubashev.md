@@ -1,7 +1,7 @@
 ---
 name: "Анатолий Зубашев"
 company: "YADRO"
-photo: "https://storage.yandexcloud.net/barbez/speaker/Zubashev.png"
+photo: "/static/images/speakers/anatoliy-zubashev.webp"
 telegram: ""
 github: ""
 ---

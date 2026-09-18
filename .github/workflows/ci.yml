@@ -1,0 +1,45 @@
+name: CI
+
+# Раньше на PR не проверялось ничего: deploy.yml срабатывает только на push
+# в main, то есть ошибка в контенте обнаруживалась уже на проде. Здесь та же
+# сборка плюс проверки, которые CLAUDE.md просит держать в голове: имена
+# спикеров, обязательные поля, существование картинок, внутренние ссылки.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Tests
+        run: make test
+
+      - name: Build
+        run: make check
+
+      - name: Validate content and links
+        run: python3 scripts/validate_content.py

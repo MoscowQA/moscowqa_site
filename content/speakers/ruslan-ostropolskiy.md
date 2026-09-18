@@ -1,7 +1,7 @@
 ---
 name: Руслан Остропольский
 company: Test IT
-photo: https://storage.yandexcloud.net/barbez/speaker/ostropol.png
+photo: "/static/images/speakers/ruslan-ostropolskiy.webp"
 telegram: ''
 github: ''
 external_talks:

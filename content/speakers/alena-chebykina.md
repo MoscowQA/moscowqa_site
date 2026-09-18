@@ -1,7 +1,7 @@
 ---
 name: "Алена Чебыкина"
 company: "ГК «Юзтех»"
-photo: "https://storage.yandexcloud.net/barbez/speaker/chebikina.png"
+photo: "/static/images/speakers/alena-chebykina.webp"
 telegram: ""
 github: ""
 external_talks: []

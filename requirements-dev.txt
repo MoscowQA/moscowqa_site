@@ -1,0 +1,3 @@
+# Зависимости для тестов: pytest прогоняется `make test` и в CI на каждом PR.
+-r requirements.txt
+pytest>=8.0

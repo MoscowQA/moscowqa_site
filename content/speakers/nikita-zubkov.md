@@ -1,7 +1,7 @@
 ---
 name: "Никита Зубков"
 company: "Яндекс"
-photo: "https://storage.yandexcloud.net/barbez/speaker/zubkov.png"
+photo: "/static/images/speakers/nikita-zubkov.webp"
 telegram: ""
 github: ""
 external_talks:

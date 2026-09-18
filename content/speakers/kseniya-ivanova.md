@@ -1,7 +1,7 @@
 ---
 name: "Ксения Иванова"
 company: "wink"
-photo: "https://storage.yandexcloud.net/barbez/speaker/ivanovaXeniya.png"
+photo: "/static/images/speakers/kseniya-ivanova.webp"
 telegram: "kus_qa"
 github: ""
 ---

@@ -1,7 +1,7 @@
 ---
 name: "Александр Юрков"
 company: "АО «ИнфоТеКС»"
-photo: "https://storage.yandexcloud.net/barbez/speaker/Yurkov.png"
+photo: "/static/images/speakers/aleksandr-yurkov.webp"
 telegram: ""
 github: ""
 ---

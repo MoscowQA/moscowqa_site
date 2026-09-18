@@ -1,7 +1,7 @@
 ---
 name: Марина Куликова
 company: Garage Eight
-photo: https://storage.yandexcloud.net/barbez/speaker/kulicova2.png
+photo: "/static/images/speakers/marina-kulikova.webp"
 telegram: ''
 github: ''
 external_talks:

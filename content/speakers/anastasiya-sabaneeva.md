@@ -1,7 +1,7 @@
 ---
 name: "Анастасия Сабанеева"
 company: "Альфа-Банк"
-photo: "https://storage.yandexcloud.net/barbez/speaker/sabaneeva.png"
+photo: "/static/images/speakers/anastasiya-sabaneeva.webp"
 telegram: ""
 github: ""
 external_talks:

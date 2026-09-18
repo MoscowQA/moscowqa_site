@@ -1,7 +1,7 @@
 ---
 name: "Татьяна Романова"
 company: "Ozon банк"
-photo: "https://storage.yandexcloud.net/barbez/speaker/romanova.png"
+photo: "/static/images/speakers/tatyana-romanova.webp"
 telegram: ""
 github: ""
 ---

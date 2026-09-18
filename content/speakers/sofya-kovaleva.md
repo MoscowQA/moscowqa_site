@@ -1,7 +1,7 @@
 ---
 name: Софья Ковалева
 company: Т-Банк
-photo: https://storage.yandexcloud.net/barbez/speaker/kovaleva.png
+photo: "/static/images/speakers/sofya-kovaleva.webp"
 telegram: ''
 github: ''
 external_talks:

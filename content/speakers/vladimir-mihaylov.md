@@ -1,7 +1,7 @@
 ---
 name: "Владимир Михайлов"
 company: "Head of QA"
-photo: "/static/images/speakers/vladimir-mihaylov.png"
+photo: "/static/images/speakers/vladimir-mihaylov.webp"
 telegram: ""
 github: ""
 ---

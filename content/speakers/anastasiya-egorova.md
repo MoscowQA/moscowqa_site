@@ -1,7 +1,7 @@
 ---
 name: "Анастасия Егорова"
 company: "CosyFrontend"
-photo: "https://storage.yandexcloud.net/barbez/speaker/egorova.png"
+photo: "/static/images/speakers/anastasiya-egorova.webp"
 telegram: ""
 github: ""
 ---

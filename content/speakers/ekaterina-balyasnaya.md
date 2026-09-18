@@ -1,7 +1,7 @@
 ---
 name: "Екатерина Балясная"
 company: "M2"
-photo: "https://storage.yandexcloud.net/barbez/speaker/balaysnaya.png"
+photo: "/static/images/speakers/ekaterina-balyasnaya.webp"
 telegram: ""
 github: ""
 ---

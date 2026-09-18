@@ -1,7 +1,7 @@
 ---
 name: Александр Мелентьев
 company: X5 Tech
-photo: https://storage.yandexcloud.net/barbez/speaker/mel.png
+photo: "/static/images/speakers/aleksandr-melentev.webp"
 telegram: ''
 github: ''
 external_talks:

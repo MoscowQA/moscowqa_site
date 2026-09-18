@@ -1,7 +1,7 @@
 ---
 name: Андрей Мясников
 company: more.tv
-photo: https://storage.yandexcloud.net/barbez/speaker/miyasnikov.jpg
+photo: "/static/images/speakers/andrey-myasnikov.webp"
 telegram: ''
 github: ''
 external_talks:

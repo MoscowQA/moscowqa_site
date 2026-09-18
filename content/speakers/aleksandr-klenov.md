@@ -1,7 +1,7 @@
 ---
 name: "Александр Кленов"
 company: "VK Tech"
-photo: "https://storage.yandexcloud.net/barbez/speaker/Klenov.png"
+photo: "/static/images/speakers/aleksandr-klenov.webp"
 telegram: ""
 github: ""
 ---

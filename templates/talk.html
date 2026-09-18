@@ -65,6 +65,13 @@
     <div class="talk-hero__inner">
         <div class="talk-hero__tag">Доклад</div>
         <h1 class="talk-hero__title">{{ talk.title }}</h1>
+        {% if talk.tag_links %}
+        <div class="topic-tags topic-tags--hero">
+            {% for link in talk.tag_links %}
+            <a class="tag tag--topic-invert" href="{{ base }}/tags/{{ link.slug }}/">{{ link.name }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -189,7 +196,7 @@
                             <div class="talk-card__speaker">
                                 <div class="talk-card__speaker-avatar">
                                     {% if speaker_by_name.get(speaker_name, {}).get('photo') %}
-                                    <img src="{{ speaker_by_name[speaker_name].photo }}" alt="{{ speaker_name }}" loading="lazy" width="40" height="40" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                                    <img src="{{ speaker_by_name[speaker_name].photo_variants.small }}" alt="{{ speaker_name }}" loading="lazy" width="40" height="40" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
                                     {% else %}
                                     &#128100;
                                     {% endif %}

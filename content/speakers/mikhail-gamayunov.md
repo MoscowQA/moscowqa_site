@@ -1,7 +1,7 @@
 ---
 name: "Михаил Гамаюнов"
 company: "VK Видео"
-photo: "https://storage.yandexcloud.net/barbez/photo_2024-01-16_14-26-04.jpg"
+photo: "/static/images/speakers/mikhail-gamayunov.webp"
 telegram: ""
 github: ""
 external_talks:

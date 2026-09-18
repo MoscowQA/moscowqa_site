@@ -1,7 +1,7 @@
 ---
 name: Дарья Романова
 company: Wildberries
-photo: https://storage.yandexcloud.net/barbez/speaker/romanovaD.png
+photo: "/static/images/speakers/darya-romanova.webp"
 telegram: ''
 github: ''
 external_talks:

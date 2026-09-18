@@ -1,7 +1,7 @@
 ---
 name: "Василий Корянов"
 company: "Moscow Drinkup"
-photo: "https://storage.yandexcloud.net/barbez/speaker/koryanov.png"
+photo: "/static/images/speakers/vasiliy-koryanov.webp"
 telegram: ""
 github: ""
 ---

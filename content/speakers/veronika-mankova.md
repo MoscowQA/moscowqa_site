@@ -1,7 +1,7 @@
 ---
 name: "Вероника Манкова"
 company: "Ви Tech"
-photo: "https://storage.yandexcloud.net/barbez/speaker/mankova.png"
+photo: "/static/images/speakers/veronika-mankova.webp"
 telegram: ""
 github: ""
 ---
