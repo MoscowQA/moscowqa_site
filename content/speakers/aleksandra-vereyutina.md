@@ -1,7 +1,7 @@
 ---
 name: "Александра Вереютина"
 company: ""
-photo: "https://storage.yandexcloud.net/barbez/speaker/vereutina.png"
+photo: "/static/images/speakers/aleksandra-vereyutina.webp"
 telegram: ""
 github: ""
 ---

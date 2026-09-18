@@ -50,7 +50,9 @@
             <div class="speaker-card" data-speaker-card data-speaker-search="{{ speaker.search_text }}">
                 <div class="speaker-card__photo">
                     {% if speaker.photo %}
-                    <img src="{{ speaker.photo }}" alt="{{ speaker.name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                    <img src="{{ speaker.photo_variants.src }}"
+                         {% if speaker.photo_variants.srcset %}srcset="{{ speaker.photo_variants.srcset }}" sizes="280px"{% endif %}
+                         alt="{{ speaker.name }}" loading="lazy" width="280" height="280" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
                     {% else %}
                     <div class="speaker-card__placeholder">&#128100;</div>
                     {% endif %}

@@ -20,7 +20,7 @@
 ---
 name: "Алексей Иванов"
 company: "2ГИС"
-photo: "https://storage.yandexcloud.net/barbez/speaker/aleksey-ivanov.png"
+photo: "/static/images/speakers/aleksey-ivanov.webp"
 telegram: "alexey_qa"
 github: "dragin96"
 twitter: "dragin96"
@@ -45,13 +45,21 @@ external_talks:
 |------|----------|--------|
 | `name` | Ваше имя и фамилия | `"Алексей Иванов"` |
 | `company` | Текущая компания | `"2ГИС"` |
-| `photo` | URL к вашему фото | `"https://storage.yandexcloud.net/barbez/speaker/aleksey-ivanov.png"` |
+| `photo` | Путь к фото на сайте | `"/static/images/speakers/aleksey-ivanov.webp"` |
 
-Если фото заливается локально в `static/images/speakers/` (например `photo: "/static/images/speakers/ivan-ivanov.png"`), перед коммитом сожмите его до ~1080px по длинной стороне:
+Фотографии лежат у нас, в `static/images/speakers/`, двумя вариантами:
+`{слаг}.webp` (~1080px) и `{слаг}-540.webp` — маленький нужен карточкам,
+сборка сама собирает из них `srcset`. Раньше фото жили на стороннем бакете:
+одна его недоступность роняла разом все страницы спикеров.
+
+Если вы прислали ссылку на фото, достаточно указать её в `photo` и прогнать:
 
 ```bash
-python3 scripts/compress_photo.py static/images/speakers/ivan-ivanov.png
+make photos ARGS="ivan-ivanov"
 ```
+
+Скрипт скачает фото, положит оба варианта и сам перепишет поле `photo`.
+Уже лежащий локально файл (png/jpg) он тоже переведёт в webp.
 
 ### Необязательные поля (социальные сети)
 
@@ -122,7 +130,7 @@ Head of QA в Garage Eight. Специализируется на построе
 ---
 name: "Константин Волков"
 company: "Flipper Devices"
-photo: "https://storage.yandexcloud.net/barbez/speaker/volkov.png"
+photo: "/static/images/speakers/konstantin-volkov.webp"
 external_talks:
   - title: "Тестируем Flipper Zero: от прототипа до конвейера"
     event: "Heisenbug"
@@ -177,7 +185,7 @@ QA manager в Flipper Devices.
 ---
 name: "Алексей Иванов"
 company: "2ГИС"
-photo: "https://storage.yandexcloud.net/barbez/speaker/aleksey-ivanov.png"
+photo: "/static/images/speakers/aleksey-ivanov.webp"
 ---
 
 Automation QA в 2ГИС, основатель сообщества Moscow QA.

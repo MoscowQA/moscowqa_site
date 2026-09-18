@@ -13,6 +13,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlencode
 from jinja2 import Environment, FileSystemLoader
+from PIL import Image
 
 # Completed vs. upcoming status is now determined on the frontend in
 # static/js/events-status.js, based on the visitor's current date. The build
@@ -424,6 +425,46 @@ def speaker_search_text(speaker: dict, talks: list[dict]) -> str:
     return " ".join(unique)
 
 
+# --- Speaker photos -------------------------------------------------------
+# Photos live in static/images/speakers/ as two WebP variants written by
+# scripts/localize_speaker_photos.py: {slug}.webp (~1080px) and
+# {slug}-540.webp. Cards and avatars are far smaller than 1080px, so the
+# templates get a srcset and the browser picks the cheaper file.
+PHOTO_CARD_WIDTH = 540
+
+
+def speaker_photo_variants(photo: str) -> dict:
+    """Return {"src", "small", "srcset"} for a speaker photo.
+
+    `srcset` is empty for a photo hosted elsewhere or one without the smaller
+    variant on disk — those are rendered as a plain <img> exactly as before.
+    """
+    photo = (photo or "").strip()
+    if not photo:
+        return {"src": "", "small": "", "srcset": "", "absolute": ""}
+
+    # og:image and schema.org need an absolute URL; a local photo is a path.
+    absolute = f"{SITE_URL}{photo}" if photo.startswith("/") else photo
+    variants = {"src": photo, "small": photo, "srcset": "", "absolute": absolute}
+    if not photo.startswith("/static/"):
+        return variants
+
+    full_path = ROOT / photo.lstrip("/")
+    small_path = full_path.with_name(f"{full_path.stem}-{PHOTO_CARD_WIDTH}.webp")
+    if not (full_path.exists() and small_path.exists()):
+        return variants
+
+    small_url = f"{photo.rsplit('/', 1)[0]}/{small_path.name}"
+    with Image.open(full_path) as image:
+        full_width = image.width
+
+    variants["small"] = small_url
+    variants["srcset"] = (
+        f"{small_url} {PHOTO_CARD_WIDTH}w, {photo} {full_width}w"
+    )
+    return variants
+
+
 def parse_md_file(filepath: Path) -> dict:
     """Parse a markdown file with YAML front matter."""
     text = filepath.read_text(encoding="utf-8")
@@ -488,6 +529,7 @@ def load_speakers() -> list[dict]:
         for f in speakers_dir.glob("*.md"):
             speaker = parse_md_file(f)
             speaker["slug"] = f.stem
+            speaker["photo_variants"] = speaker_photo_variants(speaker.get("photo"))
             speakers.append(speaker)
     speakers.sort(key=lambda s: s.get("name", ""))
     return speakers
@@ -686,7 +728,9 @@ def build():
                 talk_speakers.append({
                     "name": speaker_name,
                     "slug": speaker_slugs.get(speaker_name, ""),
-                    "photo": speaker_data.get("photo"),
+                    # Avatars are 40–80px, so the card-sized variant is plenty.
+                    "photo": (speaker_data.get("photo_variants") or {}).get("small")
+                             or speaker_data.get("photo"),
                     "company": speaker_data.get("company", talk.get("company")),
                 })
             talk_data["speaker_details"] = talk_speakers

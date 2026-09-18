@@ -1,7 +1,7 @@
 ---
 name: Наталья Полякова
 company: ТестОпс
-photo: https://storage.yandexcloud.net/barbez/speaker/polyakova.png
+photo: "/static/images/speakers/natalya-polyakova.webp"
 telegram: ''
 github: ''
 external_talks:

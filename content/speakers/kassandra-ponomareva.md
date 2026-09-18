@@ -1,7 +1,7 @@
 ---
 name: "Кассандра Пономарева"
 company: "VK Tech"
-photo: "https://storage.yandexcloud.net/barbez/speaker/kassandra.png"
+photo: "/static/images/speakers/kassandra-ponomareva.webp"
 telegram: ""
 github: ""
 ---

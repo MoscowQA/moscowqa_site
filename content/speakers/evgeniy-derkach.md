@@ -1,7 +1,7 @@
 ---
 name: "Евгений Деркач"
 company: "ИнфоТеКС"
-photo: "https://storage.yandexcloud.net/barbez/speaker/derkach.png"
+photo: "/static/images/speakers/evgeniy-derkach.webp"
 telegram: "Evalder"
 github: ""
 external_talks: []

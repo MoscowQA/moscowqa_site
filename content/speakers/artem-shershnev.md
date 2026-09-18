@@ -1,7 +1,7 @@
 ---
 name: Артём Шершнёв
 company: Lamoda Tech
-photo: "/static/images/speakers/artem-shershnev.jpg"
+photo: "/static/images/speakers/artem-shershnev.webp"
 telegram: ''
 github: ''
 ---

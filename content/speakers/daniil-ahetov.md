@@ -1,7 +1,7 @@
 ---
 name: Даниил Ахетов
 company: BugBuster
-photo: https://storage.yandexcloud.net/barbez/speaker/ahetov.png
+photo: "/static/images/speakers/daniil-ahetov.webp"
 telegram: ''
 github: ''
 external_talks:

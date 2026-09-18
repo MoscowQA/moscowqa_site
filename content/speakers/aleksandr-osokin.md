@@ -1,7 +1,7 @@
 ---
 name: "Александр Осокин"
 company: "СберМаркет Tech"
-photo: "https://storage.yandexcloud.net/barbez/speaker/osokin.jpg"
+photo: "/static/images/speakers/aleksandr-osokin.webp"
 telegram: ""
 github: ""
 ---

@@ -1,7 +1,7 @@
 ---
 name: Александр Князев
 company: ''
-photo: "/static/images/speakers/aleksandr-knyazev.png"
+photo: "/static/images/speakers/aleksandr-knyazev.webp"
 telegram: ''
 github: ''
 external_talks:

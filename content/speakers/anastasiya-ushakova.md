@@ -1,7 +1,7 @@
 ---
 name: Анастасия Ушакова
 company: Яндекс Маркет
-photo: https://storage.yandexcloud.net/barbez/speaker/ushakova.png
+photo: "/static/images/speakers/anastasiya-ushakova.webp"
 telegram: ''
 github: ''
 external_talks:

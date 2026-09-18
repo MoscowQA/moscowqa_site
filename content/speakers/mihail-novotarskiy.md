@@ -1,7 +1,7 @@
 ---
 name: Михаил Новотарский
 company: Сбер
-photo: https://storage.yandexcloud.net/barbez/speaker/novotarskiyMihail.png
+photo: "/static/images/speakers/mihail-novotarskiy.webp"
 telegram: novotarsky
 github: ''
 website: ''

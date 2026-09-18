@@ -1,7 +1,7 @@
 ---
 name: Ольга Проскурякова
 company: РТК TData
-photo: https://storage.yandexcloud.net/barbez/speaker/proskuryakova.png
+photo: "/static/images/speakers/olga-proskuryakova.webp"
 telegram: ''
 github: ''
 external_talks:

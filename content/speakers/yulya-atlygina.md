@@ -1,7 +1,7 @@
 ---
 name: "Юля Атлыгина"
 company: ""
-photo: "https://storage.yandexcloud.net/barbez/speaker/atlygina.jpg"
+photo: "/static/images/speakers/yulya-atlygina.webp"
 telegram: ""
 github: ""
 ---

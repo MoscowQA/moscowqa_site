@@ -1,7 +1,7 @@
 ---
 name: Михаил Трифонов
 company: Wildberries & Russ
-photo: https://storage.yandexcloud.net/barbez/speaker/mihailTrifonov.png
+photo: "/static/images/speakers/mihail-trifonov.webp"
 telegram: bugfixing
 github: trifonovmixail
 website: https://habr.com/ru/users/bugfixing/

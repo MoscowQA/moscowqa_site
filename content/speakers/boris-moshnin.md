@@ -1,7 +1,7 @@
 ---
 name: Борис Мошнин
 company: Wildberries & Russ
-photo: https://storage.yandexcloud.net/barbez/speaker/moshnin.png
+photo: "/static/images/speakers/boris-moshnin.webp"
 telegram: ''
 github: ''
 external_talks:

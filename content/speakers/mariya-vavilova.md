@@ -1,7 +1,7 @@
 ---
 name: Мария Вавилова
 company: ''
-photo: https://storage.yandexcloud.net/barbez/speaker/mariyaVavilova.png
+photo: "/static/images/speakers/mariya-vavilova.webp"
 telegram: ''
 github: ''
 external_talks:

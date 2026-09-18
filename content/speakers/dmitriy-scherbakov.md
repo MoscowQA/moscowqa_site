@@ -1,7 +1,7 @@
 ---
 name: Дмитрий Щербаков
 company: Wildberries & Russ
-photo: https://storage.yandexcloud.net/barbez/speaker/dmitriyShcherbakov.png
+photo: "/static/images/speakers/dmitriy-scherbakov.webp"
 telegram: d_shch
 github: ''
 external_talks:

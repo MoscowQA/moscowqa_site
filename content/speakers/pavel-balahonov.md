@@ -1,7 +1,7 @@
 ---
 name: Павел Балахонов
 company: VK Tech
-photo: https://storage.yandexcloud.net/barbez/speaker/balahonov.png
+photo: "/static/images/speakers/pavel-balahonov.webp"
 telegram: ''
 github: ''
 external_talks:

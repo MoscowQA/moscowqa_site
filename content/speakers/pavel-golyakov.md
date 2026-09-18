@@ -1,7 +1,7 @@
 ---
 name: Павел Голяков
 company: ''
-photo: https://storage.yandexcloud.net/barbez/speaker/golyakov2.png
+photo: "/static/images/speakers/pavel-golyakov.webp"
 telegram: ''
 github: ''
 external_talks:

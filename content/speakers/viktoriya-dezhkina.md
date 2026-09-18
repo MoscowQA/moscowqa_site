@@ -1,7 +1,7 @@
 ---
 name: Виктория Дежкина
 company: ''
-photo: https://storage.yandexcloud.net/barbez/speaker/dezhkina.png
+photo: "/static/images/speakers/viktoriya-dezhkina.webp"
 telegram: vikon4ick
 github: ''
 external_talks:

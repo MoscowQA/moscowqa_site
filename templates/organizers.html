@@ -28,7 +28,9 @@
     <div class="container">
         {% macro person_card(person) %}
         {% set speaker = speaker_by_name.get(person.name) %}
-        {% set photo = (speaker.photo if speaker else none) or person.photo %}
+        {# Organizers are usually speakers too, so their photo comes with the
+           srcset variants; a person who never spoke falls back to page data. #}
+        {% set photo = (speaker.photo_variants.small if speaker else none) or person.photo %}
         {% set company = (speaker.company if speaker else none) or person.company %}
         <div class="speaker-card">
             <div class="speaker-card__photo">

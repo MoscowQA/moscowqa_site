@@ -1,7 +1,7 @@
 ---
 name: "Виталий Городков"
 company: "B2Broker"
-photo: "https://storage.yandexcloud.net/barbez/speaker/gorodkov.png"
+photo: "/static/images/speakers/vitaliy-gorodkov.webp"
 telegram: "haradkou_sdet"
 github: "vitalics"
 website: "https://blog-vitaliharadkous-projects.vercel.app/"

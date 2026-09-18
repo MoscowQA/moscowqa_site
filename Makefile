@@ -18,7 +18,7 @@ DIST := dist
 
 .PHONY: help install install-parsers venv build serve clean check \
 	sync sync-dry sync-heisenbug sync-sqadays \
-	collect-heisenbug collect-sqadays photo
+	collect-heisenbug collect-sqadays photo photos
 
 help: ## Показать этот список
 	@awk 'BEGIN {FS = ":.*##"} \
@@ -83,3 +83,6 @@ collect-sqadays: ## Заново собрать данные с sqadays.com (ARG
 photo: ## Сжать фото спикера до ~1080px (FILE=static/images/speakers/name.png)
 	@test -n "$(FILE)" || { echo "Укажите файл: make photo FILE=static/images/speakers/name.png"; exit 1; }
 	$(PYTHON) scripts/compress_photo.py $(FILE) $(ARGS)
+
+photos: ## Перенести фото спикеров к себе в webp (ARGS="ivan-ivanov" или --dry-run)
+	$(PYTHON) scripts/localize_speaker_photos.py $(ARGS)

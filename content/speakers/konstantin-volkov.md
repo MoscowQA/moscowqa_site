@@ -1,7 +1,7 @@
 ---
 name: Константин Волков
 company: Veai
-photo: https://storage.yandexcloud.net/barbez/speaker/volkov3.png
+photo: "/static/images/speakers/konstantin-volkov.webp"
 telegram: Kostya_Volkov
 github: ''
 external_talks:

@@ -1,7 +1,7 @@
 ---
 name: "Наталья Кузина"
 company: "МТС Финтех"
-photo: "https://storage.yandexcloud.net/barbez/speaker/kuzina.png"
+photo: "/static/images/speakers/natalya-kuzina.webp"
 telegram: ""
 github: ""
 ---

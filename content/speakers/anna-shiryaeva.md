@@ -1,7 +1,7 @@
 ---
 name: "Анна Ширяева"
 company: "SIBUR Digital"
-photo: "https://storage.yandexcloud.net/barbez/speaker/shiryaeva.png"
+photo: "/static/images/speakers/anna-shiryaeva.webp"
 telegram: ""
 github: ""
 ---

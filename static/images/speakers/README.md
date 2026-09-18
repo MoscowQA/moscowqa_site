@@ -1,18 +1,20 @@
 # Фотографии спикеров
 
-## Формат именования
+## Формат
 
-**Стандарт:** `{speaker-slug}.{ext}`
+Для каждого спикера здесь лежат **два файла в webp**:
 
-Где:
-- `{speaker-slug}` - slug спикера из имени файла в `content/speakers/` (например, `aleksey-karavanov`)
-- `{ext}` - расширение файла (`png`, `jpg`, `jpeg`)
+| Файл | Размер | Для чего |
+|------|--------|----------|
+| `{speaker-slug}.webp` | ~1080px по длинной стороне | страница спикера, og:image |
+| `{speaker-slug}-540.webp` | 540px | карточки и аватарки в списках |
 
-## Примеры
+`{speaker-slug}` — имя файла спикера в `content/speakers/` без расширения
+(например, `aleksey-karavanov` → `content/speakers/aleksey-karavanov.md`).
 
-- `aleksey-karavanov.png` → спикер из файла `content/speakers/aleksey-karavanov.md`
-- `dmitriy-zubkov.png` → спикер из файла `content/speakers/dmitriy-zubkov.md`
-- `aleksandr-yurkov.png` → спикер из файла `content/speakers/aleksandr-yurkov.md`
+Оба варианта нужны: `build.py` находит маленький файл и собирает `srcset`,
+чтобы карточка шириной 280px не тянула фото на 1080px. Если маленького
+варианта нет, сборка просто отдаёт обычный `<img>` без `srcset`.
 
 ## Использование в YAML
 
@@ -20,34 +22,35 @@
 ---
 name: "Алексей Караванов"
 company: "YADRO"
-photo: "/static/images/speakers/aleksey-karavanov.png"
+photo: "/static/images/speakers/aleksey-karavanov.webp"
 ---
 ```
 
-## Правила
-
-1. **Только lowercase** - все буквы в нижнем регистре
-2. **Дефисы вместо пробелов** - используйте `-` для разделения слов
-3. **Транслитерация** - кириллица транслитерируется (а→a, ё→yo, и т.д.)
-4. **Соответствие slug'у** - имя файла должно совпадать с slug'ом спикера
-
-## Соответствие файлов
-
-| Старое имя | Новое имя | Slug спикера |
-|------------|-----------|--------------|
-| karavanov.png | aleksey-karavanov.png | aleksey-karavanov |
-| zubkov.png | dmitriy-zubkov.png | dmitriy-zubkov |
-| delendik.png | yuriy-delendik.png | yuriy-delendik |
-| Yurkov.png | aleksandr-yurkov.png | aleksandr-yurkov |
-| Zubashev.png | ivan-zubashev.png | ivan-zubashev |
+В `photo` указывается только большой вариант — маленький подставляется сам.
 
 ## Добавление новой фотографии
 
-1. Узнайте slug спикера (имя файла в `content/speakers/` без расширения)
-2. Переименуйте фото в формат `{speaker-slug}.{ext}`
-3. Положите файл в `static/images/speakers/`
-4. Обновите поле `photo` в YAML спикера:
-   ```yaml
-   photo: "/static/images/speakers/{speaker-slug}.png"
-   ```
-5. Пересоберите сайт: `python build.py`
+Не конвертируйте руками — есть скрипт:
+
+```bash
+# положили исходник или указали ссылку в photo: у спикера
+make photos ARGS="ivan-ivanov"
+```
+
+Он скачает фото по ссылке (или возьмёт уже лежащий локально файл), запишет
+оба webp-варианта и перепишет поле `photo`. Без аргументов проходит по всем
+спикерам, `ARGS=--dry-run` только показывает, что изменится.
+
+## Правила именования
+
+1. **Только lowercase** — все буквы в нижнем регистре.
+2. **Дефисы вместо пробелов**.
+3. **Транслитерация** кириллицы (а→a, ё→yo, и т.д.).
+4. **Имя файла совпадает со слагом спикера** — иначе скрипт создаст новый
+   файл с правильным именем, а старый останется мусором.
+
+## История
+
+Раньше 76 из 86 фото жили на стороннем бакете `storage.yandexcloud.net`:
+его недоступность разом ломала все страницы спикеров. Все фото перенесены
+сюда, внешних ссылок в `photo` быть не должно.

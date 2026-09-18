@@ -1,7 +1,7 @@
 ---
 name: Кирилл Куратов
 company: РТ Лабс
-photo: /static/images/speakers/kuratovKirill.png
+photo: "/static/images/speakers/kirill-kuratov.webp"
 telegram: ''
 github: ''
 external_talks:

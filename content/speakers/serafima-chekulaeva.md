@@ -1,7 +1,7 @@
 ---
 name: "Серафима Чекулаева"
 company: "self."
-photo: "https://storage.yandexcloud.net/barbez/speaker/serofima.png"
+photo: "/static/images/speakers/serafima-chekulaeva.webp"
 telegram: ""
 github: ""
 ---

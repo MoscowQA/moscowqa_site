@@ -1,7 +1,7 @@
 ---
 name: "Семён Жаров"
 company: "MTS AI"
-photo: "https://storage.yandexcloud.net/barbez/speaker/zharov.jpg"
+photo: "/static/images/speakers/semyon-zharov.webp"
 telegram: ""
 github: ""
 ---

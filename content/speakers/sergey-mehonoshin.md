@@ -1,7 +1,7 @@
 ---
 name: "Сергей Мехоношин"
 company: "Газпромбанк"
-photo: "https://storage.yandexcloud.net/barbez/speaker/meho.png"
+photo: "/static/images/speakers/sergey-mehonoshin.webp"
 telegram: ""
 github: ""
 ---

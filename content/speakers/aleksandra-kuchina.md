@@ -1,7 +1,7 @@
 ---
 name: Александра Кучина
 company: Lamoda Tech
-photo: https://storage.yandexcloud.net/barbez/speaker/kuchina.png
+photo: "/static/images/speakers/aleksandra-kuchina.webp"
 telegram: ''
 github: ''
 external_talks:

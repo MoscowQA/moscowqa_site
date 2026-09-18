@@ -1,7 +1,7 @@
 ---
 name: Глеб Боос
 company: БСПБ
-photo: https://storage.yandexcloud.net/barbez/speaker/boss.png
+photo: "/static/images/speakers/gleb-boos.webp"
 telegram: ''
 github: ''
 external_talks:

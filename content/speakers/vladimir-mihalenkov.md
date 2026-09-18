@@ -1,7 +1,7 @@
 ---
 name: "Владимир Михаленков"
 company: "Сбер"
-photo: "https://storage.yandexcloud.net/barbez/speaker/mihalenko.png"
+photo: "/static/images/speakers/vladimir-mihalenkov.webp"
 telegram: ""
 github: ""
 ---

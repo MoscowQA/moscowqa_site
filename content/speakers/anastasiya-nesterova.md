@@ -1,7 +1,7 @@
 ---
 name: Анастасия Нестерова
 company: ''
-photo: https://storage.yandexcloud.net/barbez/speaker/nester.png
+photo: "/static/images/speakers/anastasiya-nesterova.webp"
 telegram: nesterovaas
 github: ''
 external_talks:

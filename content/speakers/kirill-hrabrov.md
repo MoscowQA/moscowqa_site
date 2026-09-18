@@ -1,7 +1,7 @@
 ---
 name: Кирилл Храбров
 company: 2ГИС
-photo: https://storage.yandexcloud.net/barbez/speaker/hrabrov.png
+photo: "/static/images/speakers/kirill-hrabrov.webp"
 telegram: ''
 github: ''
 external_talks:

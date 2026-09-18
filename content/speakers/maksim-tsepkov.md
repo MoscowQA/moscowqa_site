@@ -1,7 +1,7 @@
 ---
 name: Максим Цепков
 company: mtsepkov.org
-photo: https://storage.yandexcloud.net/barbez/speaker/cepkov.png
+photo: "/static/images/speakers/maksim-tsepkov.webp"
 telegram: ''
 github: ''
 external_talks:

@@ -1,7 +1,7 @@
 ---
 name: "Иван Худоев"
 company: "ГК Иннотех"
-photo: "https://storage.yandexcloud.net/barbez/speaker/hudoev.png"
+photo: "/static/images/speakers/ivan-hudoev.webp"
 telegram: ""
 github: ""
 ---

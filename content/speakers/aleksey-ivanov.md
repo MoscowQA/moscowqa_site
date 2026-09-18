@@ -1,7 +1,7 @@
 ---
 name: Алексей Иванов
 company: Ozon Tech
-photo: https://storage.yandexcloud.net/barbez/photo_2024-01-12_14-33-53.jpg
+photo: "/static/images/speakers/aleksey-ivanov.webp"
 telegram: alexey_qa
 github: dragin96
 twitter: dragin96

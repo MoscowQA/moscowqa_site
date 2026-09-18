@@ -1,7 +1,7 @@
 ---
 name: "Григорий Окатов"
 company: "X5 Tech"
-photo: "https://storage.yandexcloud.net/barbez/speaker/okatov.png"
+photo: "/static/images/speakers/grigoriy-okatov.webp"
 telegram: ""
 github: ""
 ---

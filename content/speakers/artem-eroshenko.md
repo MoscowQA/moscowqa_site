@@ -1,7 +1,7 @@
 ---
 name: "Артём Ерошенко"
 company: "Qameta Software"
-photo: "https://storage.yandexcloud.net/barbez/speaker/eroshenko.png"
+photo: "/static/images/speakers/artem-eroshenko.webp"
 telegram: ""
 github: ""
 ---
