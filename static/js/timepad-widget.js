@@ -166,9 +166,12 @@
     // Попап могут не удалить, а спрятать; об этом MutationObserver
     // рассказывает не всегда, поэтому пока замок стоит — переспрашиваем.
     var RECHECK_MS = 500;
+    // Отступ сверху, когда подводим страницу к верху формы.
+    var REVEAL_GAP = 16;
 
     var locked = false;
     var recheckTimer = null;
+    var lastHeight = 0;
 
     function popupFrame() {
         var frames = document.querySelectorAll('iframe');
@@ -185,11 +188,23 @@
         return null;
     }
 
-    /* Попап выше окна блокировкой не вылечить: если он стоит в потоке
-       страницы, остаток формы станет недосягаем — а это уже не косметика,
-       а несделанная регистрация. Пусть в таком случае фон лучше ездит. */
-    function fitsInWindow(frame) {
-        return frame.getBoundingClientRect().height <= document.documentElement.clientHeight;
+    /* Привязан ли попап к окну: тогда прокрутка страницы на его видимость
+       не влияет — ни в плюс, ни в минус. Достаточно найти position: fixed
+       на любом родителе: он прижимает к окну всё поддерево. */
+    function pinnedToWindow(frame) {
+        for (var node = frame; node && node !== document.body; node = node.parentElement) {
+            if (window.getComputedStyle(node).position === 'fixed') return true;
+        }
+        return false;
+    }
+
+    /* Форма выросла (нажали «Продолжить»), и её верх уехал за край окна.
+       Подводим страницу к нему — сам Timepad этого не делает, и посетитель
+       остаётся смотреть на середину нового шага. */
+    function revealPopup(frame) {
+        var top = frame.getBoundingClientRect().top;
+        if (top >= 0) return;
+        window.scrollTo(0, Math.max(0, window.pageYOffset + top - REVEAL_GAP));
     }
 
     function lockBackground() {
@@ -214,8 +229,31 @@
 
     function sync() {
         var frame = popupFrame();
-        if (frame && fitsInWindow(frame)) lockBackground();
-        else unlockBackground();
+        if (!frame) {
+            unlockBackground();
+            lastHeight = 0;
+            return;
+        }
+
+        var height = frame.getBoundingClientRect().height;
+        // Высота меняется на смене шага формы — это и есть «нажали
+        // Продолжить». Просто прокрутку посетителя так не спутать.
+        var stepChanged = height !== lastHeight;
+        lastHeight = height;
+
+        // Попап помещается в окно — фон можно останавливать. Прижатый к окну
+        // попап от прокрутки не зависит вовсе, его тоже можно.
+        if (height <= document.documentElement.clientHeight || pinnedToWindow(frame)) {
+            lockBackground();
+            return;
+        }
+
+        // Попап выше окна и стоит в потоке страницы: замок сделал бы низ
+        // формы недосягаемым, а это уже не косметика, а несделанная
+        // регистрация. Фон отпускаем, но на смене шага подводим страницу
+        // к верху формы, чтобы попап не оставался за краем экрана.
+        unlockBackground();
+        if (stepChanged) revealPopup(frame);
     }
 
     function watchPopups() {
