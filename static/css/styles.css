@@ -1717,6 +1717,14 @@ img { max-width: 100%; height: auto; }
    space, and clipping it could hide the popup if Timepad ever attaches the
    overlay next to the embed code instead of to <body>. */
 
+/* Пока попап Timepad открыт, страница под ним стоит: иначе колесо мыши
+   прокручивает фон, а попап остаётся на месте открытия и уходит за край
+   экрана. Класс ставит и снимает static/js/timepad-widget.js — он же
+   компенсирует ширину исчезнувшей полосы прокрутки. */
+.timepad-popup-open {
+    overflow: hidden;
+}
+
 @media (max-width: 640px) {
     .timepad-widget__box {
         padding: 0.75rem;
