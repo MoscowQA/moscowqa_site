@@ -50,7 +50,7 @@
     <div class="event-hero__inner">
         <div class="event-hero__top{% if event.cover %} event-hero__top--cover{% endif %}">
             {% if event.cover %}
-            {{ cover.cover(event, base, "event-hero__cover", loading="") }}
+            {{ cover.cover(event, base, "event-hero__cover", loading="", desktop_sizes="352px") }}
             {% else %}
             <div class="event-hero__number">#{{ event.number }}</div>
             {% endif %}

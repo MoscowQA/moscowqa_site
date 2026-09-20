@@ -624,6 +624,52 @@ def speaker_photo_variants(photo: str) -> dict:
     return variants
 
 
+# Ширины webp-вариантов обложек. Файлы кладёт рядом с исходником
+# scripts/event_cover_variants.py — здесь мы их только находим.
+COVER_VARIANT_WIDTHS = (540, 768)
+
+
+def event_cover_variants(cover: str) -> dict:
+    """Вернуть {"src", "sources", "width", "height"} для обложки события.
+
+    `src` — исходная картинка как она записана в `cover`: она же уходит в
+    og:image, где webp понимают не все соцсети. `sources` — webp-варианты
+    (путь и ширина), если они есть на диске; без них шаблон рисует обычный
+    <img>, как раньше. Размеры исходника нужны шаблону, чтобы картинка не
+    дёргала вёрстку, пока грузится.
+
+    Ширины отдаём списком, а не готовым srcset: адреса в нём ещё надо
+    склеить с BASE_URL, а он известен только шаблону.
+    """
+    cover = (cover or "").strip()
+    variants = {"src": cover, "sources": [], "width": 0, "height": 0}
+    if not cover.startswith("/static/"):
+        return variants
+
+    source = ROOT / cover.lstrip("/")
+    if not source.exists():
+        return variants
+
+    with Image.open(source) as image:
+        variants["width"], variants["height"] = image.size
+
+    base_url = cover.rsplit("/", 1)[0]
+    for width in COVER_VARIANT_WIDTHS:
+        candidate = source.with_name(f"{source.stem}-{width}.webp")
+        if candidate.exists():
+            variants["sources"].append(
+                {"url": f"{base_url}/{candidate.name}", "width": width}
+            )
+
+    widest = source.with_suffix(".webp")
+    if widest.exists():
+        with Image.open(widest) as image:
+            variants["sources"].append(
+                {"url": f"{base_url}/{widest.name}", "width": image.width}
+            )
+    return variants
+
+
 def parse_md_file(filepath: Path) -> dict:
     """Parse a markdown file with YAML front matter."""
     text = filepath.read_text(encoding="utf-8")
@@ -657,6 +703,12 @@ def load_events() -> list[dict]:
                     talk.get("slug")
                 )
                 talk["tag_links"] = talk_tag_links(talk)
+
+            # Обложки: webp-варианты и размеры исходника для шаблона.
+            event["cover_variants"] = event_cover_variants(event.get("cover"))
+            event["cover_desktop_variants"] = event_cover_variants(
+                event.get("cover_desktop")
+            )
 
             # Timepad registration widget: the id comes from the event's
             # Timepad link unless the front matter names one explicitly.

@@ -549,3 +549,64 @@ class TestEventSchema:
 
     def test_event_without_address_has_no_location(self):
         assert "location" not in self.schema(address="")
+
+
+class TestEventCoverVariants:
+    COVER = "/static/images/events/28-black.jpg"
+
+    @pytest.fixture
+    def covers(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(build, "ROOT", tmp_path)
+        directory = tmp_path / "static" / "images" / "events"
+        directory.mkdir(parents=True)
+        return directory
+
+    def write(self, directory, name, size):
+        Image.new("RGB", size, "white").save(directory / name)
+
+    def test_webp_variants_become_sources(self, covers):
+        self.write(covers, "28-black.jpg", (1377, 768))
+        self.write(covers, "28-black.webp", (1200, 669))
+        self.write(covers, "28-black-540.webp", (540, 301))
+        self.write(covers, "28-black-768.webp", (768, 428))
+
+        variants = build.event_cover_variants(self.COVER)
+        assert [(s["url"].rsplit("/", 1)[1], s["width"]) for s in variants["sources"]] == [
+            ("28-black-540.webp", 540),
+            ("28-black-768.webp", 768),
+            ("28-black.webp", 1200),
+        ]
+
+    def test_src_stays_the_original(self, covers):
+        """og:image указывает на `cover`, а webp туда кладут не все соцсети."""
+        self.write(covers, "28-black.jpg", (1377, 768))
+        self.write(covers, "28-black.webp", (1200, 669))
+        assert build.event_cover_variants(self.COVER)["src"] == self.COVER
+
+    def test_size_of_the_original_is_reported(self, covers):
+        # Размеры нужны шаблону, чтобы картинка не дёргала вёрстку.
+        self.write(covers, "28-black.jpg", (1377, 768))
+        variants = build.event_cover_variants(self.COVER)
+        assert (variants["width"], variants["height"]) == (1377, 768)
+
+    def test_widest_descriptor_matches_the_real_file(self, covers):
+        self.write(covers, "28-black.jpg", (1377, 768))
+        self.write(covers, "28-black.webp", (1024, 571))
+        assert build.event_cover_variants(self.COVER)["sources"][-1]["width"] == 1024
+
+    def test_without_webp_no_sources(self, covers):
+        # Раньше обложки были одним JPEG — такая разметка должна остаться рабочей.
+        self.write(covers, "28-black.jpg", (1377, 768))
+        variants = build.event_cover_variants(self.COVER)
+        assert variants["sources"] == []
+        assert variants["src"] == self.COVER
+
+    def test_missing_file(self, covers):
+        variants = build.event_cover_variants(self.COVER)
+        assert variants == {"src": self.COVER, "sources": [], "width": 0, "height": 0}
+
+    def test_remote_and_empty_cover(self, covers):
+        remote = "https://example.com/cover.jpg"
+        assert build.event_cover_variants(remote)["sources"] == []
+        assert build.event_cover_variants("")["src"] == ""
+        assert build.event_cover_variants(None)["sources"] == []

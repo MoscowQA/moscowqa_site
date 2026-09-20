@@ -18,7 +18,7 @@ DIST := dist
 
 .PHONY: help install install-dev install-parsers venv build serve clean check test validate \
 	sync sync-dry sync-heisenbug sync-sqadays \
-	collect-heisenbug collect-sqadays photo photos og
+	collect-heisenbug collect-sqadays photo photos covers og
 
 help: ## Показать этот список
 	@awk 'BEGIN {FS = ":.*##"} \
@@ -96,6 +96,9 @@ photo: ## Сжать фото спикера до ~1080px (FILE=static/images/sp
 
 photos: ## Перенести фото спикеров к себе в webp (ARGS="ivan-ivanov" или --dry-run)
 	$(PYTHON) scripts/localize_speaker_photos.py $(ARGS)
+
+covers: ## Пересобрать webp-варианты обложек событий (ARGS="28-black" или --dry-run)
+	$(PYTHON) scripts/event_cover_variants.py $(ARGS)
 
 og: ## Посмотреть og-обложки событий в og-preview/ (ARGS="28-black")
 	$(PYTHON) og_images.py --out og-preview $(ARGS)

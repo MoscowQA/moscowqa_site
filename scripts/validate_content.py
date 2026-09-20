@@ -4,7 +4,8 @@
 Что проверяется:
 
 * события — обязательные поля, ISO-дата, формат времени, известный `type`,
-  номер или обложка, существование файлов обложек, вид ссылок;
+  номер или обложка, существование файлов обложек и их webp-вариантов,
+  вид ссылок;
 * доклады — есть название и спикеры, слаги не совпадают внутри события,
   **каждое имя в `talks[].speakers` дословно совпадает с `name` спикера**
   (иначе доклад молча не свяжется с профилем);
@@ -140,8 +141,14 @@ def check_events(speakers: dict[str, dict]) -> None:
 
         for field in ("cover", "cover_desktop"):
             value = (data.get(field) or "").strip()
-            if value and not (ROOT / value.lstrip("/")).exists():
+            if not value:
+                continue
+            if not (ROOT / value.lstrip("/")).exists():
                 error(where, f"{field}: файла нет — {value}")
+            elif not build.event_cover_variants(value)["sources"]:
+                # Не ошибка: сайт соберётся и с одним JPEG, просто отдаст
+                # его целиком всем подряд. Лечится `make covers`.
+                warn(where, f"{field}: нет webp-вариантов, прогоните make covers")
 
         for field in LINK_FIELDS:
             value = (data.get(field) or "").strip()

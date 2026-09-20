@@ -11,15 +11,47 @@
   the inner <img> is handled by the `.event-*__cover img` rules in styles.css.
 
   `cover` is also what og:image points at — link previews get the mobile
-  variant, which is the one closer to a 1.91:1 crop.
+  variant, which is the one closer to a 1.91:1 crop. That is why the <img>
+  still points at the original JPEG: браузеры до него не доходят, им достаётся
+  webp из <source>, а вот соцсетям webp в og:image кладут не все.
+
+  Варианты webp рядом с исходником собирает scripts/event_cover_variants.py,
+  находит их build.py (`event_cover_variants`). Нет вариантов на диске —
+  разметка получается такой же, как была до них.
 #}
-{% macro cover(event, base, css_class, loading='lazy') %}
+{% macro srcset(variants, base) %}
+{%- for source in variants.sources -%}
+{{ base }}{{ source.url }} {{ source.width }}w{{ ", " if not loop.last }}
+{%- endfor -%}
+{% endmacro %}
+
+{# `desktop_sizes` — ширина слота на экранах от 1024px: 352px в шапке события
+   и 384px на карточке в списке. Ниже 1024px обложка идёт во всю ширину. #}
+{% macro cover(event, base, css_class, loading='lazy', desktop_sizes='384px') %}
+{%- set main = event.cover_variants | default({'src': event.cover, 'sources': [], 'width': 0, 'height': 0}, true) -%}
+{%- set desktop = event.cover_desktop_variants | default({'src': event.cover_desktop, 'sources': [], 'width': 0, 'height': 0}, true) -%}
 {%- set attrs -%}
-src="{{ base }}{{ event.cover }}" alt="{{ event.title }}"{% if loading %} loading="{{ loading }}"{% endif %}
+src="{{ base }}{{ event.cover }}" alt="{{ event.title }}"
+{%- if main.width %} width="{{ main.width }}" height="{{ main.height }}"{% endif %}
+{%- if loading %} loading="{{ loading }}" decoding="async"{% endif %}
 {%- endset -%}
-{%- if event.cover_desktop -%}
+{%- if event.cover_desktop or main.sources -%}
 <picture class="{{ css_class }}">
-    <source media="(min-width: 1024px)" srcset="{{ base }}{{ event.cover_desktop }}">
+    {#- Размеры повторяются на каждом <source>: десктопный кроп обычно
+        квадратный, а мобильный вытянутый, и без них браузер держит место
+        по пропорциям <img> — то есть на десктопе не по той картинке,
+        которую в итоге покажет. -#}
+    {%- set desktop_size %}{% if desktop.width %} width="{{ desktop.width }}" height="{{ desktop.height }}"{% endif %}{% endset %}
+    {%- set main_size %}{% if main.width %} width="{{ main.width }}" height="{{ main.height }}"{% endif %}{% endset %}
+    {%- if event.cover_desktop %}
+    {%- if desktop.sources %}
+    <source media="(min-width: 1024px)" type="image/webp" srcset="{{ srcset(desktop, base) }}" sizes="{{ desktop_sizes }}"{{ desktop_size }}>
+    {%- endif %}
+    <source media="(min-width: 1024px)" srcset="{{ base }}{{ event.cover_desktop }}"{{ desktop_size }}>
+    {%- endif %}
+    {%- if main.sources %}
+    <source type="image/webp" srcset="{{ srcset(main, base) }}" sizes="100vw"{{ main_size }}>
+    {%- endif %}
     <img {{ attrs }}>
 </picture>
 {%- else -%}
