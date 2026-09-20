@@ -31,6 +31,12 @@ OUTPUT_DIR = ROOT / "dist"
 BASE_URL = os.environ.get("BASE_URL", "")
 SITE_URL = os.environ.get("SITE_URL", "https://moscowqa.ru")
 
+# Внешние адреса сообщества. Лежат рядом, потому что их читает и подвал
+# сайта (через `site`), и разметка schema.org.
+TELEGRAM_URL = "https://t.me/moscowqa"
+YOUTUBE_URL = "https://www.youtube.com/@moscowqa"
+TIMEPAD_ORG_URL = "https://moscowqa.timepad.ru"
+
 
 def env_flag(name: str, default: bool = False) -> bool:
     """Read a boolean setting from the environment."""
@@ -286,6 +292,157 @@ def google_calendar_url(event: dict, url: str) -> str:
     if event.get("address"):
         params["location"] = event["address"]
     return "https://calendar.google.com/calendar/render?" + urlencode(params)
+
+
+# --- schema.org ------------------------------------------------------------
+# Разметка события собирается здесь, а не в шаблоне: в Jinja каждое
+# необязательное поле — это ещё одна запятая, которую легко поставить не туда,
+# а сломанный JSON-LD Google просто игнорирует, ничего не сообщая.
+
+ATTENDANCE_MODES = {
+    "Online": "https://schema.org/OnlineEventAttendanceMode",
+    "Offline": "https://schema.org/OfflineEventAttendanceMode",
+}
+MIXED_ATTENDANCE_MODE = "https://schema.org/MixedEventAttendanceMode"
+
+# Города, которые умеем отделять от адреса. Адреса пишутся по-разному
+# ("Москва, Зал 4", "Москва ул. Садовническая 9А"), поэтому делим по
+# известному началу, а не по первой запятой.
+KNOWN_CITIES = ("Санкт-Петербург", "Москва")
+
+
+def postal_address(address: str) -> dict:
+    """Адрес строкой → PostalAddress.
+
+    Город выносим отдельным полем, только если узнали его в начале строки;
+    иначе весь адрес остаётся `streetAddress` — это валидно и честнее, чем
+    угадать город неправильно.
+    """
+    result = {
+        "@type": "PostalAddress",
+        "streetAddress": address,
+        "addressCountry": "RU",
+    }
+    for city in KNOWN_CITIES:
+        if address.startswith(city):
+            rest = address[len(city):].lstrip(" ,")
+            result["addressLocality"] = city
+            result["streetAddress"] = rest or city
+            break
+    return result
+
+
+def event_schema_dates(event: dict) -> dict:
+    """startDate/endDate события для schema.org.
+
+    Без `endDate` поисковик считает событие законченным в полночь дня
+    начала. Границы берём из того же расчёта, что и файл календаря, но
+    `endDate` в schema.org включительный — в отличие от iCalendar, где
+    конец дня-события это уже следующий день.
+    """
+    span = event_calendar_span(event)
+    if span is None:
+        return {}
+
+    start, end, all_day = span
+    if all_day:
+        # Времени начала нет — событие занимает весь объявленный день.
+        return {"startDate": start.isoformat(), "endDate": start.isoformat()}
+
+    moscow = timezone(MOSCOW_OFFSET)
+    return {
+        "startDate": start.astimezone(moscow).isoformat(),
+        "endDate": end.astimezone(moscow).isoformat(),
+    }
+
+
+def event_offers(event: dict, url: str) -> dict:
+    """Вход на митапы бесплатный — в schema.org это тоже offer, с ценой 0.
+
+    Без `offers` карточка события в выдаче не собирается, даже когда платить
+    не за что. Ссылку ведём на регистрацию, а если её нет — на саму страницу.
+    """
+    registration = str(event.get("registration_link") or "").strip()
+    if not registration and event.get("timepad_event_id"):
+        registration = f"{TIMEPAD_ORG_URL}/event/{event['timepad_event_id']}/"
+    return {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "RUB",
+        "availability": "https://schema.org/InStock",
+        "url": registration or url,
+    }
+
+
+def event_performers(event: dict, speaker_by_name: dict = None) -> list[dict]:
+    """Спикеры события как `performer`, без повторов и в порядке программы."""
+    speaker_by_name = speaker_by_name or {}
+    performers = []
+    seen = set()
+    for talk in event.get("talks") or []:
+        for name in talk.get("speakers") or []:
+            name = str(name).strip()
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            person = {"@type": "Person", "name": name}
+            profile = speaker_by_name.get(name) or {}
+            if profile.get("slug"):
+                person["url"] = f"{SITE_URL}/speakers/{profile['slug']}/"
+            if profile.get("company"):
+                person["worksFor"] = {
+                    "@type": "Organization",
+                    "name": profile["company"],
+                }
+            performers.append(person)
+    return performers
+
+
+def event_schema(event: dict, url: str, speaker_by_name: dict = None) -> dict:
+    """Разметка Event для страницы события."""
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": event.get("title", ""),
+    }
+
+    description = str(event.get("short_description") or "").strip()
+    if description:
+        schema["description"] = description
+
+    schema.update(event_schema_dates(event))
+    schema["eventAttendanceMode"] = ATTENDANCE_MODES.get(
+        event.get("type"), MIXED_ATTENDANCE_MODE
+    )
+    schema["eventStatus"] = "https://schema.org/EventScheduled"
+
+    address = str(event.get("address") or "").strip()
+    if address:
+        location = {"@type": "Place", "address": postal_address(address)}
+        company = str(event.get("company") or "").strip()
+        if company:
+            location["name"] = company
+        schema["location"] = location
+
+    # Обложка: своя, если нарисована, иначе сгенерированная (og_images.py).
+    image = event.get("cover") or event.get("og_image")
+    if image:
+        schema["image"] = [f"{SITE_URL}{image}"]
+
+    performers = event_performers(event, speaker_by_name)
+    if performers:
+        schema["performer"] = performers
+
+    schema["organizer"] = {
+        "@type": "Organization",
+        "name": "Moscow QA",
+        "url": SITE_URL + "/",
+        "sameAs": [TELEGRAM_URL, YOUTUBE_URL],
+    }
+    schema["isAccessibleForFree"] = True
+    schema["offers"] = event_offers(event, url)
+    schema["url"] = url
+    return schema
 
 
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
@@ -647,9 +804,9 @@ def build():
     site = {
         "title": "Moscow QA",
         "description": "QA-сообщество Москвы — митапы по тестированию",
-        "telegram": "https://t.me/moscowqa",
-        "youtube": "https://www.youtube.com/@moscowqa",
-        "timepad": "https://moscowqa.timepad.ru",
+        "telegram": TELEGRAM_URL,
+        "youtube": YOUTUBE_URL,
+        "timepad": TIMEPAD_ORG_URL,
         "base_url": BASE_URL,
         # Consumed by templates/partials/timepad.html — see TIMEPAD_WIDGET.md.
         "timepad_widget": {
@@ -708,7 +865,10 @@ def build():
     tpl = env.get_template("event.html")
     for event in events:
         canonical = f"{SITE_URL}/events/{event['slug']}/"
-        html = tpl.render(**common, event=event, canonical_url=canonical)
+        html = tpl.render(
+            **common, event=event, canonical_url=canonical,
+            event_schema=event_schema(event, canonical, speaker_by_name),
+        )
         event_dir = OUTPUT_DIR / "events" / event["slug"]
         event_dir.mkdir(parents=True, exist_ok=True)
         (event_dir / "index.html").write_text(html, encoding="utf-8")

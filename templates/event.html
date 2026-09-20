@@ -25,27 +25,12 @@
 {%- endif %}
 {%- endblock %}
 
+{# Разметка Event собирается в build.py (`event_schema`): у события много
+   необязательных полей, и в шаблоне каждое из них — лишняя запятая, из-за
+   которой Google молча выбрасывает весь блок. #}
 {% block structured_data %}
 <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "Event",
-    "name": {{ event.title | tojson }},
-    "description": {{ event.short_description | default('') | tojson }},
-    "startDate": "{{ event.date }}",
-    {% if event.address %}"location": {
-        "@type": "Place",
-        "name": "{{ event.company | default('') }}",
-        "address": {{ event.address | tojson }}
-    },{% endif %}
-    "organizer": {
-        "@type": "Organization",
-        "name": "Moscow QA",
-        "url": "https://t.me/moscowqa"
-    },
-    "eventStatus": "https://schema.org/EventScheduled",
-    "eventAttendanceMode": "https://schema.org/{% if event.type == 'Online' %}OnlineEventAttendanceMode{% elif event.type == 'Offline' %}OfflineEventAttendanceMode{% else %}MixedEventAttendanceMode{% endif %}"
-}
+{{ event_schema | tojson }}
 </script>
 <script type="application/ld+json">
 {

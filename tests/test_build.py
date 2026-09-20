@@ -4,6 +4,7 @@
 URL, виджет регистрации не появляется, .ics не открывается в календаре.
 Запуск: `make test` или `python3 -m pytest`.
 """
+import json
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -386,3 +387,165 @@ class TestSpeakerPhotoVariants:
     def test_speaker_without_photo(self, photos):
         assert build.speaker_photo_variants("")["src"] == ""
         assert build.speaker_photo_variants(None)["srcset"] == ""
+
+
+# --- Разметка события -----------------------------------------------------
+
+class TestPostalAddress:
+    def test_splits_off_a_known_city(self):
+        address = build.postal_address("Москва, Вятская улица, 27с42")
+        assert address["addressLocality"] == "Москва"
+        assert address["streetAddress"] == "Вятская улица, 27с42"
+        assert address["addressCountry"] == "RU"
+
+    def test_city_without_a_comma_after_it(self):
+        # Адреса пишутся по-разному, делить по первой запятой нельзя.
+        address = build.postal_address("Москва ул. Садовническая 9А")
+        assert address["addressLocality"] == "Москва"
+        assert address["streetAddress"] == "ул. Садовническая 9А"
+
+    def test_second_known_city(self):
+        address = build.postal_address("Санкт-Петербург, Пискарёвский проспект, 2к2")
+        assert address["addressLocality"] == "Санкт-Петербург"
+
+    def test_unknown_city_stays_whole(self):
+        # Лучше весь адрес одной строкой, чем угаданный не тот город.
+        address = build.postal_address("Казань, улица Баумана, 1")
+        assert "addressLocality" not in address
+        assert address["streetAddress"] == "Казань, улица Баумана, 1"
+
+    def test_city_alone(self):
+        assert build.postal_address("Москва")["streetAddress"] == "Москва"
+
+
+class TestEventSchemaDates:
+    def test_day_without_time_ends_the_same_day(self):
+        """endDate в schema.org включительный, в отличие от iCalendar.
+
+        Календарный расчёт отдаёт следующий день, и если отдать его как есть,
+        поисковик решит, что митап идёт двое суток.
+        """
+        dates = build.event_schema_dates({"date": "2026-10-01"})
+        assert dates == {"startDate": "2026-10-01", "endDate": "2026-10-01"}
+
+    def test_time_is_written_in_moscow_time(self):
+        dates = build.event_schema_dates({"date": "2026-10-01", "time": "18:00"})
+        assert dates["startDate"] == "2026-10-01T18:00:00+03:00"
+        # Без end_time берётся та же длительность, что и для календаря.
+        assert dates["endDate"] == "2026-10-01T21:00:00+03:00"
+
+    def test_explicit_end_time(self):
+        dates = build.event_schema_dates(
+            {"date": "2026-10-01", "time": "19:00", "end_time": "22:30"})
+        assert dates["endDate"] == "2026-10-01T22:30:00+03:00"
+
+    def test_event_without_date(self):
+        assert build.event_schema_dates({"title": "Без даты"}) == {}
+
+
+class TestEventOffers:
+    URL = "https://moscowqa.ru/events/28-black/"
+
+    def test_free_entry_is_still_an_offer(self):
+        # Без offers карточка события в выдаче не собирается.
+        offers = build.event_offers({}, self.URL)
+        assert offers["price"] == "0"
+        assert offers["priceCurrency"] == "RUB"
+        assert offers["availability"] == "https://schema.org/InStock"
+
+    def test_registration_link_wins(self):
+        offers = build.event_offers(
+            {"registration_link": "https://example.com/reg"}, self.URL)
+        assert offers["url"] == "https://example.com/reg"
+
+    def test_falls_back_to_timepad(self):
+        offers = build.event_offers({"timepad_event_id": "4204473"}, self.URL)
+        assert offers["url"] == "https://moscowqa.timepad.ru/event/4204473/"
+
+    def test_falls_back_to_the_event_page(self):
+        assert build.event_offers({"registration_link": ""}, self.URL)["url"] == self.URL
+
+
+class TestEventPerformers:
+    def test_order_of_the_programme_without_duplicates(self):
+        event = {"talks": [
+            {"speakers": ["Аня"]},
+            {"speakers": ["Боря", "Аня"]},
+        ]}
+        assert [p["name"] for p in build.event_performers(event)] == ["Аня", "Боря"]
+
+    def test_links_to_the_speaker_page_and_company(self):
+        profiles = {"Аня": {"name": "Аня", "slug": "anya", "company": "Ozon Tech"}}
+        person = build.event_performers({"talks": [{"speakers": ["Аня"]}]}, profiles)[0]
+        assert person["url"] == f"{build.SITE_URL}/speakers/anya/"
+        assert person["worksFor"] == {"@type": "Organization", "name": "Ozon Tech"}
+
+    def test_speaker_without_a_profile_still_gets_named(self):
+        person = build.event_performers({"talks": [{"speakers": ["Аня"]}]}, {})[0]
+        assert person == {"@type": "Person", "name": "Аня"}
+
+    def test_event_without_talks(self):
+        assert build.event_performers({}) == []
+
+
+class TestEventSchema:
+    URL = "https://moscowqa.ru/events/28-black/"
+
+    def make(self, **extra):
+        event = {
+            "slug": "28-black",
+            "title": "Moscow QA #28",
+            "date": "2026-10-01",
+            "type": "Offline",
+            "company": "Ozon Tech",
+            "address": "Москва, Пресненская набережная, 10",
+            "short_description": "Митап про тестирование",
+            "talks": [{"speakers": ["Аня"]}],
+        }
+        event.update(extra)
+        return event
+
+    def schema(self, **extra):
+        return build.event_schema(self.make(**extra), self.URL)
+
+    def test_has_everything_google_asks_for(self):
+        schema = self.schema(og_image="/static/og/events/28-black.png")
+        for field in ("name", "startDate", "endDate", "location", "image",
+                      "offers", "performer", "organizer", "eventStatus",
+                      "eventAttendanceMode"):
+            assert field in schema, field
+
+    def test_is_serialisable_json(self):
+        # Шаблон отдаёт это через `| tojson`; несериализуемое поле уронит сборку.
+        assert json.loads(json.dumps(self.schema()))["@type"] == "Event"
+
+    @pytest.mark.parametrize("event_type,mode", [
+        ("Online", "OnlineEventAttendanceMode"),
+        ("Offline", "OfflineEventAttendanceMode"),
+        ("Offline + Online", "MixedEventAttendanceMode"),
+        (None, "MixedEventAttendanceMode"),
+    ])
+    def test_attendance_mode(self, event_type, mode):
+        assert self.schema(type=event_type)["eventAttendanceMode"].endswith(mode)
+
+    def test_own_cover_wins_over_the_generated_one(self):
+        schema = self.schema(cover="/static/images/events/28-black.jpg",
+                             og_image="/static/og/events/28-black.png")
+        assert schema["image"] == [f"{build.SITE_URL}/static/images/events/28-black.jpg"]
+
+    def test_image_is_an_absolute_url(self):
+        schema = self.schema(og_image="/static/og/events/28-black.png")
+        assert schema["image"][0].startswith("https://")
+
+    def test_event_without_a_picture_has_no_image_field(self):
+        # Пустой image хуже отсутствующего: поисковик считает его ошибкой.
+        assert "image" not in self.schema()
+
+    def test_empty_description_is_omitted(self):
+        assert "description" not in self.schema(short_description="")
+
+    def test_free_entry_is_stated(self):
+        assert self.schema()["isAccessibleForFree"] is True
+
+    def test_event_without_address_has_no_location(self):
+        assert "location" not in self.schema(address="")
