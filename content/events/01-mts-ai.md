@@ -4,7 +4,6 @@ number: 1
 date: "2024-01-18"
 company: "MTS AI"
 address: "г. Москва, Подсосенский переулок 23 с2"
-completed: true
 type: "Offline"
 short_description: "Первый оффлайн-митап сообщества Moscow QA в офисе MTS AI."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg34195pMB241ac4SGDc4Imy-"

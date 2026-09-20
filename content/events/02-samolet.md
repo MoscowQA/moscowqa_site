@@ -4,7 +4,6 @@ number: 2
 date: "2024-02-29"
 company: "Самолет"
 address: "г. Москва, Варшавское шоссе, 33с12"
-completed: true
 type: "Offline"
 short_description: "Второй митап совместно с компанией Самолет. Доклады инженеров из Самолета, Flipper Devices и more.tv."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg36FzW0esw388PGyoC2-M-hq"

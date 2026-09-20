@@ -15,10 +15,17 @@ from urllib.parse import urlencode
 from jinja2 import Environment, FileSystemLoader
 from PIL import Image
 
-# Completed vs. upcoming status is now determined on the frontend in
-# static/js/events-status.js, based on the visitor's current date. The build
-# step intentionally does not set `event.completed`; templates render both
-# states and let JS toggle `.is-upcoming` / `.is-completed` classes.
+import og_images
+
+# Прошло событие или ещё нет — считается здесь, на сборке, по `date`.
+# Раньше это делал только фронтенд (static/js/events-status.js): без JS и для
+# краулера главная была плоским списком, где все 29 митапов помечены
+# «Предстоящее». Чтобы разбивка не устаревала между деплоями, сайт
+# пересобирается каждую ночь (.github/workflows/deploy.yml).
+#
+# JS остался поправкой на те часы, что проходят между ночной сборкой и
+# визитом: он перекладывает карточку, если событие успело закончиться, и
+# переключает `.is-upcoming` / `.is-completed` по дате самого посетителя.
 
 ROOT = Path(__file__).parent
 CONTENT_DIR = ROOT / "content"
@@ -28,6 +35,12 @@ OUTPUT_DIR = ROOT / "dist"
 
 BASE_URL = os.environ.get("BASE_URL", "")
 SITE_URL = os.environ.get("SITE_URL", "https://moscowqa.ru")
+
+# Внешние адреса сообщества. Лежат рядом, потому что их читает и подвал
+# сайта (через `site`), и разметка schema.org.
+TELEGRAM_URL = "https://t.me/moscowqa"
+YOUTUBE_URL = "https://www.youtube.com/@moscowqa"
+TIMEPAD_ORG_URL = "https://moscowqa.timepad.ru"
 
 
 def env_flag(name: str, default: bool = False) -> bool:
@@ -129,7 +142,13 @@ MOSCOW_OFFSET = timedelta(hours=3)
 # `end_time`) turns the calendar entry into a real interval; without it the
 # entry is an all-day one, which is the honest rendering of "we announced the
 # day, not the hour".
-DEFAULT_EVENT_DURATION = timedelta(hours=3)
+#
+# Митапы заканчиваются в 22:00 — это и есть время окончания, когда его не
+# указали явно.
+DEFAULT_END_TIME = time(22, 0)
+# Подстраховка на случай, когда митап начинается в 22:00 или позже: 22:00
+# к этому моменту уже прошло, и концом события быть не может.
+FALLBACK_EVENT_DURATION = timedelta(hours=3)
 
 TIME_RE = re.compile(r"^(\d{1,2})[:.](\d{2})$")
 
@@ -181,13 +200,49 @@ def event_calendar_span(event: dict):
     start = datetime.combine(day, start_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
     end_time = parse_event_time(event.get("end_time"))
     if end_time is None:
-        return start, start + DEFAULT_EVENT_DURATION, False
+        default_end = (
+            datetime.combine(day, DEFAULT_END_TIME, tzinfo=timezone.utc)
+            - MOSCOW_OFFSET
+        )
+        if default_end <= start:
+            return start, start + FALLBACK_EVENT_DURATION, False
+        return start, default_end, False
 
     end = datetime.combine(day, end_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
     if end <= start:
         # An event that runs past midnight, e.g. 19:00 — 00:30.
         end += timedelta(days=1)
     return start, end, False
+
+
+def moscow_today(now: datetime = None) -> date:
+    """Сегодняшняя дата по Москве.
+
+    Сборка идёт на раннере в UTC. Без поправки вечерний деплой (после 21:00
+    UTC — это уже завтра в Москве) считал бы сегодняшним вчерашний день и
+    держал вчерашний митап в предстоящих.
+    """
+    now = now or datetime.now(timezone.utc)
+    return (now + MOSCOW_OFFSET).date()
+
+
+def event_completed(event: dict, today: date) -> bool:
+    """Прошло ли событие. День самого митапа считается предстоящим."""
+    day = parse_event_date(event.get("date"))
+    return day is not None and day < today
+
+
+def split_events(events: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Разделить события на предстоящие и прошедшие.
+
+    Предстоящие идут ближайшим вперёд — их читают как план. Прошедшие
+    остаются в порядке `events`, от свежих к старым: это архив.
+    """
+    upcoming = sorted(
+        (e for e in events if not e.get("completed")),
+        key=lambda e: e.get("date", ""),
+    )
+    return upcoming, [e for e in events if e.get("completed")]
 
 
 def escape_ics_text(value: str) -> str:
@@ -284,6 +339,162 @@ def google_calendar_url(event: dict, url: str) -> str:
     if event.get("address"):
         params["location"] = event["address"]
     return "https://calendar.google.com/calendar/render?" + urlencode(params)
+
+
+# --- schema.org ------------------------------------------------------------
+# Разметка события собирается здесь, а не в шаблоне: в Jinja каждое
+# необязательное поле — это ещё одна запятая, которую легко поставить не туда,
+# а сломанный JSON-LD Google просто игнорирует, ничего не сообщая.
+
+ATTENDANCE_MODES = {
+    "Online": "https://schema.org/OnlineEventAttendanceMode",
+    "Offline": "https://schema.org/OfflineEventAttendanceMode",
+}
+MIXED_ATTENDANCE_MODE = "https://schema.org/MixedEventAttendanceMode"
+
+# Города, которые умеем отделять от адреса. Адреса пишутся по-разному
+# ("Москва, Зал 4", "Москва ул. Садовническая 9А"), поэтому делим по
+# известному началу, а не по первой запятой.
+KNOWN_CITIES = ("Санкт-Петербург", "Москва")
+
+
+def postal_address(address: str) -> dict:
+    """Адрес строкой → PostalAddress.
+
+    Город выносим отдельным полем, только если узнали его в начале строки;
+    иначе весь адрес остаётся `streetAddress` — это валидно и честнее, чем
+    угадать город неправильно.
+    """
+    result = {
+        "@type": "PostalAddress",
+        "streetAddress": address,
+        "addressCountry": "RU",
+    }
+    for city in KNOWN_CITIES:
+        if address.startswith(city):
+            rest = address[len(city):].lstrip(" ,")
+            result["addressLocality"] = city
+            result["streetAddress"] = rest or city
+            break
+    return result
+
+
+def event_schema_dates(event: dict) -> dict:
+    """startDate/endDate события для schema.org.
+
+    Без `endDate` поисковик считает событие законченным в полночь дня
+    начала. Границы берём из того же расчёта, что и файл календаря, но
+    `endDate` в schema.org включительный — в отличие от iCalendar, где
+    конец дня-события это уже следующий день.
+    """
+    span = event_calendar_span(event)
+    if span is None:
+        return {}
+
+    start, end, all_day = span
+    if all_day:
+        # Времени начала нет — событие занимает весь объявленный день.
+        return {"startDate": start.isoformat(), "endDate": start.isoformat()}
+
+    moscow = timezone(MOSCOW_OFFSET)
+    return {
+        "startDate": start.astimezone(moscow).isoformat(),
+        "endDate": end.astimezone(moscow).isoformat(),
+    }
+
+
+def event_offers(event: dict, url: str) -> dict:
+    """Вход на митапы бесплатный — в schema.org это тоже offer, с ценой 0.
+
+    Без `offers` карточка события в выдаче не собирается, даже когда платить
+    не за что. Ссылку ведём на регистрацию, а если её нет — на саму страницу.
+    """
+    registration = str(event.get("registration_link") or "").strip()
+    if not registration and event.get("timepad_event_id"):
+        registration = f"{TIMEPAD_ORG_URL}/event/{event['timepad_event_id']}/"
+    return {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "RUB",
+        "availability": "https://schema.org/InStock",
+        "url": registration or url,
+    }
+
+
+def event_speaker_names(event: dict) -> list[str]:
+    """Имена спикеров события в порядке программы, без повторов."""
+    names = []
+    for talk in event.get("talks") or []:
+        for name in talk.get("speakers") or []:
+            name = str(name).strip()
+            if name and name not in names:
+                names.append(name)
+    return names
+
+
+def event_performers(event: dict, speaker_by_name: dict = None) -> list[dict]:
+    """Спикеры события как `performer`, без повторов и в порядке программы."""
+    speaker_by_name = speaker_by_name or {}
+    performers = []
+    for name in event_speaker_names(event):
+        person = {"@type": "Person", "name": name}
+        profile = speaker_by_name.get(name) or {}
+        if profile.get("slug"):
+            person["url"] = f"{SITE_URL}/speakers/{profile['slug']}/"
+        if profile.get("company"):
+            person["worksFor"] = {
+                "@type": "Organization",
+                "name": profile["company"],
+            }
+        performers.append(person)
+    return performers
+
+
+def event_schema(event: dict, url: str, speaker_by_name: dict = None) -> dict:
+    """Разметка Event для страницы события."""
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": event.get("title", ""),
+    }
+
+    description = str(event.get("short_description") or "").strip()
+    if description:
+        schema["description"] = description
+
+    schema.update(event_schema_dates(event))
+    schema["eventAttendanceMode"] = ATTENDANCE_MODES.get(
+        event.get("type"), MIXED_ATTENDANCE_MODE
+    )
+    schema["eventStatus"] = "https://schema.org/EventScheduled"
+
+    address = str(event.get("address") or "").strip()
+    if address:
+        location = {"@type": "Place", "address": postal_address(address)}
+        company = str(event.get("company") or "").strip()
+        if company:
+            location["name"] = company
+        schema["location"] = location
+
+    # Обложка: своя, если нарисована, иначе сгенерированная (og_images.py).
+    image = event.get("cover") or event.get("og_image")
+    if image:
+        schema["image"] = [f"{SITE_URL}{image}"]
+
+    performers = event_performers(event, speaker_by_name)
+    if performers:
+        schema["performer"] = performers
+
+    schema["organizer"] = {
+        "@type": "Organization",
+        "name": "Moscow QA",
+        "url": SITE_URL + "/",
+        "sameAs": [TELEGRAM_URL, YOUTUBE_URL],
+    }
+    schema["isAccessibleForFree"] = True
+    schema["offers"] = event_offers(event, url)
+    schema["url"] = url
+    return schema
 
 
 md = markdown.Markdown(extensions=["meta", "tables", "fenced_code", "toc"])
@@ -465,6 +676,52 @@ def speaker_photo_variants(photo: str) -> dict:
     return variants
 
 
+# Ширины webp-вариантов обложек. Файлы кладёт рядом с исходником
+# scripts/event_cover_variants.py — здесь мы их только находим.
+COVER_VARIANT_WIDTHS = (540, 768)
+
+
+def event_cover_variants(cover: str) -> dict:
+    """Вернуть {"src", "sources", "width", "height"} для обложки события.
+
+    `src` — исходная картинка как она записана в `cover`: она же уходит в
+    og:image, где webp понимают не все соцсети. `sources` — webp-варианты
+    (путь и ширина), если они есть на диске; без них шаблон рисует обычный
+    <img>, как раньше. Размеры исходника нужны шаблону, чтобы картинка не
+    дёргала вёрстку, пока грузится.
+
+    Ширины отдаём списком, а не готовым srcset: адреса в нём ещё надо
+    склеить с BASE_URL, а он известен только шаблону.
+    """
+    cover = (cover or "").strip()
+    variants = {"src": cover, "sources": [], "width": 0, "height": 0}
+    if not cover.startswith("/static/"):
+        return variants
+
+    source = ROOT / cover.lstrip("/")
+    if not source.exists():
+        return variants
+
+    with Image.open(source) as image:
+        variants["width"], variants["height"] = image.size
+
+    base_url = cover.rsplit("/", 1)[0]
+    for width in COVER_VARIANT_WIDTHS:
+        candidate = source.with_name(f"{source.stem}-{width}.webp")
+        if candidate.exists():
+            variants["sources"].append(
+                {"url": f"{base_url}/{candidate.name}", "width": width}
+            )
+
+    widest = source.with_suffix(".webp")
+    if widest.exists():
+        with Image.open(widest) as image:
+            variants["sources"].append(
+                {"url": f"{base_url}/{widest.name}", "width": image.width}
+            )
+    return variants
+
+
 def parse_md_file(filepath: Path) -> dict:
     """Parse a markdown file with YAML front matter."""
     text = filepath.read_text(encoding="utf-8")
@@ -484,6 +741,7 @@ def parse_md_file(filepath: Path) -> dict:
 def load_events() -> list[dict]:
     """Load all event markdown files, sorted by date descending."""
     events_dir = CONTENT_DIR / "events"
+    today = moscow_today()
     events = []
     if events_dir.exists():
         for f in events_dir.glob("*.md"):
@@ -499,6 +757,12 @@ def load_events() -> list[dict]:
                 )
                 talk["tag_links"] = talk_tag_links(talk)
 
+            # Обложки: webp-варианты и размеры исходника для шаблона.
+            event["cover_variants"] = event_cover_variants(event.get("cover"))
+            event["cover_desktop_variants"] = event_cover_variants(
+                event.get("cover_desktop")
+            )
+
             # Timepad registration widget: the id comes from the event's
             # Timepad link unless the front matter names one explicitly.
             event["timepad_event_id"] = parse_timepad_event_id(event)
@@ -513,9 +777,10 @@ def load_events() -> list[dict]:
                 event, f"{SITE_URL}/events/{event['slug']}/"
             )
 
-            # Note: past-vs-upcoming detection has moved to the browser
-            # (static/js/events-status.js). Templates emit `data-event-date`
-            # on cards and JS applies `.is-completed` / `.is-upcoming`.
+            # Поле `completed` во front matter (если осталось от старых
+            # файлов) не читаем: оно устаревало молча. Считаем по дате.
+            event["completed"] = event_completed(event, today)
+            event["speaker_names"] = event_speaker_names(event)
             events.append(event)
     events.sort(key=lambda e: e.get("date", ""), reverse=True)
     return events
@@ -636,6 +901,9 @@ def build():
     # Set up Jinja2
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
     env.policies["json.dumps_kwargs"] = {"ensure_ascii": False}
+    # «2026-10-01» → «1 октября 2026». Нужен блоку «Ближайший митап»: в
+    # списках дата остаётся в ISO, а на первом экране её читают глазами.
+    env.filters["ru_date"] = og_images.format_date
 
     # Load data
     events = load_events()
@@ -645,9 +913,9 @@ def build():
     site = {
         "title": "Moscow QA",
         "description": "QA-сообщество Москвы — митапы по тестированию",
-        "telegram": "https://t.me/moscowqa",
-        "youtube": "https://www.youtube.com/@moscowqa",
-        "timepad": "https://moscowqa.timepad.ru",
+        "telegram": TELEGRAM_URL,
+        "youtube": YOUTUBE_URL,
+        "timepad": TIMEPAD_ORG_URL,
         "base_url": BASE_URL,
         # Consumed by templates/partials/timepad.html — see TIMEPAD_WIDGET.md.
         "timepad_widget": {
@@ -677,14 +945,35 @@ def build():
     # Topic tags: talks grouped by the `tags` of their front matter.
     tags = collect_tags(events)
 
+    # Link-preview covers. An event with its own `cover` keeps it; the rest
+    # get a card drawn from their front matter, and `event["og_image"]` is
+    # what templates/event.html puts into og:image. See og_images.py.
+    og_count = og_images.generate_event_cards(
+        events, OUTPUT_DIR, speaker_by_name, STATIC_DIR / "images" / "logo.png"
+    )
+
     common = {"site": site, "events": events, "speakers": speakers, "base": BASE_URL,
               "speaker_slugs": speaker_slugs, "speaker_by_name": speaker_by_name,
-              "site_url": SITE_URL, "tags": tags}
+              "site_url": SITE_URL, "tags": tags,
+              "og_image_width": og_images.WIDTH,
+              "og_image_height": og_images.HEIGHT}
+
+    upcoming_events, past_events = split_events(events)
+
+    # Главная открывается одним событием: ближайшим, а когда впереди ничего
+    # нет — последним прошедшим (шаблон сам подписывает его иначе). В списках
+    # ниже оно не повторяется.
+    featured_event = next(iter(upcoming_events or past_events), None)
 
     # Build index page
     tpl = env.get_template("index.html")
-    html = tpl.render(**common, latest_events=events[:6],
-                      canonical_url=f"{SITE_URL}/")
+    html = tpl.render(
+        **common,
+        featured_event=featured_event,
+        upcoming_events=[e for e in upcoming_events if e is not featured_event],
+        past_events=[e for e in past_events if e is not featured_event],
+        canonical_url=f"{SITE_URL}/",
+    )
     (OUTPUT_DIR / "index.html").write_text(html, encoding="utf-8")
 
     # Build events list page
@@ -697,7 +986,10 @@ def build():
     tpl = env.get_template("event.html")
     for event in events:
         canonical = f"{SITE_URL}/events/{event['slug']}/"
-        html = tpl.render(**common, event=event, canonical_url=canonical)
+        html = tpl.render(
+            **common, event=event, canonical_url=canonical,
+            event_schema=event_schema(event, canonical, speaker_by_name),
+        )
         event_dir = OUTPUT_DIR / "events" / event["slug"]
         event_dir.mkdir(parents=True, exist_ok=True)
         (event_dir / "index.html").write_text(html, encoding="utf-8")
@@ -859,8 +1151,12 @@ def build():
     tagged_talks = sum(
         1 for e in events for t in e.get("talks", []) if t.get("tag_links")
     )
-    print(f"Built {len(events)} events, {talk_count} talks, {len(speakers)} speakers, {len(pages)} pages")
+    print(f"Built {len(events)} events ({len(upcoming_events)} upcoming, "
+          f"{len(past_events)} past), {talk_count} talks, "
+          f"{len(speakers)} speakers, {len(pages)} pages")
     print(f"Tags: {len(tags)} topics, {tagged_talks}/{talk_count} talks tagged")
+    print(f"OG covers: {og_count} generated, "
+          f"{len(events) - og_count} events with their own cover")
     if TIMEPAD_WIDGET_ENABLED:
         print(f"Timepad widget: {widget_count}/{len(events)} events, "
               f"list widget {'on' if site['timepad_widget']['list_enabled'] else 'off'}")

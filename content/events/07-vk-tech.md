@@ -4,7 +4,6 @@ number: 7
 date: "2024-11-07"
 company: "VK Tech"
 address: "Москва, Ленинградский пр., 70, БЦ «Алкон»"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с VK Tech. Доклады о Web 3.0, нагрузочном тестировании K6-Tarantool и BDUI."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg34g8aJ8hsUytd-cnLAv_Bzz"

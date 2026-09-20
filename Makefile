@@ -18,7 +18,7 @@ DIST := dist
 
 .PHONY: help install install-dev install-parsers venv build serve clean check test validate \
 	sync sync-dry sync-heisenbug sync-sqadays \
-	collect-heisenbug collect-sqadays photo photos
+	collect-heisenbug collect-sqadays photo photos covers og
 
 help: ## Показать этот список
 	@awk 'BEGIN {FS = ":.*##"} \
@@ -53,10 +53,11 @@ validate: build ## Проверить контент и ссылки в собр
 	$(PYTHON) scripts/validate_content.py
 
 check: ## Проверить синтаксис Python и прогнать сборку
-	$(PYTHON) -m compileall -q build.py parsers scripts
+	$(PYTHON) -m compileall -q build.py og_images.py parsers scripts
 	$(PYTHON) build.py
 	@test -s $(DIST)/index.html || { echo "dist/index.html не собрался"; exit 1; }
 	@test -s $(DIST)/sitemap.xml || { echo "dist/sitemap.xml не собрался"; exit 1; }
+	@ls $(DIST)/static/og/events/*.png >/dev/null 2>&1 || { echo "og-обложки не собрались"; exit 1; }
 	@echo "OK"
 
 ##@ Спикеры и конференции
@@ -95,3 +96,9 @@ photo: ## Сжать фото спикера до ~1080px (FILE=static/images/sp
 
 photos: ## Перенести фото спикеров к себе в webp (ARGS="ivan-ivanov" или --dry-run)
 	$(PYTHON) scripts/localize_speaker_photos.py $(ARGS)
+
+covers: ## Пересобрать webp-варианты обложек событий (ARGS="28-black" или --dry-run)
+	$(PYTHON) scripts/event_cover_variants.py $(ARGS)
+
+og: ## Посмотреть og-обложки событий в og-preview/ (ARGS="28-black")
+	$(PYTHON) og_images.py --out og-preview $(ARGS)

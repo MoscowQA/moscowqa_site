@@ -1,14 +1,20 @@
 /*
- * Frontend-side determination of "upcoming" vs "completed" events.
+ * Поправка статуса событий на дату посетителя.
  *
- * Templates render every event as `.is-upcoming` by default and tag
- * upcoming-only / completed-only bits with `.js-upcoming-only` /
- * `.js-completed-only`. This script walks every element carrying a
- * `data-event-date="YYYY-MM-DD"` attribute, compares it to the visitor's
- * local "today", and flips the parent class when the event is in the past.
+ * Раскладывает события по «предстоящим» и «прошедшим» сборка (build.py,
+ * `split_events`), а сайт пересобирается каждую ночь. Этот скрипт закрывает
+ * то, что остаётся: часы между ночной сборкой и визитом, и посетителей в
+ * других часовых поясах, у которых «сегодня» наступает раньше.
  *
- * On the index page, it also partitions cards from `[data-events-source]`
- * into `[data-events-upcoming]` and `[data-events-past]` containers.
+ * Что он делает:
+ *   - сверяет `data-event-date` с локальным «сегодня» и ставит элементу
+ *     `.is-completed` или `.is-upcoming` (по ним CSS прячет `.js-upcoming-only`
+ *     и `.js-completed-only` — кнопку регистрации, подпись блока и прочее);
+ *   - переносит карточку между `[data-events-upcoming]` и `[data-events-past]`,
+ *     если сборка успела устареть;
+ *   - прячет пустую секцию.
+ *
+ * На свежей сборке переносить обычно нечего, и страница не дёргается.
  */
 (function () {
     'use strict';
@@ -22,41 +28,54 @@
         return eventDate < today;
     }
 
+    function applyStatus(el, completed) {
+        el.classList.toggle('is-completed', completed);
+        el.classList.toggle('is-upcoming', !completed);
+    }
+
+    // Карточка переезжает в начало списка: предстоящие идут ближайшим вперёд,
+    // прошедшие — свежим вперёд, и в обоих случаях её место именно там.
+    function move(cards, target) {
+        for (var i = 0; i < cards.length; i++) {
+            target.insertBefore(cards[i], target.firstChild);
+        }
+    }
+
+    function staleCards(container, wantCompleted) {
+        var found = [];
+        if (!container) return found;
+        var cards = container.querySelectorAll('[data-event-date]');
+        for (var i = 0; i < cards.length; i++) {
+            if (isCompleted(cards[i].getAttribute('data-event-date')) === wantCompleted) {
+                found.push(cards[i]);
+            }
+        }
+        return found;
+    }
+
+    function hideIfEmpty(container) {
+        if (!container) return;
+        var section = container.closest('section');
+        if (section) section.hidden = container.children.length === 0;
+    }
+
     function apply() {
         var nodes = document.querySelectorAll('[data-event-date]');
         for (var i = 0; i < nodes.length; i++) {
-            var el = nodes[i];
-            if (isCompleted(el.getAttribute('data-event-date'))) {
-                el.classList.remove('is-upcoming');
-                el.classList.add('is-completed');
-            }
+            applyStatus(nodes[i], isCompleted(nodes[i].getAttribute('data-event-date')));
         }
 
-        var source = document.querySelector('[data-events-source]');
-        var upcomingList = document.querySelector('[data-events-upcoming]');
-        var pastList = document.querySelector('[data-events-past]');
+        var upcoming = document.querySelector('[data-events-upcoming]');
+        var past = document.querySelector('[data-events-past]');
+        if (!upcoming || !past) return;
 
-        if (source && upcomingList && pastList) {
-            var cards = source.querySelectorAll('[data-event-date]');
-            for (var j = 0; j < cards.length; j++) {
-                var card = cards[j];
-                if (card.classList.contains('is-completed')) {
-                    pastList.appendChild(card);
-                } else {
-                    upcomingList.appendChild(card);
-                }
-            }
+        move(staleCards(upcoming, true), past);
+        // Обратный случай: посетитель в часовом поясе западнее сборки, у него
+        // событие ещё не наступило.
+        move(staleCards(past, false), upcoming);
 
-            var upcomingSection = upcomingList.closest('section');
-            var pastSection = pastList.closest('section');
-            if (upcomingSection) {
-                upcomingSection.hidden = upcomingList.children.length === 0;
-            }
-            if (pastSection) {
-                pastSection.hidden = pastList.children.length === 0;
-            }
-            source.parentNode.removeChild(source);
-        }
+        hideIfEmpty(upcoming);
+        hideIfEmpty(past);
     }
 
     if (document.readyState === 'loading') {

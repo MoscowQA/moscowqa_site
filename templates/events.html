@@ -29,7 +29,9 @@
         {{ timepad.event_list(site) }}
 
         {% for event in events %}
-        <article class="event-card is-upcoming" data-event-date="{{ event.date }}">
+        {# Архив идёт одним списком, от свежих к старым; статус проставлен
+           на сборке, JS его только поправляет для посетителя (см. build.py). #}
+        <article class="event-card {{ 'is-completed' if event.completed else 'is-upcoming' }}" data-event-date="{{ event.date }}">
             <div class="event-card__inner">
                 <div class="event-card__badge{% if event.cover %} event-card__badge--cover{% endif %}" style="position: relative;">
                     {% if event.cover %}

@@ -1,0 +1,65 @@
+{#
+  Карточка события в списках главной.
+
+  Раньше эта разметка лежала прямо в index.html одним циклом: события шли
+  сплошным списком, а раскладывал их по «предстоящим» и «прошедшим» уже
+  браузер. Теперь списка два, они собираются на сборке (build.py,
+  `split_events`), и карточка стала макросом, чтобы не расходиться между ними.
+
+  `is-upcoming` / `is-completed` проставляются здесь же по `event.completed`;
+  static/js/events-status.js переключает их, если у посетителя дата уже другая.
+#}
+{% macro card(event, base, site, timepad, cover) %}
+<article class="event-card {{ 'is-completed' if event.completed else 'is-upcoming' }}"
+         data-event-date="{{ event.date }}">
+    <div class="event-card__inner">
+        <div class="event-card__badge{% if event.cover %} event-card__badge--cover{% endif %}" style="position: relative;">
+            {% if event.cover %}
+            {{ cover.cover(event, base, "event-card__cover") }}
+            {% else %}
+            <span class="event-card__number">{{ event.number }}</span>
+            <span class="event-card__label">MoscowQA</span>
+            {% endif %}
+            <span class="event-card__tag--upcoming js-upcoming-only">Предстоящее</span>
+        </div>
+        <div class="event-card__body">
+            <div class="event-card__meta">
+                <div class="event-card__meta-item">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/></svg>
+                    <time datetime="{{ event.date }}">{{ event.date }}</time>
+                </div>
+                {% if event.address %}
+                <div class="event-card__meta-item js-upcoming-only">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke-width="2"/><circle cx="12" cy="9" r="2.5" stroke-width="2"/></svg>
+                    <span>{{ event.address }}</span>
+                </div>
+                {% endif %}
+                {% if event.company %}
+                <div class="event-card__meta-item js-completed-only">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-width="2"/></svg>
+                    <span>{{ event.company }}</span>
+                </div>
+                {% endif %}
+            </div>
+            <h3 class="event-card__title">
+                <a href="{{ base }}/events/{{ event.slug }}/">{{ event.title }}</a>
+            </h3>
+            <p class="event-card__desc">{{ event.short_description }}</p>
+            <div class="event-card__actions">
+                {% if event.talks %}
+                <span class="event-card__tag event-card__tag--talks">
+                    {% set n = event.talks | length %}{{ n }} {% if n % 10 == 1 and n % 100 != 11 %}доклад{% elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}доклада{% else %}докладов{% endif %}
+                </span>
+                {% endif %}
+                {% if event.registration_link %}
+                {#- Timepad popup opens over the list; without the
+                    widget the link works as usual. -#}
+                {% set tp_trigger = timepad.trigger_class(event, site) %}
+                <a href="{{ event.registration_link }}" class="btn btn--green js-upcoming-only{{ ' ' ~ tp_trigger if tp_trigger }}" target="_blank" rel="noopener">Зарегистрироваться &rarr;</a>
+                {% endif %}
+                <a href="{{ base }}/events/{{ event.slug }}/" class="btn btn--pink">Подробнее &rsaquo;</a>
+            </div>
+        </div>
+    </div>
+</article>
+{% endmacro %}

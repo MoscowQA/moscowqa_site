@@ -4,7 +4,6 @@ number: 25
 date: "2026-07-03"
 company: "Ozon Tech"
 address: "Москва, Пресненская набережная, 10"
-completed: false
 type: "Offline + Online"
 short_description: "Митап совместно с командой Ozon Tech. Доклады про эволюцию QA в эпоху ИИ и автоматизацию API тестов без рук."
 registration_link: "https://moscowqa.timepad.ru/event/4046132/"

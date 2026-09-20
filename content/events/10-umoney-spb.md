@@ -4,7 +4,6 @@ number: 10
 date: "2025-03-27"
 company: "ЮMoney"
 address: "Санкт-Петербург, Пискарёвский проспект, 2к2, БЦ «Бенуа», 6 этаж"
-completed: true
 type: "Offline + Online"
 short_description: "Выездной митап Moscow QA в Санкт-Петербурге совместно с ЮMoney. Доклады об Allure Report 3, аудите автотестов и правильных вопросах в QA."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35q0uC60q7m9k0iLA6n0Upu"

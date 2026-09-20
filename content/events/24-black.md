@@ -4,7 +4,6 @@ number: 24
 date: "2026-05-21"
 company: ""
 address: "Москва, район м. Добрынинская"
-completed: false
 type: "Offline"
 short_description: "Благотворительный барный митап 18+. Все собранные средства пойдут на помощь котикам в приют. Острые темы, живое общение и офигенные спикеры!"
 registration_link: "https://moscowqa.timepad.ru/event/3973443/"

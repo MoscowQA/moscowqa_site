@@ -4,7 +4,6 @@ number: 5
 date: "2024-09-19"
 company: "X5 Tech"
 address: "Москва, Варшавское шоссе 33с12"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с X5 Tech. Доклады о soft skills, нейронных сетях в тестировании и построении QA-коммьюнити."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg36vUTDrX3ajnrv3Tg946QXY"
