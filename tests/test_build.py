@@ -5,6 +5,7 @@ URL, виджет регистрации не появляется, .ics не о
 Запуск: `make test` или `python3 -m pytest`.
 """
 import json
+import re
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -714,3 +715,90 @@ class TestLoadedEvents:
 
     def test_event_without_talks_has_no_speakers(self):
         assert build.event_speaker_names({}) == []
+
+
+# --- sitemap.xml ----------------------------------------------------------
+
+class TestSitemapLastmod:
+    TODAY = date(2026, 10, 1)
+
+    def test_takes_the_latest_date(self):
+        assert build.sitemap_lastmod(
+            ["2025-04-12", "2026-02-20", "2025-12-01"], self.TODAY) == "2026-02-20"
+
+    def test_future_dates_are_clipped_to_today(self):
+        # У предстоящего митапа `date` в будущем, а страница менялась не
+        # завтра. lastmod из будущего поисковики просто игнорируют.
+        assert build.sitemap_lastmod(["2026-12-05"], self.TODAY) == "2026-10-01"
+
+    def test_yaml_dates_and_empties_are_both_understood(self):
+        assert build.sitemap_lastmod(
+            [None, "", date(2026, 2, 20)], self.TODAY) == "2026-02-20"
+
+    def test_nothing_to_date_the_page_by(self):
+        # Лучше без lastmod, чем с выдуманным.
+        assert build.sitemap_lastmod([], self.TODAY) == ""
+        assert build.sitemap_lastmod([None, "не дата"], self.TODAY) == ""
+
+
+class TestGenerateSitemap:
+    """Хабы (главная, списки, теги) тоже должны датироваться, а не только события."""
+
+    EVENTS = [
+        {"slug": "2-two", "date": "2026-02-20", "talks": [
+            {"slug": "t2", "tag_links": [{"name": "api", "slug": "api"}],
+             "speakers": ["Аня"]},
+        ]},
+        {"slug": "1-one", "date": "2025-04-12", "talks": [
+            {"slug": "t1", "tag_links": [{"name": "api", "slug": "api"}],
+             "speakers": ["Боря"]},
+        ]},
+    ]
+    SPEAKERS = [
+        {"name": "Аня", "slug": "anya"},
+        {"name": "Боря", "slug": "borya", "external_talks": [
+            {"title": "Доклад на SQA Days", "date": "2026-05-30"},
+        ]},
+        {"name": "Вера", "slug": "vera"},  # в программкомитете, без докладов
+    ]
+    PAGES = {"about": {"title": "О сообществе", "updated": "2026-03-27"},
+             "cfp": {"title": "Стать спикером"}}
+
+    def sitemap(self, monkeypatch, today=date(2026, 10, 1)):
+        monkeypatch.setattr(build, "moscow_today", lambda *a, **kw: today)
+        tags = build.collect_tags(self.EVENTS)
+        xml = build.generate_sitemap(self.EVENTS, self.SPEAKERS, self.PAGES, tags)
+        return dict(re.findall(
+            r"<loc>(.*?)</loc>\s*(?:<lastmod>(.*?)</lastmod>)?", xml))
+
+    def test_every_url_but_the_undatable_ones_has_a_lastmod(self, monkeypatch):
+        urls = self.sitemap(monkeypatch)
+        undated = [loc for loc, mod in urls.items() if not mod]
+        # Вера без докладов и cfp без `updated` — датировать нечем.
+        assert sorted(undated) == [
+            f"{build.SITE_URL}/cfp/", f"{build.SITE_URL}/speakers/vera/"]
+
+    def test_hubs_take_the_date_of_their_freshest_item(self, monkeypatch):
+        urls = self.sitemap(monkeypatch)
+        assert urls[f"{build.SITE_URL}/"] == "2026-02-20"
+        assert urls[f"{build.SITE_URL}/events/"] == "2026-02-20"
+        assert urls[f"{build.SITE_URL}/tags/"] == "2026-02-20"
+        assert urls[f"{build.SITE_URL}/tags/api/"] == "2026-02-20"
+        # Список спикеров свежее самого митапа: у Бори есть доклад с SQA Days.
+        assert urls[f"{build.SITE_URL}/speakers/"] == "2026-05-30"
+        assert urls[f"{build.SITE_URL}/presentations/"] == "2026-05-30"
+
+    def test_speaker_page_counts_both_our_talks_and_the_external_ones(self, monkeypatch):
+        urls = self.sitemap(monkeypatch)
+        assert urls[f"{build.SITE_URL}/speakers/anya/"] == "2026-02-20"
+        assert urls[f"{build.SITE_URL}/speakers/borya/"] == "2026-05-30"
+
+    def test_static_page_is_dated_by_its_updated_field(self, monkeypatch):
+        urls = self.sitemap(monkeypatch)
+        assert urls[f"{build.SITE_URL}/about/"] == "2026-03-27"
+
+    def test_upcoming_event_is_not_dated_into_the_future(self, monkeypatch):
+        urls = self.sitemap(monkeypatch, today=date(2026, 1, 15))
+        assert urls[f"{build.SITE_URL}/events/2-two/"] == "2026-01-15"
+        assert urls[f"{build.SITE_URL}/events/2-two/talks/t2/"] == "2026-01-15"
+        assert urls[f"{build.SITE_URL}/events/1-one/"] == "2025-04-12"

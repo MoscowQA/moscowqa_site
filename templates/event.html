@@ -24,6 +24,9 @@
     <meta property="og:image:alt" content="{{ event.og_image_alt }}">
 {%- endif %}
 {%- endblock %}
+{# Широкая карточка — только когда картинка правда широкая: og_images.py
+   рисует 1200×630, свой `cover` у события тоже горизонтальный. #}
+{% block twitter_card %}{% if event.cover or event.og_image %}summary_large_image{% else %}summary{% endif %}{% endblock %}
 
 {# Разметка Event собирается в build.py (`event_schema`): у события много
    необязательных полей, и в шаблоне каждое из них — лишняя запятая, из-за

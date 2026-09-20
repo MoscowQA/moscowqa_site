@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Шапка и фон страницы — чёрные, пусть и адресная строка мобильного
+       браузера будет такой же, а не серой по умолчанию. #}
+    <meta name="theme-color" content="#000000">
     <script>document.documentElement.classList.add('has-js');</script>
     <title>{% block title %}{{ site.title }}{% endblock %}</title>
     <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
@@ -15,6 +18,12 @@
     <meta property="og:site_name" content="{{ site.title }}">
     <meta property="og:locale" content="ru_RU">
     {% block og_image %}{% endblock %}
+    {# X (Twitter) единственный из соцсетей не читает Open Graph без
+       twitter:card: без этого тега ссылка разворачивается голой строкой.
+       Остальное — заголовок, описание, картинку — он дочитывает из og:*,
+       поэтому дублировать их в twitter:* незачем. Страницы события отдают
+       карточку 1200×630 и переопределяют блок на summary_large_image. #}
+    <meta name="twitter:card" content="{% block twitter_card %}summary{% endblock %}">
     {# Inter лежит у нас, а не на fonts.googleapis.com: без похода на чужой
        CDN и без лишнего запроса за его CSS. Файлы и fonts.css собирает
        scripts/fetch_fonts.py (make fonts), подробности — в

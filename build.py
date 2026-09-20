@@ -810,25 +810,86 @@ def load_pages() -> dict:
     return pages
 
 
+def sitemap_lastmod(values, today: date) -> str:
+    """<lastmod> страницы: самая поздняя дата её содержимого, но не позже «сегодня».
+
+    lastmod отвечает на вопрос «когда страница менялась в последний раз»,
+    поэтому дата из будущего для него не годится — а у предстоящего события
+    в `date` именно она. Поисковики такой lastmod игнорируют, то есть без
+    обрезки выходит тот же «нет lastmod», только молча. Обрезка по «сегодня»
+    заодно двигает дату, когда анонсируют новый митап: краулеру есть повод
+    перезайти на главную и на страницы его спикеров.
+
+    Пустой строкой отвечаем, когда датировать страницу нечем — выдуманный
+    lastmod хуже отсутствующего.
+    """
+    known = [d for d in (parse_event_date(v) for v in values) if d]
+    if not known:
+        return ""
+    return min(max(known), today).isoformat()
+
+
 def generate_sitemap(events, speakers, pages, tags=()):
-    """Generate sitemap.xml for search engines."""
-    today = date.today().isoformat()
+    """Generate sitemap.xml for search engines.
+
+    lastmod считается из контента, а не из mtime файлов: в CI репозиторий
+    клонируется заново, и mtime там у всех одинаковый — время сборки. Дата
+    страницы — это дата самого свежего, что на ней показано: митап, доклад
+    спикера, событие с этим тегом.
+    """
+    today = moscow_today()
     urls = []
 
+    # Доклады спикера на наших митапах — половина его страницы; вторая
+    # половина, external_talks, приезжает с конференций (make sync).
+    talks_by_speaker = build_talks_by_speaker(events)
+
+    events_lastmod = sitemap_lastmod((e.get("date") for e in events), today)
+
+    speaker_lastmod = {}
+    for speaker in speakers:
+        dates = [t.get("date") for t in speaker.get("external_talks") or []]
+        dates += [
+            talk["event"].get("date")
+            for talk in talks_by_speaker.get(speaker.get("name", ""), [])
+        ]
+        speaker_lastmod[speaker["slug"]] = sitemap_lastmod(dates, today)
+
+    tag_lastmod = {
+        tag["slug"]: sitemap_lastmod(
+            (talk["event"].get("date") for talk in tag.get("talks", [])), today
+        )
+        for tag in tags
+    }
+
     # Index page
-    urls.append({"loc": f"{SITE_URL}/", "changefreq": "weekly", "priority": "1.0"})
+    urls.append({"loc": f"{SITE_URL}/", "lastmod": events_lastmod,
+                 "changefreq": "weekly", "priority": "1.0"})
     # Events list
-    urls.append({"loc": f"{SITE_URL}/events/", "changefreq": "weekly", "priority": "0.9"})
+    urls.append({"loc": f"{SITE_URL}/events/", "lastmod": events_lastmod,
+                 "changefreq": "weekly", "priority": "0.9"})
     # Speakers list
-    urls.append({"loc": f"{SITE_URL}/speakers/", "changefreq": "weekly", "priority": "0.8"})
+    urls.append({"loc": f"{SITE_URL}/speakers/",
+                 "lastmod": sitemap_lastmod(speaker_lastmod.values(), today),
+                 "changefreq": "weekly", "priority": "0.8"})
     # Presentations (external talks aggregator)
-    urls.append({"loc": f"{SITE_URL}/presentations/", "changefreq": "weekly", "priority": "0.75"})
+    urls.append({
+        "loc": f"{SITE_URL}/presentations/",
+        "lastmod": sitemap_lastmod(
+            (t.get("date")
+             for s in speakers
+             for t in s.get("external_talks") or []),
+            today,
+        ),
+        "changefreq": "weekly",
+        "priority": "0.75",
+    })
 
     # Individual events
     for event in events:
         urls.append({
             "loc": f"{SITE_URL}/events/{event['slug']}/",
-            "lastmod": event.get("date", today),
+            "lastmod": sitemap_lastmod([event.get("date")], today),
             "changefreq": "monthly",
             "priority": "0.7",
         })
@@ -838,7 +899,7 @@ def generate_sitemap(events, speakers, pages, tags=()):
         for talk in event.get("talks", []):
             urls.append({
                 "loc": f"{SITE_URL}/events/{event['slug']}/talks/{talk['slug']}/",
-                "lastmod": event.get("date", today),
+                "lastmod": sitemap_lastmod([event.get("date")], today),
                 "changefreq": "monthly",
                 "priority": "0.65",
             })
@@ -847,6 +908,7 @@ def generate_sitemap(events, speakers, pages, tags=()):
     for speaker in speakers:
         urls.append({
             "loc": f"{SITE_URL}/speakers/{speaker['slug']}/",
+            "lastmod": speaker_lastmod.get(speaker["slug"], ""),
             "changefreq": "monthly",
             "priority": "0.6",
         })
@@ -855,20 +917,25 @@ def generate_sitemap(events, speakers, pages, tags=()):
     if tags:
         urls.append({
             "loc": f"{SITE_URL}/tags/",
+            "lastmod": sitemap_lastmod(tag_lastmod.values(), today),
             "changefreq": "weekly",
             "priority": "0.6",
         })
         for tag in tags:
             urls.append({
                 "loc": f"{SITE_URL}/tags/{tag['slug']}/",
+                "lastmod": tag_lastmod.get(tag["slug"], ""),
                 "changefreq": "monthly",
                 "priority": "0.55",
             })
 
-    # Extra pages
-    for slug in pages:
+    # Extra pages. Своей даты в контенте у «О сообществе» и соседей нет —
+    # берём её из необязательного поля `updated` во front matter. Не
+    # заполнили — lastmod не выдумываем.
+    for slug, page in pages.items():
         urls.append({
             "loc": f"{SITE_URL}/{slug}/",
+            "lastmod": sitemap_lastmod([page.get("updated")], today),
             "changefreq": "monthly",
             "priority": "0.5",
         })
@@ -878,7 +945,7 @@ def generate_sitemap(events, speakers, pages, tags=()):
     for u in urls:
         lines.append("  <url>")
         lines.append(f"    <loc>{u['loc']}</loc>")
-        if "lastmod" in u:
+        if u.get("lastmod"):
             lines.append(f"    <lastmod>{u['lastmod']}</lastmod>")
         lines.append(f"    <changefreq>{u['changefreq']}</changefreq>")
         lines.append(f"    <priority>{u['priority']}</priority>")
