@@ -18,7 +18,7 @@ DIST := dist
 
 .PHONY: help install install-dev install-parsers venv build serve clean check test validate \
 	sync sync-dry sync-heisenbug sync-sqadays \
-	collect-heisenbug collect-sqadays photo photos covers og
+	collect-heisenbug collect-sqadays photo photos covers og fonts
 
 help: ## Показать этот список
 	@awk 'BEGIN {FS = ":.*##"} \
@@ -102,3 +102,6 @@ covers: ## Пересобрать webp-варианты обложек собы�
 
 og: ## Посмотреть og-обложки событий в og-preview/ (ARGS="28-black")
 	$(PYTHON) og_images.py --out og-preview $(ARGS)
+
+fonts: ## Перекачать Inter с Google Fonts к себе и пересобрать fonts.css
+	$(PYTHON) scripts/fetch_fonts.py $(ARGS)

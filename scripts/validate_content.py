@@ -10,7 +10,8 @@
   **каждое имя в `talks[].speakers` дословно совпадает с `name` спикера**
   (иначе доклад молча не свяжется с профилем);
 * спикеры — уникальные имена, фото лежит у нас и оба варианта на месте;
-* собранный `dist/` — внутренние ссылки ведут на существующие страницы.
+* собранный `dist/` — внутренние ссылки ведут на существующие страницы,
+  а `fonts.css` ссылается на наши woff2, а не на чужой CDN.
 
 Ошибки (`ОШИБКА`) роняют проверку, замечания (`ВНИМАНИЕ`) — нет.
 
@@ -243,6 +244,31 @@ def check_links(dist: Path) -> None:
                 error(f"dist/{where}", f"битая внутренняя ссылка: {link}")
 
 
+def check_fonts(dist: Path) -> None:
+    """Каждый url() из fonts.css лежит в сборке.
+
+    fonts.css собирает scripts/fetch_fonts.py, и если у Google поменяется
+    набор подмножеств, CSS поедет вперёд файлов. Ссылка на пропавший woff2
+    видна только в консоли браузера — страница молча съезжает на фолбэк.
+    """
+    css = dist / "static" / "css" / "fonts.css"
+    if not css.is_file():
+        error("dist/static/css/fonts.css", "не собрался (нужен make fonts)")
+        return
+
+    urls = re.findall(r"url\(['\"]?([^'\")]+)['\"]?\)", css.read_text(encoding="utf-8"))
+    if not urls:
+        error("dist/static/css/fonts.css", "нет ни одного @font-face с url()")
+        return
+
+    for url in sorted(set(urls)):
+        if url.startswith(("http://", "https://", "//")):
+            error("dist/static/css/fonts.css",
+                  f"шрифт грузится со стороны, а должен лежать у нас: {url}")
+        elif not (css.parent / url).resolve().is_file():
+            error("dist/static/css/fonts.css", f"нет файла шрифта: {url}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--no-links", action="store_true",
@@ -255,6 +281,7 @@ def main() -> None:
     check_events(speakers)
     if not args.no_links:
         check_links(args.dist)
+        check_fonts(args.dist)
 
     for line in warnings:
         print(line)

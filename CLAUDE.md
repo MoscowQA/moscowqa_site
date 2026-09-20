@@ -61,6 +61,21 @@ make                   # список всех целей
   из них сборка соберёт `<picture>`. Исходник при этом остаётся на месте — он
   уходит в og:image, куда webp кладут не все соцсети. `make validate` ругнётся
   замечанием, если варианты забыли собрать.
+- **Шрифт лежит у нас.** Inter больше не приезжает с `fonts.googleapis.com`:
+  woff2 лежат в `static/fonts/inter/`, `@font-face` на них — в
+  `static/css/fonts.css`, его подключает `templates/base.html`. Шрифт
+  вариативный, так что все начертания 400–800 — это один файл на
+  подмножество; `unicode-range` от Google остался, поэтому русской странице
+  достаются только `cyrillic` и `latin` (их же `base.html` предзагружает).
+  Файл `fonts.css` генерируется — руками его не правим:
+  ```bash
+  make fonts                   # перекачать шрифт и пересобрать fonts.css
+  make fonts ARGS=--dry-run
+  ```
+  Ссылки на шрифт в HTML и все `url()` из `fonts.css` проверяет
+  `make validate`. Подробности — в [`static/fonts/inter/README.md`](./static/fonts/inter/README.md).
+  Отдельно живёт `assets/fonts/Inter.ttf` — тот же шрифт для og-обложек
+  (`og_images.py`), на сайт он не уезжает.
 - **Фото спикеров лежат у нас.** В `static/images/speakers/` для каждого спикера два webp: `{слаг}.webp` (~1080px) и `{слаг}-540.webp`; из них сборка собирает `srcset`. Внешние ссылки в `photo` не оставляем — если прислали URL, прогоните:
   ```bash
   make photos ARGS="ivan-ivanov"     # скачает, сожмёт и перепишет photo

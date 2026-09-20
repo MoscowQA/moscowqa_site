@@ -15,9 +15,14 @@
     <meta property="og:site_name" content="{{ site.title }}">
     <meta property="og:locale" content="ru_RU">
     {% block og_image %}{% endblock %}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    {# Inter лежит у нас, а не на fonts.googleapis.com: без похода на чужой
+       CDN и без лишнего запроса за его CSS. Файлы и fonts.css собирает
+       scripts/fetch_fonts.py (make fonts), подробности — в
+       static/fonts/inter/README.md. Предзагружаем два подмножества, которые
+       нужны каждой странице: кириллицу и латиницу. #}
+    <link rel="preload" href="{{ base }}/static/fonts/inter/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ base }}/static/fonts/inter/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ base }}/static/css/fonts.css">
     <link rel="stylesheet" href="{{ base }}/static/css/styles.css">
     <link rel="icon" href="{{ base }}/static/images/logo.png">
     {% block structured_data %}{% endblock %}
