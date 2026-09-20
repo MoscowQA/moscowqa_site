@@ -147,9 +147,108 @@
         for (var m = 0; m < lazy.length; m++) observer.observe(lazy[m]);
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', apply);
-    } else {
+    /* --- Фон под попапом ----------------------------------------------
+     *
+     * Форму регистрации Timepad открывает поверх страницы, но саму страницу
+     * при этом не блокирует: колесо мыши прокручивает фон, а попап остаётся
+     * там, где его открыли, и уезжает за край экрана.
+     *
+     * Ни события «попап открылся», ни своих классов Timepad наружу не отдаёт
+     * (в bindEvents только события отрисовки — dev.timepad.ru/widget/
+     * bind-to-event), так что опираемся на то, что видно из DOM: своих
+     * iframe у сайта нет, значит крупный видимый iframe вне блоков
+     * встроенной формы и афиши — это и есть попап.
+     */
+
+    var LOCK_CLASS = 'timepad-popup-open';
+    // Служебные iframe загрузчика — нулевого размера, форма заметно больше.
+    var POPUP_MIN_SIZE = 200;
+    // Попап могут не удалить, а спрятать; об этом MutationObserver
+    // рассказывает не всегда, поэтому пока замок стоит — переспрашиваем.
+    var RECHECK_MS = 500;
+
+    var locked = false;
+    var recheckTimer = null;
+
+    function popupFrame() {
+        var frames = document.querySelectorAll('iframe');
+        for (var i = 0; i < frames.length; i++) {
+            var holder = frames[i].closest('[data-timepad-widget]');
+            // Встроенная форма и афиша живут в своих блоках прямо на
+            // странице — это не попап, и блокировать из-за них нечего.
+            if (holder && !holder.classList.contains('timepad-widget--popup')) continue;
+            var rect = frames[i].getBoundingClientRect();
+            if (rect.width >= POPUP_MIN_SIZE && rect.height >= POPUP_MIN_SIZE) {
+                return frames[i];
+            }
+        }
+        return null;
+    }
+
+    /* Попап выше окна блокировкой не вылечить: если он стоит в потоке
+       страницы, остаток формы станет недосягаем — а это уже не косметика,
+       а несделанная регистрация. Пусть в таком случае фон лучше ездит. */
+    function fitsInWindow(frame) {
+        return frame.getBoundingClientRect().height <= document.documentElement.clientHeight;
+    }
+
+    function lockBackground() {
+        if (locked) return;
+        locked = true;
+        // Полоса прокрутки исчезает вместе со скроллом — компенсируем, иначе
+        // страница под попапом дёрнется вправо на её ширину.
+        var gap = window.innerWidth - document.documentElement.clientWidth;
+        if (gap > 0) document.body.style.paddingRight = gap + 'px';
+        document.documentElement.classList.add(LOCK_CLASS);
+        recheckTimer = setInterval(sync, RECHECK_MS);
+    }
+
+    function unlockBackground() {
+        if (!locked) return;
+        locked = false;
+        clearInterval(recheckTimer);
+        recheckTimer = null;
+        document.documentElement.classList.remove(LOCK_CLASS);
+        document.body.style.paddingRight = '';
+    }
+
+    function sync() {
+        var frame = popupFrame();
+        if (frame && fitsInWindow(frame)) lockBackground();
+        else unlockBackground();
+    }
+
+    function watchPopups() {
+        if (typeof MutationObserver !== 'function') return;
+
+        var scheduled = false;
+        function schedule() {
+            if (scheduled) return;
+            scheduled = true;
+            // Попап появляется пачкой изменений — пересчитываем раз за кадр.
+            var run = function () { scheduled = false; sync(); };
+            if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+            else setTimeout(run, 16);
+        }
+
+        new MutationObserver(schedule).observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class', 'hidden']
+        });
+        // Окно могли уменьшить так, что попап перестал помещаться.
+        window.addEventListener('resize', schedule);
+    }
+
+    function init() {
         apply();
+        watchPopups();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 })();
