@@ -196,13 +196,30 @@ class TestCalendarSpan:
             {"date": "2026-10-01", "time": "18:00"})
         assert all_day is False
         assert start == datetime(2026, 10, 1, 15, 0, tzinfo=timezone.utc)
-        # Без end_time берётся три часа.
-        assert end == datetime(2026, 10, 1, 18, 0, tzinfo=timezone.utc)
+        # Без end_time митап заканчивается в 22:00 по Москве.
+        assert end == datetime(2026, 10, 1, 19, 0, tzinfo=timezone.utc)
 
     def test_explicit_end_time(self):
         start, end, _ = build.event_calendar_span(
             {"date": "2026-10-01", "time": "18:00", "end_time": "22:00"})
         assert (end - start).seconds == 4 * 3600
+
+    def test_default_end_is_22_00_moscow(self):
+        """Митапы заканчиваются в 22:00 — это и есть дефолт, а не «+3 часа»."""
+        moscow = timezone(build.MOSCOW_OFFSET)
+        for time_of_day, hours in (("18:00", 4), ("19:00", 3), ("21:30", 0.5)):
+            start, end, _ = build.event_calendar_span(
+                {"date": "2026-10-01", "time": time_of_day})
+            assert end.astimezone(moscow).strftime("%H:%M") == "22:00"
+            assert (end - start).total_seconds() == hours * 3600
+
+    def test_start_at_or_after_22_falls_back_to_a_duration(self):
+        # 22:00 уже прошло, концом события быть не может — берём три часа.
+        for time_of_day in ("22:00", "23:00"):
+            start, end, _ = build.event_calendar_span(
+                {"date": "2026-10-01", "time": time_of_day})
+            assert end > start
+            assert (end - start) == build.FALLBACK_EVENT_DURATION
 
     def test_end_past_midnight_moves_to_next_day(self):
         start, end, _ = build.event_calendar_span(
@@ -239,7 +256,7 @@ class TestIcs:
     def test_timed_event_in_utc(self):
         ics = self.unfold(self.make(time="18:00"))
         assert "DTSTART:20261001T150000Z" in ics
-        assert "DTEND:20261001T180000Z" in ics
+        assert "DTEND:20261001T190000Z" in ics
 
     def test_stable_uid_and_stamp(self):
         ics = self.unfold(self.make())
@@ -281,7 +298,7 @@ class TestGoogleCalendarUrl:
         url = build.google_calendar_url(
             {"title": "Moscow QA #28", "date": "2026-10-01", "time": "18:00"},
             "https://moscowqa.ru/")
-        assert "dates=20261001T150000Z%2F20261001T180000Z" in url
+        assert "dates=20261001T150000Z%2F20261001T190000Z" in url
 
     def test_location_included_when_known(self):
         url = build.google_calendar_url(
@@ -431,8 +448,8 @@ class TestEventSchemaDates:
     def test_time_is_written_in_moscow_time(self):
         dates = build.event_schema_dates({"date": "2026-10-01", "time": "18:00"})
         assert dates["startDate"] == "2026-10-01T18:00:00+03:00"
-        # Без end_time берётся та же длительность, что и для календаря.
-        assert dates["endDate"] == "2026-10-01T21:00:00+03:00"
+        # Без end_time — то же время окончания, что и в календаре.
+        assert dates["endDate"] == "2026-10-01T22:00:00+03:00"
 
     def test_explicit_end_time(self):
         dates = build.event_schema_dates(

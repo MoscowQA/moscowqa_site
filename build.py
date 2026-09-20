@@ -137,7 +137,13 @@ MOSCOW_OFFSET = timedelta(hours=3)
 # `end_time`) turns the calendar entry into a real interval; without it the
 # entry is an all-day one, which is the honest rendering of "we announced the
 # day, not the hour".
-DEFAULT_EVENT_DURATION = timedelta(hours=3)
+#
+# Митапы заканчиваются в 22:00 — это и есть время окончания, когда его не
+# указали явно.
+DEFAULT_END_TIME = time(22, 0)
+# Подстраховка на случай, когда митап начинается в 22:00 или позже: 22:00
+# к этому моменту уже прошло, и концом события быть не может.
+FALLBACK_EVENT_DURATION = timedelta(hours=3)
 
 TIME_RE = re.compile(r"^(\d{1,2})[:.](\d{2})$")
 
@@ -189,7 +195,13 @@ def event_calendar_span(event: dict):
     start = datetime.combine(day, start_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
     end_time = parse_event_time(event.get("end_time"))
     if end_time is None:
-        return start, start + DEFAULT_EVENT_DURATION, False
+        default_end = (
+            datetime.combine(day, DEFAULT_END_TIME, tzinfo=timezone.utc)
+            - MOSCOW_OFFSET
+        )
+        if default_end <= start:
+            return start, start + FALLBACK_EVENT_DURATION, False
+        return start, default_end, False
 
     end = datetime.combine(day, end_time, tzinfo=timezone.utc) - MOSCOW_OFFSET
     if end <= start:
