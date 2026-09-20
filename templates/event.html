@@ -12,7 +12,18 @@
 {% block title %}{{ event.title }} — митап по тестированию в Москве — {{ site.title }}{% endblock %}
 {% block description %}{{ event.short_description | default(event.title ~ ' — митап по тестированию в Москве от сообщества Moscow QA, ' ~ event.date) }}{% endblock %}
 {% block og_type %}article{% endblock %}
-{% block og_image %}{% if event.cover %}<meta property="og:image" content="{{ site_url }}{{ event.cover }}">{% endif %}{% endblock %}
+{# Своя обложка события важнее нарисованной: её рисовали под конкретную
+   активность. Если её нет, сборка кладёт сюда карточку из og_images.py —
+   размеры известны заранее, поэтому их можно отдать вместе со ссылкой. #}
+{% block og_image %}
+{%- if event.cover %}<meta property="og:image" content="{{ site_url }}{{ event.cover }}">
+{%- elif event.og_image %}<meta property="og:image" content="{{ site_url }}{{ event.og_image }}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="{{ og_image_width }}">
+    <meta property="og:image:height" content="{{ og_image_height }}">
+    <meta property="og:image:alt" content="{{ event.og_image_alt }}">
+{%- endif %}
+{%- endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">

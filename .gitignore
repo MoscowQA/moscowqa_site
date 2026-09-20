@@ -1,4 +1,5 @@
 dist/
+og-preview/
 __pycache__/
 *.pyc
 .venv/

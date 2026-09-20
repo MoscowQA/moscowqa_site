@@ -15,6 +15,8 @@ from urllib.parse import urlencode
 from jinja2 import Environment, FileSystemLoader
 from PIL import Image
 
+import og_images
+
 # Completed vs. upcoming status is now determined on the frontend in
 # static/js/events-status.js, based on the visitor's current date. The build
 # step intentionally does not set `event.completed`; templates render both
@@ -677,9 +679,18 @@ def build():
     # Topic tags: talks grouped by the `tags` of their front matter.
     tags = collect_tags(events)
 
+    # Link-preview covers. An event with its own `cover` keeps it; the rest
+    # get a card drawn from their front matter, and `event["og_image"]` is
+    # what templates/event.html puts into og:image. See og_images.py.
+    og_count = og_images.generate_event_cards(
+        events, OUTPUT_DIR, speaker_by_name, STATIC_DIR / "images" / "logo.png"
+    )
+
     common = {"site": site, "events": events, "speakers": speakers, "base": BASE_URL,
               "speaker_slugs": speaker_slugs, "speaker_by_name": speaker_by_name,
-              "site_url": SITE_URL, "tags": tags}
+              "site_url": SITE_URL, "tags": tags,
+              "og_image_width": og_images.WIDTH,
+              "og_image_height": og_images.HEIGHT}
 
     # Build index page
     tpl = env.get_template("index.html")
@@ -861,6 +872,8 @@ def build():
     )
     print(f"Built {len(events)} events, {talk_count} talks, {len(speakers)} speakers, {len(pages)} pages")
     print(f"Tags: {len(tags)} topics, {tagged_talks}/{talk_count} talks tagged")
+    print(f"OG covers: {og_count} generated, "
+          f"{len(events) - og_count} events with their own cover")
     if TIMEPAD_WIDGET_ENABLED:
         print(f"Timepad widget: {widget_count}/{len(events)} events, "
               f"list widget {'on' if site['timepad_widget']['list_enabled'] else 'off'}")
