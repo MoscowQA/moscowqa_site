@@ -4,7 +4,6 @@ number: 16
 date: "2025-10-08"
 company: ""
 address: "Москва, район м. Китай-город"
-completed: true
 type: "Offline"
 short_description: "Митап в барном формате 18+. Острые темы, живое общение: о скрытой работе во Flipper Zero, 13 годах в QA и уроках из провалов на проде."
 photos_link: "https://vk.com/album-227064516_310370170"

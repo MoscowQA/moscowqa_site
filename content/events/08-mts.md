@@ -4,7 +4,6 @@ number: 8
 date: "2024-12-13"
 company: "МТС Диджитал"
 address: "Москва, пр-т Андропова 18к1, МТС банк, 1 этаж, Медиарум"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с МТС Диджитал. Доклады о разработке железа Flipper Zero, асинхронности в автоматизации и публичных выступлениях."
 registration_link: "https://moscowqa.timepad.ru/event/3140171/"

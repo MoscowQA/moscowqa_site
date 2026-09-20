@@ -4,7 +4,6 @@ number: 9
 date: "2025-02-27"
 company: "МТС Финтех"
 address: "Москва, пр-т Андропова 18к1, МТС банк, 1 этаж, Медиарум"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с МТС Финтех. Доклады о юнит-тестах с Jest и Testing Library, мультипротокольном подходе к управлению качеством и самоорганизации QA без лидов."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35uGkEp2cuNIx7ky33dGsAO"

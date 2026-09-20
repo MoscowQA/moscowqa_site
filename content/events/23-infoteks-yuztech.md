@@ -4,7 +4,6 @@ number: 23
 date: "2026-04-09"
 company: "ИнфоТеКС и ГК «Юзтех»"
 address: "Москва, Отрадная ул., 2Б, стр. 1"
-completed: false
 type: "Offline + Online"
 short_description: "Митап совместно с ИнфоТеКС и ГК «Юзтех». Доклады о работе единственным QA на проекте, тестировании FIX-протокола и осознанной рутине в QA."
 registration_link: "https://moscowqa.timepad.ru/event/3892468/"

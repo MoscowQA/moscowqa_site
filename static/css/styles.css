@@ -377,6 +377,148 @@ img { max-width: 100%; height: auto; }
     margin-bottom: 2rem;
 }
 
+/* === Ближайший митап (первый экран главной) === */
+/* Блок отвечает на вопрос, с которым сюда приходят. Когда впереди ничего
+   нет, он же показывает последний прошедший митап — подпись и кнопки
+   переключаются через .is-upcoming / .is-completed. */
+.next-event .container {
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+}
+
+.next-event__box {
+    background: linear-gradient(135deg, var(--pink-light) 0%, rgba(124, 58, 237, 0.09) 100%);
+    border: 1px solid var(--gray-200);
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow-lg);
+    padding: 1.75rem;
+}
+
+.next-event__label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--pink);
+    margin-bottom: 1.25rem;
+}
+
+.next-event__inner {
+    display: flex;
+    gap: 1.75rem;
+    align-items: flex-start;
+}
+
+.next-event__visual {
+    flex: 0 0 15rem;
+    align-self: stretch;
+    min-height: 12rem;
+    background: linear-gradient(135deg, var(--pink) 0%, #ec4899 50%, var(--purple) 100%);
+    color: #fff;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.next-event__visual--cover {
+    background: #000;
+}
+
+/* Обложка — <img> или <picture>, отсюда правила и для вложенного <img>
+   (см. templates/partials/cover.html). */
+.next-event__cover,
+.next-event__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.next-event__number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.next-event__body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.next-event__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.875rem;
+}
+
+.next-event__title a {
+    color: var(--gray-900);
+    text-decoration: none;
+}
+
+.next-event__title a:hover {
+    color: var(--pink);
+    text-decoration: none;
+}
+
+.next-event__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    color: var(--gray-600);
+    font-size: 0.9375rem;
+    margin-bottom: 1rem;
+}
+
+.next-event__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.next-event__desc {
+    color: var(--gray-700);
+    margin-bottom: 0.875rem;
+}
+
+.next-event__speakers {
+    color: var(--gray-600);
+    font-size: 0.9375rem;
+    margin-bottom: 1.5rem;
+}
+
+.next-event__speakers-label {
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.next-event__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .next-event__box {
+        padding: 1.25rem;
+    }
+    .next-event__inner {
+        flex-direction: column;
+    }
+    .next-event__visual {
+        flex: 0 0 auto;
+        width: 100%;
+        align-self: auto;
+        min-height: 10rem;
+    }
+    .next-event__title {
+        font-size: 1.5rem;
+    }
+}
+
 /* === Event Card === */
 .event-card {
     background: #fff;
@@ -1533,16 +1675,11 @@ img { max-width: 100%; height: auto; }
     }
 }
 
-/* === Frontend-determined event status === */
-/* Templates render every event as `.is-upcoming` by default and
-   static/js/events-status.js flips past events to `.is-completed`
-   based on the visitor's local date. */
+/* === Статус события === */
+/* Проставляется на сборке (build.py) и поправляется на дату посетителя
+   в static/js/events-status.js. */
 .is-upcoming .js-completed-only { display: none !important; }
 .is-completed .js-upcoming-only { display: none !important; }
-
-/* When JS is available, hide the flat source list while the partitioning
-   script runs. Without JS, the source section stays visible as a fallback. */
-.has-js [data-events-source] { display: none; }
 
 /* === Timepad widget === */
 /* Placeholder rendered by templates/partials/timepad.html; the embed code is

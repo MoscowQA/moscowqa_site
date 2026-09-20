@@ -17,10 +17,15 @@ from PIL import Image
 
 import og_images
 
-# Completed vs. upcoming status is now determined on the frontend in
-# static/js/events-status.js, based on the visitor's current date. The build
-# step intentionally does not set `event.completed`; templates render both
-# states and let JS toggle `.is-upcoming` / `.is-completed` classes.
+# Прошло событие или ещё нет — считается здесь, на сборке, по `date`.
+# Раньше это делал только фронтенд (static/js/events-status.js): без JS и для
+# краулера главная была плоским списком, где все 29 митапов помечены
+# «Предстоящее». Чтобы разбивка не устаревала между деплоями, сайт
+# пересобирается каждую ночь (.github/workflows/deploy.yml).
+#
+# JS остался поправкой на те часы, что проходят между ночной сборкой и
+# визитом: он перекладывает карточку, если событие успело закончиться, и
+# переключает `.is-upcoming` / `.is-completed` по дате самого посетителя.
 
 ROOT = Path(__file__).parent
 CONTENT_DIR = ROOT / "content"
@@ -210,6 +215,36 @@ def event_calendar_span(event: dict):
     return start, end, False
 
 
+def moscow_today(now: datetime = None) -> date:
+    """Сегодняшняя дата по Москве.
+
+    Сборка идёт на раннере в UTC. Без поправки вечерний деплой (после 21:00
+    UTC — это уже завтра в Москве) считал бы сегодняшним вчерашний день и
+    держал вчерашний митап в предстоящих.
+    """
+    now = now or datetime.now(timezone.utc)
+    return (now + MOSCOW_OFFSET).date()
+
+
+def event_completed(event: dict, today: date) -> bool:
+    """Прошло ли событие. День самого митапа считается предстоящим."""
+    day = parse_event_date(event.get("date"))
+    return day is not None and day < today
+
+
+def split_events(events: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Разделить события на предстоящие и прошедшие.
+
+    Предстоящие идут ближайшим вперёд — их читают как план. Прошедшие
+    остаются в порядке `events`, от свежих к старым: это архив.
+    """
+    upcoming = sorted(
+        (e for e in events if not e.get("completed")),
+        key=lambda e: e.get("date", ""),
+    )
+    return upcoming, [e for e in events if e.get("completed")]
+
+
 def escape_ics_text(value: str) -> str:
     """Escape a value for an iCalendar TEXT field (RFC 5545 §3.3.11)."""
     return (
@@ -386,27 +421,32 @@ def event_offers(event: dict, url: str) -> dict:
     }
 
 
+def event_speaker_names(event: dict) -> list[str]:
+    """Имена спикеров события в порядке программы, без повторов."""
+    names = []
+    for talk in event.get("talks") or []:
+        for name in talk.get("speakers") or []:
+            name = str(name).strip()
+            if name and name not in names:
+                names.append(name)
+    return names
+
+
 def event_performers(event: dict, speaker_by_name: dict = None) -> list[dict]:
     """Спикеры события как `performer`, без повторов и в порядке программы."""
     speaker_by_name = speaker_by_name or {}
     performers = []
-    seen = set()
-    for talk in event.get("talks") or []:
-        for name in talk.get("speakers") or []:
-            name = str(name).strip()
-            if not name or name in seen:
-                continue
-            seen.add(name)
-            person = {"@type": "Person", "name": name}
-            profile = speaker_by_name.get(name) or {}
-            if profile.get("slug"):
-                person["url"] = f"{SITE_URL}/speakers/{profile['slug']}/"
-            if profile.get("company"):
-                person["worksFor"] = {
-                    "@type": "Organization",
-                    "name": profile["company"],
-                }
-            performers.append(person)
+    for name in event_speaker_names(event):
+        person = {"@type": "Person", "name": name}
+        profile = speaker_by_name.get(name) or {}
+        if profile.get("slug"):
+            person["url"] = f"{SITE_URL}/speakers/{profile['slug']}/"
+        if profile.get("company"):
+            person["worksFor"] = {
+                "@type": "Organization",
+                "name": profile["company"],
+            }
+        performers.append(person)
     return performers
 
 
@@ -701,6 +741,7 @@ def parse_md_file(filepath: Path) -> dict:
 def load_events() -> list[dict]:
     """Load all event markdown files, sorted by date descending."""
     events_dir = CONTENT_DIR / "events"
+    today = moscow_today()
     events = []
     if events_dir.exists():
         for f in events_dir.glob("*.md"):
@@ -736,9 +777,10 @@ def load_events() -> list[dict]:
                 event, f"{SITE_URL}/events/{event['slug']}/"
             )
 
-            # Note: past-vs-upcoming detection has moved to the browser
-            # (static/js/events-status.js). Templates emit `data-event-date`
-            # on cards and JS applies `.is-completed` / `.is-upcoming`.
+            # Поле `completed` во front matter (если осталось от старых
+            # файлов) не читаем: оно устаревало молча. Считаем по дате.
+            event["completed"] = event_completed(event, today)
+            event["speaker_names"] = event_speaker_names(event)
             events.append(event)
     events.sort(key=lambda e: e.get("date", ""), reverse=True)
     return events
@@ -859,6 +901,9 @@ def build():
     # Set up Jinja2
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
     env.policies["json.dumps_kwargs"] = {"ensure_ascii": False}
+    # «2026-10-01» → «1 октября 2026». Нужен блоку «Ближайший митап»: в
+    # списках дата остаётся в ISO, а на первом экране её читают глазами.
+    env.filters["ru_date"] = og_images.format_date
 
     # Load data
     events = load_events()
@@ -913,10 +958,22 @@ def build():
               "og_image_width": og_images.WIDTH,
               "og_image_height": og_images.HEIGHT}
 
+    upcoming_events, past_events = split_events(events)
+
+    # Главная открывается одним событием: ближайшим, а когда впереди ничего
+    # нет — последним прошедшим (шаблон сам подписывает его иначе). В списках
+    # ниже оно не повторяется.
+    featured_event = next(iter(upcoming_events or past_events), None)
+
     # Build index page
     tpl = env.get_template("index.html")
-    html = tpl.render(**common, latest_events=events[:6],
-                      canonical_url=f"{SITE_URL}/")
+    html = tpl.render(
+        **common,
+        featured_event=featured_event,
+        upcoming_events=[e for e in upcoming_events if e is not featured_event],
+        past_events=[e for e in past_events if e is not featured_event],
+        canonical_url=f"{SITE_URL}/",
+    )
     (OUTPUT_DIR / "index.html").write_text(html, encoding="utf-8")
 
     # Build events list page
@@ -1094,7 +1151,9 @@ def build():
     tagged_talks = sum(
         1 for e in events for t in e.get("talks", []) if t.get("tag_links")
     )
-    print(f"Built {len(events)} events, {talk_count} talks, {len(speakers)} speakers, {len(pages)} pages")
+    print(f"Built {len(events)} events ({len(upcoming_events)} upcoming, "
+          f"{len(past_events)} past), {talk_count} talks, "
+          f"{len(speakers)} speakers, {len(pages)} pages")
     print(f"Tags: {len(tags)} topics, {tagged_talks}/{talk_count} talks tagged")
     print(f"OG covers: {og_count} generated, "
           f"{len(events) - og_count} events with their own cover")

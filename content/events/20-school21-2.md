@@ -4,7 +4,6 @@ number: 20
 date: "2026-01-29"
 company: "Школа 21"
 address: "Москва, Вятская улица, 27с42, БЦ «Фактория»"
-completed: true
 type: "Offline + Online"
 short_description: "Юбилейный митап совместно со Школой 21. Доклады об архитектуре тестов на Playwright, автоматизации тест-кейсов, факапах QA-менеджера, безопасности npm, мобильных фермах и публичных выступлениях."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35WzFLiDs-1QJFl0r5t7ylD"

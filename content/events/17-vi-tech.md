@@ -4,7 +4,6 @@ number: 17
 date: "2025-11-21"
 company: "Ви Tech"
 address: "Москва, Лесная 9, вход Б, 4 этаж"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с Ви Tech. Доклады о погружении в автоматизацию, организации тестовых контуров, перф-ревью и выживании на новом проекте."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg37n_lTLslSg_DYnvnrKnxCw"

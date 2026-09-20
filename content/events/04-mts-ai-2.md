@@ -4,7 +4,6 @@ number: 4
 date: "2024-04-24"
 company: "MTS AI"
 address: "г. Москва, Подсосенский переулок 23 с2"
-completed: true
 type: "Offline + Online"
 short_description: "Четвёртый митап снова в офисе MTS AI. Доклады об инструментах тестировщика, тестировании производительности Speechkit и секретный доклад от Qameta Software."
 video_link: "https://www.youtube.com/watch?v=ASszwFTROPg"

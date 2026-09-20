@@ -4,7 +4,6 @@ number: 14
 date: "2025-07-21"
 company: "Газпромбанк.Тех"
 address: "Москва, Коровий вал, 5, БЦ Оазис"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с Газпромбанк.Тех. Доклады о Quality Gates, борьбе с флаки-тестами, компонентном тестировании и автотестах на естественном языке."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg34MttaW7M9KUl3uf5v0mALW"

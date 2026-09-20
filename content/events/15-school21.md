@@ -4,7 +4,6 @@ number: 15
 date: "2025-08-27"
 company: "Школа 21"
 address: "Москва, Вятская улица, 27с42, БЦ «Фактория»"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно со Школой 21. Доклады о метриках QA, сертификации ISTQB, карьерном росте тестировщика и переходе в менеджмент."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg363bJpBdtNfrkWMJ7SNxOU0"

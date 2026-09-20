@@ -627,3 +627,90 @@ class TestEventCoverVariants:
         assert build.event_cover_variants(remote)["sources"] == []
         assert build.event_cover_variants("")["src"] == ""
         assert build.event_cover_variants(None)["sources"] == []
+
+
+# --- Прошедшие и предстоящие ----------------------------------------------
+
+class TestMoscowToday:
+    def test_utc_evening_is_already_tomorrow_in_moscow(self):
+        """Сборка идёт в UTC, а событиям важна московская дата.
+
+        Без поправки вечерний деплой держал бы вчерашний митап в предстоящих.
+        """
+        assert build.moscow_today(
+            datetime(2026, 10, 1, 22, 30, tzinfo=timezone.utc)) == date(2026, 10, 2)
+
+    def test_same_day_during_the_working_hours(self):
+        assert build.moscow_today(
+            datetime(2026, 10, 1, 9, 0, tzinfo=timezone.utc)) == date(2026, 10, 1)
+
+    def test_nightly_rebuild_sees_the_new_day(self):
+        # Расписание в deploy.yml стоит на 01:00 UTC — это 04:00 по Москве.
+        assert build.moscow_today(
+            datetime(2026, 10, 2, 1, 0, tzinfo=timezone.utc)) == date(2026, 10, 2)
+
+
+class TestEventCompleted:
+    TODAY = date(2026, 10, 1)
+
+    def test_yesterday_is_completed(self):
+        assert build.event_completed({"date": "2026-09-30"}, self.TODAY) is True
+
+    def test_the_day_of_the_meetup_is_still_upcoming(self):
+        # Митап вечером: весь его день он ещё предстоящий.
+        assert build.event_completed({"date": "2026-10-01"}, self.TODAY) is False
+
+    def test_tomorrow_is_upcoming(self):
+        assert build.event_completed({"date": "2026-10-02"}, self.TODAY) is False
+
+    def test_event_without_a_date_is_not_completed(self):
+        assert build.event_completed({"title": "Без даты"}, self.TODAY) is False
+
+
+class TestSplitEvents:
+    def make(self, *dates):
+        return [{"slug": d, "date": d, "completed": d < "2026-10-01"} for d in dates]
+
+    def test_upcoming_go_nearest_first(self):
+        # В списке событий порядок обратный — от свежих к старым.
+        upcoming, _ = build.split_events(self.make("2026-12-01", "2026-11-01", "2026-10-05"))
+        assert [e["date"] for e in upcoming] == ["2026-10-05", "2026-11-01", "2026-12-01"]
+
+    def test_past_keep_the_archive_order(self):
+        _, past = build.split_events(self.make("2026-09-05", "2026-07-03", "2026-05-21"))
+        assert [e["date"] for e in past] == ["2026-09-05", "2026-07-03", "2026-05-21"]
+
+    def test_nothing_is_lost_or_duplicated(self):
+        events = self.make("2026-12-01", "2026-10-05", "2026-09-05", "2026-07-03")
+        upcoming, past = build.split_events(events)
+        assert len(upcoming) + len(past) == len(events)
+        assert {e["slug"] for e in upcoming} | {e["slug"] for e in past} == {
+            e["slug"] for e in events}
+
+    def test_all_past(self):
+        upcoming, past = build.split_events(self.make("2026-09-05", "2026-07-03"))
+        assert upcoming == []
+        assert len(past) == 2
+
+    def test_no_events(self):
+        assert build.split_events([]) == ([], [])
+
+
+class TestLoadedEvents:
+    """Статус и состав проставляются при загрузке — на них опираются шаблоны."""
+
+    def test_status_comes_from_the_date_not_the_front_matter(self):
+        events = build.load_events()
+        today = build.moscow_today()
+        for event in events:
+            assert event["completed"] == build.event_completed(event, today)
+
+    def test_speaker_names_are_collected_in_programme_order(self):
+        event = {"talks": [
+            {"speakers": ["Аня", "Боря"]},
+            {"speakers": ["Боря", "Вера"]},
+        ]}
+        assert build.event_speaker_names(event) == ["Аня", "Боря", "Вера"]
+
+    def test_event_without_talks_has_no_speakers(self):
+        assert build.event_speaker_names({}) == []

@@ -4,7 +4,6 @@ number: 6
 date: "2024-10-10"
 company: "РТК ИТ"
 address: "Москва, Киевское ш., 6, строение 1"
-completed: true
 type: "Offline + Online"
 short_description: "Митап совместно с РТК ИТ. Доклады о буднях автоматизаторов, тестировании Big Data и передаче знаний в команде."
 video_link: "https://www.youtube.com/playlist?list=PLH7c9nA6mg35g9rrcpBXoJm1E8Namz1ST"

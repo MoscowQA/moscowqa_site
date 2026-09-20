@@ -4,7 +4,6 @@ number: 26
 date: "2026-07-16"
 company: "Школа 21"
 address: "Москва, Вятская улица, 27с42, БЦ «Фактория»"
-completed: false
 type: "Offline + Online"
 short_description: "Юбилейный митап совместно со «Школой 21». Доклады про AI Driven Quality Gates и тестирование прошивок для спутников."
 registration_link: ""
