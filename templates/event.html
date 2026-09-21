@@ -231,6 +231,16 @@
                         {% endfor %}
                     </div>
                     {% endif %}
+                    {% if talk.slides_url or talk.record %}
+                    <div class="talk-links">
+                        {% if talk.slides_url %}
+                        <a href="{{ talk.slides_url }}" target="_blank" rel="noopener">&#128196; Слайды</a>
+                        {% endif %}
+                        {% if talk.record %}
+                        <a href="{{ talk.record }}" target="_blank" rel="noopener">&#9654; Запись</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
