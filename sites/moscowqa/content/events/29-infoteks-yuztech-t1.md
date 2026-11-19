@@ -7,7 +7,7 @@ company: "ИнфоТеКС, ГК «Юзтех» и ИТ-холдинг Т1"
 address: "Москва, Ленинградский просп., 36, стр. 41 (БЦ «Арена», 23 этаж)"
 type: "Offline + Online"
 short_description: "Новогодний митап совместно с ИнфоТеКС, ГК «Юзтех» и ИТ-холдингом Т1. Доклады про аналитику автотестов в Allure TestOps, дрейф конфигураций на тестовых стендах и тестирование инвариантов."
-registration_link: ""
+registration_link: "https://moscowqa.timepad.ru/event/4296093/"
 video_link: ""
 photos_link: ""
 talks:
