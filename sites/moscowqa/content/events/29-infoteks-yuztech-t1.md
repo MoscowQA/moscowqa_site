@@ -1,5 +1,5 @@
 ---
-title: "Moscow QA #29 x ИнфоТеКС, ГК «Юзтех» и ИТ-холдинг Т1"
+title: "Moscow QA #29"
 number: 29
 date: "2026-12-14"
 time: "18:00"
